@@ -1,9 +1,11 @@
 {
+    Double_t event_id;
     Double_t im;
     Double_t mm;
     Double_t cop;
 
     TTree* tree = new TTree("events", "events");
+    tree->Branch("event_id", &event_id);
     tree->Branch("im", &im);
     tree->Branch("mm", &mm);
     tree->Branch("cop", &cop);
@@ -30,7 +32,8 @@
 
     gRandom->SetSeed(123);
 
-    for (Int_t i = 0; i < 1e5; i++)
+    event_id = 1;
+    for (Long64_t i = 0; i < 1e5; i++)
     {
         if (gRandom->Rndm() > 0.9)
         {
@@ -50,6 +53,8 @@
         histo_mm->Fill(mm);
         histo_im_mm->Fill(im, mm);
         histo_im_mm_cop->Fill(im, mm, cop);
+
+        event_id++;
     }
 
     TFile* fout = new TFile("data.root", "recreate");
