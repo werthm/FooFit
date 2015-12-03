@@ -1,6 +1,12 @@
 cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 project(FooFit)
 
+# Mac OS X special settings
+IF(APPLE)
+    set(CMAKE_MACOSX_RPATH 1)
+    SET(CMAKE_SHARED_LIBRARY_SUFFIX ".so")
+ENDIF(APPLE)
+
 # use copied CMake modules from ROOT 6
 #set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "$ENV{ROOTSYS}/etc/cmake/")
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
@@ -10,7 +16,7 @@ list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS})
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
 
 # locate the ROOT package and defines a number of variables (e.g. ROOT_INCLUDE_DIRS)
-find_package(ROOT REQUIRED MODULE COMPONENTS MathCore RIO Hist Tree Net RooFit RooStats)
+find_package(ROOT REQUIRED MODULE COMPONENTS MathCore RIO Hist Tree Net RooFit RooFitCore RooStats)
 
 # check for RooFit support
 if(NOT ROOT_roofit_FOUND)
