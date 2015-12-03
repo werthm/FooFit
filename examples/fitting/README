@@ -1,0 +1,10 @@
+FooFit fitting examples:
+
+1) go to the 1d, 2d or 3d directory
+2) create some test data:
+   $ root -b ../CreateData.C
+3) run a fit macro:
+   $ root FitTree.C
+   $ root FitHist.C
+   $ root FitTreeHistPdf.C
+
