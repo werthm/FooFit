@@ -21,6 +21,7 @@
 #include "TH2.h"
 
 #include "FFRooFit.h"
+#include "FFFooFit.h"
 #include "FFRooModel.h"
 
 ClassImp(FFRooFit)
@@ -218,9 +219,19 @@ Bool_t FFRooFit::Fit()
     // build the model
     fModel->BuildModel(fVar);
 
+    // user info
+    Info("Fit", "Fitting using %d CPU(s) (Parallelization strategy: %d)",
+         FFFooFit::gUseNCPU, FFFooFit::gParStrat);
+
     // fit the model to the data
     if (fResult) delete fResult;
-    fResult = fModel->GetPdf()->fitTo(*fData, RooFit::Extended(), RooFit::Save());
+    fResult = fModel->GetPdf()->fitTo(*fData, RooFit::Extended(),
+                                              RooFit::Save(),
+                                              FFFooFit::gUseNCPU > 1 ?
+                                                  RooFit::NumCPU(FFFooFit::gUseNCPU, FFFooFit::gParStrat) :
+                                                  RooCmdArg::none());
+
+    // show fit result
     fResult->Print("v");
 
     // do various things after fitting
