@@ -1,6 +1,14 @@
 cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 project(FooFit)
 
+# more warnings
+add_definitions(-D_FORTIFY_SOURCE=2)
+
+# set default build type
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE "Release")
+endif()
+
 # Mac OS X special settings
 IF(APPLE)
     set(CMAKE_MACOSX_RPATH 1)
@@ -45,7 +53,7 @@ add_custom_command(TARGET FooFit POST_BUILD
                     -l ${PROJECT_BINARY_DIR}/lib/libFooFit.so
                     -d ${ROOT_LIBRARIES}
                     -c ${CMAKE_SOURCE_DIR}/include/LinkDef.h
-    COMMAND root -b ${CMAKE_SOURCE_DIR}/src/htmldoc.C'(\"${CMAKE_SOURCE_DIR}\")'
+    COMMAND root -b ${CMAKE_SOURCE_DIR}/src/htmldoc.C'(\"${CMAKE_SOURCE_DIR}\") '
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/include ${PROJECT_BINARY_DIR}/include
 )
 
