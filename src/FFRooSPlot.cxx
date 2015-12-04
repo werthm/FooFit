@@ -161,17 +161,14 @@ Bool_t FFRooSPlot::CheckSpecBounds(Int_t spec, const Char_t* loc) const
 }
 
 //______________________________________________________________________________
-Double_t FFRooSPlot::GetSpeciesWeight(Int_t i, Int_t event) const
+const Char_t* FFRooSPlot::GetSpeciesName(Int_t i) const
 {
-    // Return the weight of the species at index 'i' for the event 'event'.
+    // Return the name of the species at index 'i'.
 
     // check species index
-    if (CheckSpecBounds(i, "GetSpeciesWeight()"))
+    if (CheckSpecBounds(i, "GetSpeciesName()"))
     {
-        if (fSPlot)
-            return fSPlot->GetSWeight(event, fModel->GetParName(i));
-        else
-            return 0;
+        return fModel->GetParTitle(i);
     }
     else return 0;
 }
@@ -319,5 +316,43 @@ Bool_t FFRooSPlot::Fit()
     }
 
     return kTRUE;
+}
+
+//______________________________________________________________________________
+Int_t FFRooSPlot::GetNEvents() const
+{
+    // Return the number of fitted events.
+
+    if (fSPlot)
+        return fSPlot->GetSDataSet()->numEntries();
+    else
+        return 0;
+}
+
+//______________________________________________________________________________
+Double_t FFRooSPlot::GetEventID(Int_t event) const
+{
+    // Return the ID of the event 'event'.
+
+    if (fSPlot)
+        return fSPlot->GetSDataSet()->get(event)->getRealValue(fgBranchEventID);
+    else
+        return 0;
+}
+
+//______________________________________________________________________________
+Double_t FFRooSPlot::GetSpeciesWeight(Int_t event, Int_t i) const
+{
+    // Return the weight of the species at index 'i' for the event 'event'.
+
+    // check species index
+    if (CheckSpecBounds(i, "GetSpeciesWeight()"))
+    {
+        if (fSPlot)
+            return fSPlot->GetSWeight(event, fModel->GetParName(i));
+        else
+            return 0;
+    }
+    else return 0;
 }
 

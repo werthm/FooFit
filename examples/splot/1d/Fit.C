@@ -39,8 +39,8 @@
     {
         chain.GetEntry(event);
 
-        Double_t w_sig = splot.GetSpeciesWeight(0, event);
-        Double_t w_bg = splot.GetSpeciesWeight(1, event);
+        Double_t w_sig = splot.GetSpeciesWeight(event, 0);
+        Double_t w_bg = splot.GetSpeciesWeight(event, 1);
 
         histo_mm->Fill(mm);
         histo_mm_sig->Fill(mm, w_sig);

@@ -44,8 +44,10 @@ public:
     FFRooSPlot(TChain* chain, Int_t nVar, Int_t nSpec);
     virtual ~FFRooSPlot();
 
-    RooStats::SPlot* GetSPlot() const { return fSPlot; }
-    Double_t GetSpeciesWeight(Int_t i, Int_t event) const;
+    Int_t GetNSpecies() const { return fNSpec; }
+    FFRooModel** GetSpeciesModels() const { return fSpecModel; }
+    FFRooModel* GetSpeciesModel(Int_t i) const { return fSpecModel[i]; }
+    const Char_t* GetSpeciesName(Int_t i) const;
 
     void SetSpeciesModel(Int_t i, FFRooModel* model);
     void SetSpeciesYield(Int_t i, Double_t v);
@@ -54,6 +56,9 @@ public:
     void SetSpeciesName(Int_t i, const Char_t* name);
 
     virtual Bool_t Fit();
+    Int_t GetNEvents() const;
+    Double_t GetEventID(Int_t event) const;
+    Double_t GetSpeciesWeight(Int_t event, Int_t i) const;
 
     ClassDef(FFRooSPlot, 0)  // perform sPlot fits with RooFit
 };
