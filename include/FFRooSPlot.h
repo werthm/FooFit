@@ -45,6 +45,7 @@ public:
     virtual ~FFRooSPlot();
 
     RooStats::SPlot* GetSPlot() const { return fSPlot; }
+    Double_t GetSpeciesWeight(Int_t i, Int_t event) const;
 
     void SetSpeciesModel(Int_t i, FFRooModel* model);
     void SetSpeciesYield(Int_t i, Double_t v);

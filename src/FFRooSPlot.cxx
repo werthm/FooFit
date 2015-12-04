@@ -164,6 +164,18 @@ Bool_t FFRooSPlot::CheckSpecBounds(Int_t spec, const Char_t* loc) const
 }
 
 //______________________________________________________________________________
+Double_t FFRooSPlot::GetSpeciesWeight(Int_t i, Int_t event) const
+{
+    // Return the weight of the species at index 'i' for the event 'event'.
+
+    // check species index
+    if (CheckSpecBounds(i, "GetSpeciesWeight()"))
+    {
+        if (fSPlot) fSPlot->GetSWeight(event, fModel->GetParName(i));
+    }
+}
+
+//______________________________________________________________________________
 void FFRooSPlot::SetSpeciesYield(Int_t i, Double_t v)
 {
     // Set the yield for the species at index 'i' to the value 'v'.
