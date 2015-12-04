@@ -22,6 +22,7 @@
 #pragma link C++ nestedclasses;
 #pragma link C++ nestedtypedef;
 
+#pragma link C++ namespace FFFooFit;
 #pragma link C++ class FFRooModel+;
 #pragma link C++ class FFRooModelExpo+;
 #pragma link C++ class FFRooModelGauss+;
