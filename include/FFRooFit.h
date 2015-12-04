@@ -20,6 +20,7 @@ class RooRealVar;
 class RooAbsData;
 class RooAbsPdf;
 class RooPlot;
+class RooFitResult;
 class FFRooModel;
 class TCanvas;
 class TH2;
@@ -34,6 +35,7 @@ protected:
     RooRealVar** fVarAux;           //[fNVarAux] array of auxiliary variables (elements not owned)
     RooAbsData* fData;              // dataset
     FFRooModel* fModel;             // model (not owned)
+    RooFitResult* fResult;          // result of last fit
 
     Bool_t CheckVarBounds(Int_t var, const Char_t* loc) const;
     Bool_t CheckVariables() const;
@@ -48,7 +50,8 @@ public:
     FFRooFit() : TObject(),
                  fNVar(0), fVar(0),
                  fNVarAux(0), fVarAux(0),
-                 fData(0), fModel(0) { }
+                 fData(0), fModel(0),
+                 fResult(0) { }
     FFRooFit(Int_t nVar);
     virtual ~FFRooFit();
 
@@ -57,6 +60,7 @@ public:
     RooRealVar* GetVariable(Int_t i) const;
     RooAbsData* GetData() const { return fData; }
     FFRooModel* GetModel() const { return fModel; }
+    RooFitResult* GetResult() const { return fResult; }
 
     void SetVariable(Int_t i, const Char_t* name, const Char_t* title,
                      Double_t min, Double_t max);

@@ -15,6 +15,7 @@
 #include "RooAbsData.h"
 #include "RooAbsPdf.h"
 #include "RooPlot.h"
+#include "RooFitResult.h"
 #include "TCanvas.h"
 #include "TLegend.h"
 #include "TH2.h"
@@ -42,6 +43,7 @@ FFRooFit::FFRooFit(Int_t nVar)
     fVarAux = 0;
     fData = 0;
     fModel = 0;
+    fResult = 0;
 }
 
 //______________________________________________________________________________
@@ -57,6 +59,7 @@ FFRooFit::~FFRooFit()
     }
     if (fVarAux) delete [] fVarAux;
     if (fData) delete fData;
+    if (fResult) delete fResult;
 }
 
 //______________________________________________________________________________
@@ -216,7 +219,9 @@ Bool_t FFRooFit::Fit()
     fModel->BuildModel(fVar);
 
     // fit the model to the data
-    fModel->GetPdf()->fitTo(*fData, RooFit::Extended());
+    if (fResult) delete fResult;
+    fResult = fModel->GetPdf()->fitTo(*fData, RooFit::Extended(), RooFit::Save());
+    fResult->Print("v");
 
     // do various things after fitting
     if (!PostFit())
