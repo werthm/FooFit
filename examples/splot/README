@@ -1,0 +1,8 @@
+FooFit sPlot examples:
+
+1) go to the 1d, 2d or 3d directory
+2) create some test data:
+   $ root -b ../../CreateData.C
+3) run the fit macro:
+   $ root Fit.C
+
