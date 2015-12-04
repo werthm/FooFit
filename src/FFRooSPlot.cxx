@@ -168,8 +168,12 @@ Double_t FFRooSPlot::GetSpeciesWeight(Int_t i, Int_t event) const
     // check species index
     if (CheckSpecBounds(i, "GetSpeciesWeight()"))
     {
-        if (fSPlot) fSPlot->GetSWeight(event, fModel->GetParName(i));
+        if (fSPlot)
+            return fSPlot->GetSWeight(event, fModel->GetParName(i));
+        else
+            return 0;
     }
+    else return 0;
 }
 
 //______________________________________________________________________________
