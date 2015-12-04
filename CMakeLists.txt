@@ -39,8 +39,12 @@ ROOT_GENERATE_DICTIONARY(G__FooFit include/FF*.h LINKDEF LinkDef.h)
 add_library(FooFit SHARED ${SRCS} G__FooFit.cxx)
 target_link_libraries(FooFit ${ROOT_LIBRARIES})
 
-# copy headers to build directory
+# generate rootmap, copy headers to build directory
 add_custom_command(TARGET FooFit POST_BUILD 
+    COMMAND rlibmap -o ${PROJECT_BINARY_DIR}/lib/libFooFit.rootmap
+                    -l ${PROJECT_BINARY_DIR}/lib/libFooFit.so
+                    -d ${ROOT_LIBRARIES}
+                    -c ${CMAKE_SOURCE_DIR}/include/LinkDef.h
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/include ${PROJECT_BINARY_DIR}/include
 )
 
