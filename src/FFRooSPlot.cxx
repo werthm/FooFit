@@ -12,12 +12,9 @@
 
 
 #include "TChain.h"
-#include "TFile.h"
 #include "TMath.h"
 #include "RooStats/SPlot.h"
 #include "RooAbsPdf.h"
-
-#include "TStopwatch.h"
 
 #include "FFRooSPlot.h"
 #include "FFRooModelSum.h"
