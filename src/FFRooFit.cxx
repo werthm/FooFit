@@ -75,16 +75,17 @@ RooRealVar* FFRooFit::GetVariable(Int_t i) const
 
 //______________________________________________________________________________
 void FFRooFit::SetVariable(Int_t i, const Char_t* name, const Char_t* title,
-                           Double_t min, Double_t max)
+                           Double_t min, Double_t max, Int_t nbins)
 {
     // Set the fit variable with index 'i' to the name 'name' and title 'title', and
-    // adjust the range to the interval [min,max].
+    // adjust the range to the interval [min,max]. Use 'nbins' bins when not zero.
 
     // check variable index
     if (CheckVarBounds(i, "SetVariable()"))
     {
         if (fVar[i]) delete fVar[i];
         fVar[i] = new RooRealVar(name, title, min, max);
+        if (nbins) fVar[i]->setBins(nbins);
     }
 }
 

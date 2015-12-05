@@ -63,7 +63,7 @@ public:
     RooFitResult* GetResult() const { return fResult; }
 
     void SetVariable(Int_t i, const Char_t* name, const Char_t* title,
-                     Double_t min, Double_t max);
+                     Double_t min, Double_t max, Int_t nbins = 0);
     void SetModel(FFRooModel* model) { fModel = model; }
     void AddAuxVariable(RooRealVar* aux_var);
 
