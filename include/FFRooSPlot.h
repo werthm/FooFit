@@ -29,7 +29,7 @@ class FFRooSPlot : public FFRooFitTree
 protected:
     Int_t fNSpec;                   // number of species
     FFRooModel** fSpecModel;        //[fNSpec] array of models (objects not owned)
-    RooRealVar* fEventID;           // event id variable
+    RooRealVar* fEventID;           // event ID variable
     RooStats::SPlot* fSPlot;        // sPlot object
 
     Bool_t CheckSpecBounds(Int_t spec, const Char_t* loc) const;

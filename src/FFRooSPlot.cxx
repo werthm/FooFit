@@ -60,14 +60,14 @@ FFRooSPlot::FFRooSPlot(TChain* chain, Int_t nVar, Int_t nSpec)
         fChain = 0;
     }
 
-    // check event ids
+    // check event IDs
     if (!CheckEventID())
     {
-        Error("FFRooSPlot", "Cannot process data chain due to event id error!");
+        Error("FFRooSPlot", "Cannot process data chain due to event ID error!");
         fChain = 0;
     }
 
-    // register event id as auxiliary variable to import it into the dataset
+    // register event ID as auxiliary variable to import it into the dataset
     AddAuxVariable(fEventID);
 }
 
@@ -87,22 +87,22 @@ FFRooSPlot::~FFRooSPlot()
 //______________________________________________________________________________
 Bool_t FFRooSPlot::CheckEventID()
 {
-    // Check if the event id branch is present in the input data chain and
-    // if all event id numbers are valid.
+    // Check if the event ID branch is present in the input data chain and
+    // if all event ID numbers are valid.
     // Return kTRUE if everything is ok, otherwise kFALSE.
 
-    // check if data contains an event id branch
+    // check if data contains an event ID branch
     if (!fChain->GetBranch(fgBranchEventID))
     {
-        Error("CheckEventID", "Event id branch not found in data chain!");
+        Error("CheckEventID", "Event ID branch not found in data chain!");
         return kFALSE;
     }
 
     //
-    // check if all event id numbers do not have more than 15 significant digits
+    // check if all event ID numbers do not have more than 15 significant digits
     //
 
-    // read event id
+    // read event ID
     Double_t event_id;
     fChain->SetBranchAddress(fgBranchEventID, &event_id);
 
@@ -111,7 +111,7 @@ Bool_t FFRooSPlot::CheckEventID()
     fChain->SetBranchStatus(fgBranchEventID, 1);
 
     // user info
-    Info("CheckEventID", "Checking event ids of %.9e events...", (Double_t)fChain->GetEntries());
+    Info("CheckEventID", "Checking event IDs of %.9e events...", (Double_t)fChain->GetEntries());
 
     Int_t nerror = 0;
     for (Long64_t i = 0; i < fChain->GetEntries(); i++)
@@ -122,14 +122,14 @@ Bool_t FFRooSPlot::CheckEventID()
         // check limit
         if (TMath::Log10(event_id) >= 15)
         {
-            Error("CheckEventID", "Event id %.15g of event %lld above limit!", event_id, i);
+            Error("CheckEventID", "Event ID %.15g of event %lld above limit!", event_id, i);
             nerror++;
         }
 
         // abort when too many errors
         if (nerror > 10)
         {
-            Error("CheckEventID", "Too many invalid event ids - aborting scan!");
+            Error("CheckEventID", "Too many invalid event IDs - aborting scan!");
             break;
         }
     }
