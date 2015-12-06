@@ -9,6 +9,9 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release")
 endif()
 
+# define variables
+set(DOCS ON CACHE BOOL "create FooFit HTML documentation")
+
 # Mac OS X special settings
 IF(APPLE)
     set(CMAKE_MACOSX_RPATH 1)
@@ -47,13 +50,19 @@ ROOT_GENERATE_DICTIONARY(G__FooFit include/FF*.h LINKDEF LinkDef.h)
 add_library(FooFit SHARED ${SRCS} G__FooFit.cxx)
 target_link_libraries(FooFit ${ROOT_LIBRARIES})
 
-# generate rootmap, HTML docs, copy headers to build directory
+# generate rootmap and copy headers to build directory
 add_custom_command(TARGET FooFit POST_BUILD 
     COMMAND rlibmap -o ${PROJECT_BINARY_DIR}/lib/libFooFit.rootmap
                     -l ${PROJECT_BINARY_DIR}/lib/libFooFit.so
                     -d ${ROOT_LIBRARIES}
                     -c ${CMAKE_SOURCE_DIR}/include/LinkDef.h
-    COMMAND root -b ${CMAKE_SOURCE_DIR}/src/htmldoc.C'(\"${CMAKE_SOURCE_DIR}\") '
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/include ${PROJECT_BINARY_DIR}/include
 )
+
+# generate HTML documentation
+if (DOCS)
+    add_custom_command(TARGET FooFit POST_BUILD
+        COMMAND root -b ${CMAKE_SOURCE_DIR}/src/htmldoc.C'(\"${CMAKE_SOURCE_DIR}\") '
+    )
+endif()
 
