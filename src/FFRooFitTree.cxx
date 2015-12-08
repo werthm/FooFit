@@ -22,8 +22,9 @@
 ClassImp(FFRooFitTree)
 
 //______________________________________________________________________________
-FFRooFitTree::FFRooFitTree(TChain* chain, Int_t nVar)
-    : FFRooFit(nVar)
+FFRooFitTree::FFRooFitTree(TChain* chain, Int_t nVar,
+                           const Char_t* name, const Char_t* title)
+    : FFRooFit(nVar, name, title)
 {
     // Constructor using the tree chain 'chain' and 'nVar' fit variables.
 

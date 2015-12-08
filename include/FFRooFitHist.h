@@ -31,7 +31,8 @@ protected:
 public:
     FFRooFitHist() : FFRooFit(),
                      fHist(0) { }
-    FFRooFitHist(TH1* hist, Int_t nVar);
+    FFRooFitHist(TH1* hist, Int_t nVar,
+                 const Char_t* name = "FFRooFitHist", const Char_t* title = "a FooFit RooFit");
     virtual ~FFRooFitHist() { }
 
     TH1* GetHistogram() const { return fHist; }

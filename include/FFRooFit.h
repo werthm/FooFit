@@ -14,7 +14,7 @@
 #ifndef FOOFIT_FFRooFit
 #define FOOFIT_FFRooFit
 
-#include "TObject.h"
+#include "TNamed.h"
 
 class RooRealVar;
 class RooAbsData;
@@ -25,7 +25,7 @@ class FFRooModel;
 class TCanvas;
 class TH2;
 
-class FFRooFit : public TObject
+class FFRooFit : public TNamed
 {
 
 protected:
@@ -47,12 +47,12 @@ protected:
     static const Color_t fgColors[8];     // some colors
 
 public:
-    FFRooFit() : TObject(),
+    FFRooFit() : TNamed(),
                  fNVar(0), fVar(0),
                  fNVarAux(0), fVarAux(0),
                  fData(0), fModel(0),
                  fResult(0) { }
-    FFRooFit(Int_t nVar);
+    FFRooFit(Int_t nVar, const Char_t* name = "FFRooFit", const Char_t* title = "a FooFit RooFit");
     virtual ~FFRooFit();
 
     Int_t GetNVariable() const { return fNVar; }

@@ -22,8 +22,9 @@
 ClassImp(FFRooFitHist)
 
 //______________________________________________________________________________
-FFRooFitHist::FFRooFitHist(TH1* hist, Int_t nVar)
-    : FFRooFit(nVar)
+FFRooFitHist::FFRooFitHist(TH1* hist, Int_t nVar,
+                           const Char_t* name, const Char_t* title)
+    : FFRooFit(nVar, name, title)
 {
     // Constructor using the histogram 'hist' and 'nVar' fit variables.
 

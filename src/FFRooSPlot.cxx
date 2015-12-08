@@ -25,8 +25,9 @@ ClassImp(FFRooSPlot)
 const Char_t FFRooSPlot::fgBranchEventID[] = "event_id";
 
 //______________________________________________________________________________
-FFRooSPlot::FFRooSPlot(TChain* chain, Int_t nVar, Int_t nSpec)
-    : FFRooFitTree(chain, nVar)
+FFRooSPlot::FFRooSPlot(TChain* chain, Int_t nVar, Int_t nSpec,
+                       const Char_t* name, const Char_t* title)
+    : FFRooFitTree(chain, nVar, name, title)
 {
     // Constructor using the data chain 'chain' to fit 'nVar' variables of
     // 'nSpec' species.

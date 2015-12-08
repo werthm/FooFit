@@ -41,7 +41,8 @@ public:
     FFRooSPlot() : FFRooFitTree(),
                    fNSpec(0), fSpecModel(0),
                    fEventID(0), fSPlot(0) { }
-    FFRooSPlot(TChain* chain, Int_t nVar, Int_t nSpec);
+    FFRooSPlot(TChain* chain, Int_t nVar, Int_t nSpec,
+               const Char_t* name = "FFRooSPlot", const Char_t* title = "a FooFit RooFit");
     virtual ~FFRooSPlot();
 
     Int_t GetNSpecies() const { return fNSpec; }

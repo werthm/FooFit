@@ -31,8 +31,8 @@ const Color_t FFRooFit::fgColors[8] = { kBlue, kRed, kMagenta, kCyan,
                                         kOrange-1, kGray, kYellow-6, 28 };
 
 //______________________________________________________________________________
-FFRooFit::FFRooFit(Int_t nVar)
-    : TObject()
+FFRooFit::FFRooFit(Int_t nVar, const Char_t* name, const Char_t* title)
+    : TNamed(name, title)
 {
     // Constructor using 'nVar' fit variables.
 
@@ -408,7 +408,8 @@ TCanvas* FFRooFit::DrawFit()
     if (fNVar == 1)
     {
         // create the canvas
-        TCanvas* canvas = new TCanvas("FFRooFit", "FFRooFit result", 700, 500);
+        sprintf(tmp, "Result of %s", GetTitle());
+        TCanvas* canvas = new TCanvas(GetName(), tmp, 700, 500);
 
         // plot data and model projection
         RooPlot* p = PlotDataAndModel(0);
@@ -421,7 +422,8 @@ TCanvas* FFRooFit::DrawFit()
     {
         // create the canvas
         Int_t nPad = 1;
-        TCanvas* canvas = new TCanvas("FFRooFit", "FFRooFit result", 900, 800);
+        sprintf(tmp, "Result of %s", GetTitle());
+        TCanvas* canvas = new TCanvas(GetName(), tmp, 900, 800);
         if (fNVar == 2) canvas->Divide(2, 3);
         else if (fNVar == 3) canvas->Divide(3, 4);
 

@@ -31,7 +31,8 @@ protected:
 public:
     FFRooFitTree() : FFRooFit(),
                      fChain(0) { }
-    FFRooFitTree(TChain* chain, Int_t nVar);
+    FFRooFitTree(TChain* chain, Int_t nVar,
+                 const Char_t* name = "FFRooFitTree", const Char_t* title = "a FooFit RooFit");
     virtual ~FFRooFitTree() { }
 
     TChain* GetChain() const { return fChain; }
