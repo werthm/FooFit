@@ -270,6 +270,10 @@ RooPlot* FFRooFit::PlotDataAndModel(Int_t var)
     // create plot
     RooPlot* frame = fVar[var]->frame();
 
+    // name plot
+    sprintf(tmp, "%s_Variable_%s", GetName(), fVar[var]->GetName());
+    frame->SetName(tmp);
+
     // plot data
     fData->plotOn(frame, RooFit::DataError(RooAbsData::SumW2));
 
