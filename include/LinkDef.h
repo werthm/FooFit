@@ -30,6 +30,7 @@
 #pragma link C++ class FFRooModelPol+;
 #pragma link C++ class FFRooModelProd+;
 #pragma link C++ class FFRooModelSum+;
+#pragma link C++ class FFRooModelKeys+;
 #pragma link C++ class FFRooFit+;
 #pragma link C++ class FFRooFitHist+;
 #pragma link C++ class FFRooFitTree+;
