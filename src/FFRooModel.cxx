@@ -189,3 +189,19 @@ void FFRooModel::SetParTitle(Int_t i, const Char_t* title)
     }
 }
 
+//______________________________________________________________________________
+void FFRooModel::FixParameter(Int_t i, Double_t v)
+{
+    // Fix the value of the parameter at index 'i' to 'v'.
+
+    // check parameter index
+    if (CheckParBounds(i, "FixParameter()"))
+    {
+        if (fPar[i])
+        {
+            fPar[i]->setVal(v);
+            fPar[i]->setConstant(kTRUE);
+        }
+    }
+}
+

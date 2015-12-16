@@ -49,6 +49,7 @@ public:
     void SetParLimits(Int_t i, Double_t min, Double_t max);
     void SetParName(Int_t i, const Char_t* name);
     void SetParTitle(Int_t i, const Char_t* title);
+    void FixParameter(Int_t i, Double_t v);
 
     virtual void BuildModel(RooRealVar** vars) = 0;
 
