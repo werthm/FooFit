@@ -41,8 +41,8 @@ protected:
     Bool_t CheckVariables() const;
     Bool_t ContainsVariable(RooAbsPdf* pdf, Int_t var, Bool_t excl = kFALSE) const;
     virtual Bool_t LoadData() = 0;
-    virtual Bool_t PreFit() = 0;
-    virtual Bool_t PostFit() = 0;
+    virtual Bool_t PreFit();
+    virtual Bool_t PostFit();
 
     static const Color_t fgColors[8];     // some colors
 

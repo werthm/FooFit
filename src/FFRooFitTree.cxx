@@ -65,21 +65,3 @@ Bool_t FFRooFitTree::LoadData()
     return kTRUE;
 }
 
-//______________________________________________________________________________
-Bool_t FFRooFitTree::PreFit()
-{
-    // Perform tasks before fitting.
-    // Return kTRUE on success, otherwise kFALSE.
-
-    return kTRUE;
-}
-
-//______________________________________________________________________________
-Bool_t FFRooFitTree::PostFit()
-{
-    // Perform tasks after fitting.
-    // Return kTRUE on success, otherwise kFALSE.
-
-    return kTRUE;
-}
-

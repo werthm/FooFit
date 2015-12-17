@@ -25,8 +25,6 @@ protected:
     TChain* fChain;                 // chain of trees (not owned)
 
     virtual Bool_t LoadData();
-    virtual Bool_t PreFit();
-    virtual Bool_t PostFit();
 
 public:
     FFRooFitTree() : FFRooFit(),

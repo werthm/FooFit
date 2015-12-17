@@ -25,8 +25,6 @@ protected:
     TH1* fHist;                     // histogram (not owned)
 
     virtual Bool_t LoadData();
-    virtual Bool_t PreFit();
-    virtual Bool_t PostFit();
 
 public:
     FFRooFitHist() : FFRooFit(),

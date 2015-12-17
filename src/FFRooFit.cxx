@@ -181,6 +181,24 @@ Bool_t FFRooFit::ContainsVariable(RooAbsPdf* pdf, Int_t var, Bool_t excl) const
 }
 
 //______________________________________________________________________________
+Bool_t FFRooFit::PreFit()
+{
+    // Perform tasks before fitting.
+    // Return kTRUE on success, otherwise kFALSE.
+
+    return kTRUE;
+}
+
+//______________________________________________________________________________
+Bool_t FFRooFit::PostFit()
+{
+    // Perform tasks after fitting.
+    // Return kTRUE on success, otherwise kFALSE.
+
+    return kTRUE;
+}
+
+//______________________________________________________________________________
 Bool_t FFRooFit::Fit()
 {
     // Perform a RooFit-based fit.
@@ -196,17 +214,17 @@ Bool_t FFRooFit::Fit()
         return kFALSE;
     }
 
-    // do various things before fitting
-    if (!PreFit())
-    {
-        Error("Fit", "An error occurred during the pre-fit routine!");
-        return kFALSE;
-    }
-
     // check data
     if (!fData)
     {
         Error("Fit", "No fit data found!");
+        return kFALSE;
+    }
+
+    // do various things before fitting
+    if (!PreFit())
+    {
+        Error("Fit", "An error occurred during the pre-fit routine!");
         return kFALSE;
     }
 

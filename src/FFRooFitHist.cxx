@@ -60,21 +60,3 @@ Bool_t FFRooFitHist::LoadData()
     return kTRUE;
 }
 
-//______________________________________________________________________________
-Bool_t FFRooFitHist::PreFit()
-{
-    // Perform tasks before fitting.
-    // Return kTRUE on success, otherwise kFALSE.
-
-    return kTRUE;
-}
-
-//______________________________________________________________________________
-Bool_t FFRooFitHist::PostFit()
-{
-    // Perform tasks after fitting.
-    // Return kTRUE on success, otherwise kFALSE.
-
-    return kTRUE;
-}
-
