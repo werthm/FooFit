@@ -42,6 +42,8 @@ FFRooFit::FFRooFit(Int_t nVar, const Char_t* name, const Char_t* title)
     for (Int_t i = 0; i < fNVar; i++) fVar[i] = 0;
     fNVarAux = 0;
     fVarAux = 0;
+    fNVarCtrl = 0;
+    fVarCtrl = 0;
     fData = 0;
     fModel = 0;
     fResult = 0;
@@ -59,6 +61,12 @@ FFRooFit::~FFRooFit()
         delete [] fVar;
     }
     if (fVarAux) delete [] fVarAux;
+    if (fVarCtrl)
+    {
+        for (Int_t i = 0; i < fNVarCtrl; i++)
+            if (fVarCtrl[i]) delete fVarCtrl[i];
+        delete [] fVarCtrl;
+    }
     if (fData) delete fData;
     if (fResult) delete fResult;
 }
@@ -106,6 +114,32 @@ void FFRooFit::AddAuxVariable(RooRealVar* aux_var)
     // add new element
     fVarAux[fNVarAux] = aux_var;
     fNVarAux++;
+
+    // destroy old list
+    if (old) delete [] old;
+}
+
+//______________________________________________________________________________
+void FFRooFit::AddControlVariable(const Char_t* name, const Char_t* title)
+{
+    // Add a control variable with name 'name' and title 'title' to the list
+    // of control variables. The name of the variable has to match a column
+    // in the RooDataSet.
+
+    // backup old array
+    RooRealVar** old = fVarCtrl;
+
+    // create new array
+    fVarCtrl = new RooRealVar*[fNVarCtrl+1];
+    for (Int_t i = 0; i < fNVarCtrl; i++) fVarCtrl[i] = old[i];
+
+    // add new element
+    RooRealVar* v = new RooRealVar(name, title, -RooNumber::infinity(), RooNumber::infinity());
+    fVarCtrl[fNVarCtrl] = v;
+    fNVarCtrl++;
+
+    // register control variable as auxiliary variable
+    AddAuxVariable(v);
 
     // destroy old list
     if (old) delete [] old;

@@ -33,6 +33,8 @@ protected:
     RooRealVar** fVar;              //[fNVar] array of fit variables
     Int_t fNVarAux;                 // number of auxiliary variables (not to be fitted)
     RooRealVar** fVarAux;           //[fNVarAux] array of auxiliary variables (elements not owned)
+    Int_t fNVarCtrl;                // number of control variables
+    RooRealVar** fVarCtrl;          //[fNCtrlVar] array of control variables (subset of aux. vars.)
     RooAbsData* fData;              // dataset
     FFRooModel* fModel;             // model (not owned)
     RooFitResult* fResult;          // result of last fit
@@ -50,6 +52,7 @@ public:
     FFRooFit() : TNamed(),
                  fNVar(0), fVar(0),
                  fNVarAux(0), fVarAux(0),
+                 fNVarCtrl(0), fVarCtrl(0),
                  fData(0), fModel(0),
                  fResult(0) { }
     FFRooFit(Int_t nVar, const Char_t* name = "FFRooFit", const Char_t* title = "a FooFit RooFit");
@@ -66,6 +69,7 @@ public:
                      Double_t min, Double_t max, Int_t nbins = 0);
     void SetModel(FFRooModel* model) { fModel = model; }
     void AddAuxVariable(RooRealVar* aux_var);
+    void AddControlVariable(const Char_t* name, const Char_t* title);
 
     virtual Bool_t Fit();
     TCanvas* DrawFit();
