@@ -220,6 +220,94 @@ Bool_t FFRooFit::PreFit()
     // Perform tasks before fitting.
     // Return kTRUE on success, otherwise kFALSE.
 
+    Char_t ws[256];
+    Int_t maxLen;
+
+    //
+    // calculate correlations between fit variables
+    //
+
+    if (fNVar > 1)
+    {
+        // formatting stuff
+        maxLen = 0;
+        for (Int_t i = 0; i < fNVar; i++)
+            maxLen = TMath::Max(maxLen, (Int_t)strlen(fVar[i]->GetTitle()));
+
+        printf("\n");
+        printf("  Fit variable correlations\n");
+        printf("\n");
+
+        // loop over fit variables
+        for (Int_t i = 0; i < fNVar; i++)
+        {
+            // loop over fit variables
+            for (Int_t j = i+1; j < fNVar; j++)
+            {
+                if (j == i+1)
+                    printf("    Fit variable '%s'\n", fVar[i]->GetTitle());
+
+                // calculate correlation
+                Double_t corr = fData->correlation(*fVar[i], *fVar[j]);
+
+                // format and print
+                Int_t l = 0;
+                for (Int_t k = strlen(fVar[j]->GetTitle()); k <= maxLen; k++)
+                {
+                    ws[l] = ' ';
+                    ws[l+1] = '\0';
+                    l++;
+                }
+                printf("      to fit variable '%s'%s: %8.5f\n",
+                       fVar[j]->GetTitle(), ws, corr);
+            }
+
+            printf("\n");
+        }
+    }
+
+    //
+    // calculate correlations between fit and control variables
+    //
+
+    if (fNVarCtrl)
+    {
+        // formatting stuff
+        maxLen = 0;
+        for (Int_t i = 0; i < fNVarCtrl; i++)
+            maxLen = TMath::Max(maxLen, (Int_t)strlen(fVarCtrl[i]->GetTitle()));
+
+        if (fNVar == 1) printf("\n");
+        printf("  Fit-Control variable correlations\n");
+        printf("\n");
+
+        // loop over fit variables
+        for (Int_t i = 0; i < fNVar; i++)
+        {
+            printf("    Fit variable '%s'\n", fVar[i]->GetTitle());
+
+            // loop over control variables
+            for (Int_t j = 0; j < fNVarCtrl; j++)
+            {
+                // calculate correlation
+                Double_t corr = fData->correlation(*fVar[i], *fVarCtrl[j]);
+
+                // format and print
+                Int_t l = 0;
+                for (Int_t k = strlen(fVarCtrl[j]->GetTitle()); k <= maxLen; k++)
+                {
+                    ws[l] = ' ';
+                    ws[l+1] = '\0';
+                    l++;
+                }
+                printf("      to control variable '%s'%s: %8.5f\n",
+                       fVarCtrl[j]->GetTitle(), ws, corr);
+            }
+
+            printf("\n");
+        }
+    }
+
     return kTRUE;
 }
 
