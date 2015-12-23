@@ -13,10 +13,10 @@ endif()
 set(DOCS ON CACHE BOOL "create FooFit HTML documentation")
 
 # Mac OS X special settings
-IF(APPLE)
+if(APPLE)
     set(CMAKE_MACOSX_RPATH 1)
-    SET(CMAKE_SHARED_LIBRARY_SUFFIX ".so")
-ENDIF(APPLE)
+    set(CMAKE_SHARED_LIBRARY_SUFFIX ".so")
+endif(APPLE)
 
 # use copied CMake modules from ROOT 6
 #set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "$ENV{ROOTSYS}/etc/cmake/")
