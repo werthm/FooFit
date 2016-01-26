@@ -16,6 +16,7 @@
 #include "RooDataSet.h"
 #include "RooGlobalFunc.h"
 #include "TChain.h"
+#include "TMath.h"
 
 #include "FFRooFitTree.h"
 
@@ -62,6 +63,55 @@ Bool_t FFRooFitTree::LoadData()
     Info("LoadData", "Entries in data chain     : %.9e", (Double_t)fChain->GetEntries());
     Info("LoadData", "Entries in RooFit dataset : %.9e", (Double_t)nEntries);
 
-    return kTRUE;
+    // check data by looping over all data points
+    Bool_t badData = kFALSE;
+    for (Int_t i = 0; i < nEntries; i++)
+    {
+        // get entry
+        const RooArgSet* set = fData->get(i);
+
+        // loop over variables
+        Bool_t badRow = kFALSE;
+        for (Int_t j = 0; j < fNVar; j++)
+        {
+            RooRealVar* var = (RooRealVar*)set->find(fVar[j]->GetName());
+
+            // check value
+            if (TMath::IsNaN(var->getVal()))
+            {
+                badRow = kTRUE;
+                break;
+            }
+        }
+
+        // check row
+        if (badRow)
+        {
+            // format bad row
+            TString tmp;
+            for (Int_t j = 0; j < fNVar; j++)
+            {
+                RooRealVar* var = (RooRealVar*)set->find(fVar[j]->GetName());
+                tmp.Append(TString::Format("%s: %e  ", fVar[j]->GetName(), var->getVal()));
+            }
+            for (Int_t j = 0; j < fNVarAux; j++)
+            {
+                RooRealVar* var = (RooRealVar*)set->find(fVarAux[j]->GetName());
+                tmp.Append(TString::Format("%s: %e  ", fVarAux[j]->GetName(), var->getVal()));
+            }
+
+            Error("LoadData", "NaN at row %d: %s", i, tmp.Data());
+            badData = kTRUE;
+        }
+    }
+
+    // check overall data status
+    if (badData)
+    {
+        Error("LoadData", "Invalid data in data chain!");
+        return kFALSE;
+    }
+    else
+        return kTRUE;
 }
 
