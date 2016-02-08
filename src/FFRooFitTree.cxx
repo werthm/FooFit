@@ -1,5 +1,5 @@
 /*************************************************************************
- * Author: Dominik Werthmueller, 2015
+ * Author: Dominik Werthmueller, 2015-2016
  *************************************************************************/
 
 //////////////////////////////////////////////////////////////////////////
@@ -24,13 +24,33 @@ ClassImp(FFRooFitTree)
 
 //______________________________________________________________________________
 FFRooFitTree::FFRooFitTree(TChain* chain, Int_t nVar,
-                           const Char_t* name, const Char_t* title)
+                           const Char_t* name, const Char_t* title,
+                           const Char_t* weightVar)
     : FFRooFit(nVar, name, title)
 {
     // Constructor using the tree chain 'chain' and 'nVar' fit variables.
+    // If 'weightVar' is non-zero, create a weighted dataset using this
+    // tree variable to read the weights from.
 
     // init members
     fChain = chain;
+    if (weightVar)
+    {
+        fWeights = new RooRealVar(weightVar, "Event Weights",
+                                  -RooNumber::infinity(), RooNumber::infinity());
+        AddAuxVariable(fWeights);
+        Info("FFRooFitTree", "Using variable '%s' as weights", weightVar);
+    }
+    else
+        fWeights = 0;
+}
+
+//______________________________________________________________________________
+FFRooFitTree::~FFRooFitTree()
+{
+    // Destructor.
+
+    if (fWeights) delete fWeights;
 }
 
 //______________________________________________________________________________
@@ -56,7 +76,16 @@ Bool_t FFRooFitTree::LoadData()
 
     // create RooFit dataset
     if (fData) delete fData;
-    fData = new RooDataSet(fChain->GetName(), fChain->GetTitle(), varSet, RooFit::Import(*fChain));
+    if (fWeights)
+    {
+        fData = new RooDataSet(fChain->GetName(), fChain->GetTitle(), varSet,
+                               RooFit::Import(*fChain), RooFit::WeightVar(*fWeights));
+    }
+    else
+    {
+        fData = new RooDataSet(fChain->GetName(), fChain->GetTitle(), varSet,
+                               RooFit::Import(*fChain));
+    }
 
     // user info
     Int_t nEntries = fData->numEntries();

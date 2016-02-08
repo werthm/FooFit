@@ -1,5 +1,5 @@
 /*************************************************************************
- * Author: Dominik Werthmueller, 2015
+ * Author: Dominik Werthmueller, 2015-2016
  *************************************************************************/
 
 //////////////////////////////////////////////////////////////////////////
@@ -23,15 +23,17 @@ class FFRooFitTree : public FFRooFit
 
 protected:
     TChain* fChain;                 // chain of trees (not owned)
+    RooRealVar* fWeights;           // weights variable
 
     virtual Bool_t LoadData();
 
 public:
     FFRooFitTree() : FFRooFit(),
-                     fChain(0) { }
+                     fChain(0), fWeights(0) { }
     FFRooFitTree(TChain* chain, Int_t nVar,
-                 const Char_t* name = "FFRooFitTree", const Char_t* title = "a FooFit RooFit");
-    virtual ~FFRooFitTree() { }
+                 const Char_t* name = "FFRooFitTree", const Char_t* title = "a FooFit RooFit",
+                 const Char_t* weightVar = 0);
+    virtual ~FFRooFitTree();
 
     TChain* GetChain() const { return fChain; }
 
