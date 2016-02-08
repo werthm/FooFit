@@ -1,5 +1,5 @@
 /*************************************************************************
- * Author: Dominik Werthmueller, 2015
+ * Author: Dominik Werthmueller, 2015-2016
  *************************************************************************/
 
 //////////////////////////////////////////////////////////////////////////
@@ -341,6 +341,19 @@ Bool_t FFRooFit::Fit()
     {
         Error("Fit", "No fit data found!");
         return kFALSE;
+    }
+
+    // check for weighted data set
+    if (fData->isWeighted())
+    {
+        Info("Fit", "Using weighted dataset");
+
+        // check for missing weights
+        if (fData->sumEntries() == 0)
+        {
+            Error("Fit", "Missing weights - check weights configuration!");
+            return kFALSE;
+        }
     }
 
     // do various things before fitting
