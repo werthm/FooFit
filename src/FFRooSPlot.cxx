@@ -1,5 +1,5 @@
 /*************************************************************************
- * Author: Dominik Werthmueller, 2015
+ * Author: Dominik Werthmueller, 2015-2016
  *************************************************************************/
 
 //////////////////////////////////////////////////////////////////////////
@@ -26,11 +26,14 @@ const Char_t FFRooSPlot::fgBranchEventID[] = "event_id";
 
 //______________________________________________________________________________
 FFRooSPlot::FFRooSPlot(TChain* chain, Int_t nVar, Int_t nSpec,
-                       const Char_t* name, const Char_t* title)
-    : FFRooFitTree(chain, nVar, name, title)
+                       const Char_t* name, const Char_t* title,
+                       const Char_t* weightVar)
+    : FFRooFitTree(chain, nVar, name, title, weightVar)
 {
     // Constructor using the data chain 'chain' to fit 'nVar' variables of
     // 'nSpec' species.
+    // If 'weightVar' is non-zero, create a weighted dataset using this
+    // tree variable to read the weights from.
 
     Char_t tmp[256];
 
