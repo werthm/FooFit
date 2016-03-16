@@ -38,7 +38,7 @@ endif()
 include(${ROOT_USE_FILE})
 
 # source file globbing
-file(GLOB SRCS src/*.cxx)
+file(GLOB SRCS src/FF*.cxx)
 
 # header directory
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
