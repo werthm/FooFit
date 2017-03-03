@@ -18,8 +18,7 @@ if(APPLE)
     set(CMAKE_SHARED_LIBRARY_SUFFIX ".so")
 endif(APPLE)
 
-# use copied CMake modules from ROOT 6
-#set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "$ENV{ROOTSYS}/etc/cmake/")
+# load ROOT CMake modules
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS})
 
@@ -44,20 +43,34 @@ file(GLOB SRCS src/FF*.cxx)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 # create the dictionary
-ROOT_GENERATE_DICTIONARY(G__FooFit include/FF*.h LINKDEF LinkDef.h)
+if (ROOT_VERSION VERSION_GREATER 6)
+    ROOT_GENERATE_DICTIONARY(G__FooFit include/FF*.h LINKDEF LinkDef.h
+                             OPTIONS -rml libFooFit.so -rmf libFooFit.rootmap)
+else()
+    ROOT_GENERATE_DICTIONARY(G__FooFit include/FF*.h LINKDEF LinkDef.h)
+endif()
 
 # create the shared library
 add_library(FooFit SHARED ${SRCS} G__FooFit.cxx)
 target_link_libraries(FooFit ${ROOT_LIBRARIES})
 
-# generate rootmap and copy headers to build directory
-add_custom_command(TARGET FooFit POST_BUILD 
-    COMMAND rlibmap -o ${PROJECT_BINARY_DIR}/lib/libFooFit.rootmap
-                    -l ${PROJECT_BINARY_DIR}/lib/libFooFit.so
-                    -d ${ROOT_LIBRARIES}
-                    -c ${CMAKE_SOURCE_DIR}/include/LinkDef.h
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/include ${PROJECT_BINARY_DIR}/include
-)
+# generate rootmap
+if (ROOT_VERSION VERSION_LESS 6)
+    add_custom_command(TARGET FooFit POST_BUILD
+        COMMAND rlibmap -o ${PROJECT_BINARY_DIR}/lib/libFooFit.rootmap
+                        -l ${PROJECT_BINARY_DIR}/lib/libFooFit.so
+                        -d ${ROOT_LIBRARIES}
+                        -c ${CMAKE_SOURCE_DIR}/include/LinkDef.h
+    )
+endif()
+
+# copy rootmaps and pcm files
+if (ROOT_VERSION VERSION_GREATER 6)
+    add_custom_command(TARGET FooFit POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_BINARY_DIR}/libFooFit.rootmap ${PROJECT_BINARY_DIR}/lib
+        COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_BINARY_DIR}/G__FooFit_rdict.pcm ${PROJECT_BINARY_DIR}/lib
+    )
+endif()
 
 # generate HTML documentation
 if (DOCS)
