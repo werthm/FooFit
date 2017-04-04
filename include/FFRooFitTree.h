@@ -16,28 +16,28 @@
 
 #include "FFRooFit.h"
 
-class TChain;
+class TTree;
 
 class FFRooFitTree : public FFRooFit
 {
 
 protected:
-    TChain* fChain;                 // chain of trees (not owned)
+    TTree* fTree;                   // input tree (not owned)
     RooRealVar* fWeights;           // weights variable
 
     virtual Bool_t LoadData();
 
 public:
     FFRooFitTree() : FFRooFit(),
-                     fChain(0), fWeights(0) { }
-    FFRooFitTree(TChain* chain, Int_t nVar,
+                     fTree(0), fWeights(0) { }
+    FFRooFitTree(TTree* tree, Int_t nVar,
                  const Char_t* name = "FFRooFitTree", const Char_t* title = "a FooFit RooFit",
                  const Char_t* weightVar = 0);
     virtual ~FFRooFitTree();
 
-    TChain* GetChain() const { return fChain; }
+    TTree* GetTree() const { return fTree; }
 
-    void SetChain(TChain* chain) { fChain = chain; }
+    void SetTree(TTree* tree) { fTree = tree; }
 
     ClassDef(FFRooFitTree, 0)  // Fit trees using RooFit
 };

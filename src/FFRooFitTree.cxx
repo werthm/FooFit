@@ -15,7 +15,7 @@
 #include "RooRealVar.h"
 #include "RooDataSet.h"
 #include "RooGlobalFunc.h"
-#include "TChain.h"
+#include "TTree.h"
 #include "TMath.h"
 
 #include "FFRooFitTree.h"
@@ -23,17 +23,17 @@
 ClassImp(FFRooFitTree)
 
 //______________________________________________________________________________
-FFRooFitTree::FFRooFitTree(TChain* chain, Int_t nVar,
+FFRooFitTree::FFRooFitTree(TTree* tree, Int_t nVar,
                            const Char_t* name, const Char_t* title,
                            const Char_t* weightVar)
     : FFRooFit(nVar, name, title)
 {
-    // Constructor using the tree chain 'chain' and 'nVar' fit variables.
+    // Constructor using the tree 'tree' and 'nVar' fit variables.
     // If 'weightVar' is non-zero, create a weighted dataset using this
     // tree variable to read the weights from.
 
     // init members
-    fChain = chain;
+    fTree = tree;
     if (weightVar)
     {
         fWeights = new RooRealVar(weightVar, "Event Weights",
@@ -62,10 +62,10 @@ Bool_t FFRooFitTree::LoadData()
     // check fit variables
     if (!CheckVariables()) return kFALSE;
 
-    // check chain
-    if (!fChain)
+    // check tree
+    if (!fTree)
     {
-        Error("LoadData", "Input data chain was not set!");
+        Error("LoadData", "Input data tree was not set!");
         return kFALSE;
     }
 
@@ -78,18 +78,18 @@ Bool_t FFRooFitTree::LoadData()
     if (fData) delete fData;
     if (fWeights)
     {
-        fData = new RooDataSet(fChain->GetName(), fChain->GetTitle(), varSet,
-                               RooFit::Import(*fChain), RooFit::WeightVar(*fWeights));
+        fData = new RooDataSet(fTree->GetName(), fTree->GetTitle(), varSet,
+                               RooFit::Import(*fTree), RooFit::WeightVar(*fWeights));
     }
     else
     {
-        fData = new RooDataSet(fChain->GetName(), fChain->GetTitle(), varSet,
-                               RooFit::Import(*fChain));
+        fData = new RooDataSet(fTree->GetName(), fTree->GetTitle(), varSet,
+                               RooFit::Import(*fTree));
     }
 
     // user info
     Int_t nEntries = fData->numEntries();
-    Info("LoadData", "Entries in data chain     : %.9e", (Double_t)fChain->GetEntries());
+    Info("LoadData", "Entries in data tree      : %.9e", (Double_t)fTree->GetEntries());
     Info("LoadData", "Entries in RooFit dataset : %.9e", (Double_t)nEntries);
 
     // check data by looping over all data points
@@ -137,7 +137,7 @@ Bool_t FFRooFitTree::LoadData()
     // check overall data status
     if (badData)
     {
-        Error("LoadData", "Invalid data in data chain!");
+        Error("LoadData", "Invalid data in data tree!");
         return kFALSE;
     }
     else

@@ -11,7 +11,7 @@
 //////////////////////////////////////////////////////////////////////////
 
 
-#include "TChain.h"
+#include "TTree.h"
 #include "TMath.h"
 #include "RooStats/SPlot.h"
 #include "RooAbsPdf.h"
@@ -22,12 +22,12 @@
 ClassImp(FFRooSPlot)
 
 //______________________________________________________________________________
-FFRooSPlot::FFRooSPlot(TChain* chain, Int_t nVar, Int_t nSpec,
+FFRooSPlot::FFRooSPlot(TTree* tree, Int_t nVar, Int_t nSpec,
                        const Char_t* name, const Char_t* title,
                        const Char_t* evIDVar, const Char_t* weightVar)
-    : FFRooFitTree(chain, nVar, name, title, weightVar)
+    : FFRooFitTree(tree, nVar, name, title, weightVar)
 {
-    // Constructor using the data chain 'chain' to fit 'nVar' variables of
+    // Constructor using the data tree 'tree' to fit 'nVar' variables of
     // 'nSpec' species.
     // The tree variable of the event ID can be specified with 'evIDVar'.
     // If 'weightVar' is non-zero, create a weighted dataset using this
@@ -56,17 +56,17 @@ FFRooSPlot::FFRooSPlot(TChain* chain, Int_t nVar, Int_t nSpec,
 
     // check number of entries (RooDataSet uses Int_t as entry number)
     const Long64_t max_int = ~(1 << 31);
-    if (fChain->GetEntries() > max_int)
+    if (fTree->GetEntries() > max_int)
     {
         Error("FFRooSPlot", "Cannot process more than %lld entries!", max_int);
-        fChain = 0;
+        fTree = 0;
     }
 
     // check event IDs
     if (!CheckEventID())
     {
-        Error("FFRooSPlot", "Cannot process data chain due to event ID error!");
-        fChain = 0;
+        Error("FFRooSPlot", "Cannot process data tree due to event ID error!");
+        fTree = 0;
     }
 
     // register event ID as auxiliary variable to import it into the dataset
@@ -89,14 +89,14 @@ FFRooSPlot::~FFRooSPlot()
 //______________________________________________________________________________
 Bool_t FFRooSPlot::CheckEventID()
 {
-    // Check if the event ID branch is present in the input data chain and
+    // Check if the event ID branch is present in the input data tree and
     // if all event ID numbers are valid.
     // Return kTRUE if everything is ok, otherwise kFALSE.
 
     // check if data contains an event ID branch
-    if (!fChain->GetBranch(fEventID->GetName()))
+    if (!fTree->GetBranch(fEventID->GetName()))
     {
-        Error("CheckEventID", "Event ID branch not found in data chain!");
+        Error("CheckEventID", "Event ID branch not found in data tree!");
         return kFALSE;
     }
 
@@ -106,20 +106,20 @@ Bool_t FFRooSPlot::CheckEventID()
 
     // read event ID
     Double_t event_id;
-    fChain->SetBranchAddress(fEventID->GetName(), &event_id);
+    fTree->SetBranchAddress(fEventID->GetName(), &event_id);
 
     // do not read other branches
-    fChain->SetBranchStatus("*", 0);
-    fChain->SetBranchStatus(fEventID->GetName(), 1);
+    fTree->SetBranchStatus("*", 0);
+    fTree->SetBranchStatus(fEventID->GetName(), 1);
 
     // user info
-    Info("CheckEventID", "Checking event IDs of %.9e events...", (Double_t)fChain->GetEntries());
+    Info("CheckEventID", "Checking event IDs of %.9e events...", (Double_t)fTree->GetEntries());
 
     Int_t nerror = 0;
-    for (Long64_t i = 0; i < fChain->GetEntries(); i++)
+    for (Long64_t i = 0; i < fTree->GetEntries(); i++)
     {
         // read entry
-        fChain->GetEntry(i);
+        fTree->GetEntry(i);
 
         // check limit
         if (TMath::Log10(event_id) >= 15)
@@ -137,8 +137,8 @@ Bool_t FFRooSPlot::CheckEventID()
     }
 
     // reset branch addresses
-    fChain->ResetBranchAddresses();
-    fChain->SetBranchStatus("*", 1);
+    fTree->ResetBranchAddresses();
+    fTree->SetBranchStatus("*", 1);
 
     // check errors
     if (nerror) return kFALSE;
