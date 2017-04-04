@@ -10,7 +10,7 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 # define variables
-set(DOCS ON CACHE BOOL "create FooFit HTML documentation")
+set(DOCS OFF CACHE BOOL "create FooFit HTML documentation")
 
 # Mac OS X special settings
 if(APPLE)
