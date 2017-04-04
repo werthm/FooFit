@@ -21,17 +21,15 @@
 
 ClassImp(FFRooSPlot)
 
-// init static class members
-const Char_t FFRooSPlot::fgBranchEventID[] = "event_id";
-
 //______________________________________________________________________________
 FFRooSPlot::FFRooSPlot(TChain* chain, Int_t nVar, Int_t nSpec,
                        const Char_t* name, const Char_t* title,
-                       const Char_t* weightVar)
+                       const Char_t* evIDVar, const Char_t* weightVar)
     : FFRooFitTree(chain, nVar, name, title, weightVar)
 {
     // Constructor using the data chain 'chain' to fit 'nVar' variables of
     // 'nSpec' species.
+    // The tree variable of the event ID can be specified with 'evIDVar'.
     // If 'weightVar' is non-zero, create a weighted dataset using this
     // tree variable to read the weights from.
 
@@ -41,7 +39,7 @@ FFRooSPlot::FFRooSPlot(TChain* chain, Int_t nVar, Int_t nSpec,
     fNSpec = nSpec;
     fSpecModel = new FFRooModel*[fNSpec];
     for (Int_t i = 0; i < fNSpec; i++) fSpecModel[i] = 0;
-    fEventID = new RooRealVar(fgBranchEventID, "Event ID", 0, 9.99999999999999e14);
+    fEventID = new RooRealVar(evIDVar, "Event ID", 0, 9.99999999999999e14);
     fSPlot = 0;
 
     // create model
@@ -96,7 +94,7 @@ Bool_t FFRooSPlot::CheckEventID()
     // Return kTRUE if everything is ok, otherwise kFALSE.
 
     // check if data contains an event ID branch
-    if (!fChain->GetBranch(fgBranchEventID))
+    if (!fChain->GetBranch(fEventID->GetName()))
     {
         Error("CheckEventID", "Event ID branch not found in data chain!");
         return kFALSE;
@@ -108,11 +106,11 @@ Bool_t FFRooSPlot::CheckEventID()
 
     // read event ID
     Double_t event_id;
-    fChain->SetBranchAddress(fgBranchEventID, &event_id);
+    fChain->SetBranchAddress(fEventID->GetName(), &event_id);
 
     // do not read other branches
     fChain->SetBranchStatus("*", 0);
-    fChain->SetBranchStatus(fgBranchEventID, 1);
+    fChain->SetBranchStatus(fEventID->GetName(), 1);
 
     // user info
     Info("CheckEventID", "Checking event IDs of %.9e events...", (Double_t)fChain->GetEntries());
@@ -339,7 +337,7 @@ Double_t FFRooSPlot::GetEventID(Int_t event) const
     // Return the ID of the event 'event'.
 
     if (fSPlot)
-        return fSPlot->GetSDataSet()->get(event)->getRealValue(fgBranchEventID);
+        return fSPlot->GetSDataSet()->get(event)->getRealValue(fEventID->GetName());
     else
         return 0;
 }

@@ -35,15 +35,13 @@ protected:
     Bool_t CheckSpecBounds(Int_t spec, const Char_t* loc) const;
     Bool_t CheckEventID();
 
-    static const Char_t fgBranchEventID[];
-
 public:
     FFRooSPlot() : FFRooFitTree(),
                    fNSpec(0), fSpecModel(0),
                    fEventID(0), fSPlot(0) { }
     FFRooSPlot(TChain* chain, Int_t nVar, Int_t nSpec,
                const Char_t* name = "FFRooSPlot", const Char_t* title = "a FooFit RooFit",
-               const Char_t* weightVar = 0);
+               const Char_t* evIDVar = "event_id", const Char_t* weightVar = 0);
     virtual ~FFRooSPlot();
 
     Int_t GetNSpecies() const { return fNSpec; }
