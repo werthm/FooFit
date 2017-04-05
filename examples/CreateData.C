@@ -1,11 +1,13 @@
 {
     Double_t event_id;
+    Double_t weight;
     Double_t im;
     Double_t mm;
     Double_t cop;
 
     TTree* tree = new TTree("events", "events");
     tree->Branch("event_id", &event_id);
+    tree->Branch("weight", &weight);
     tree->Branch("im", &im);
     tree->Branch("mm", &mm);
     tree->Branch("cop", &cop);
@@ -35,7 +37,8 @@
     event_id = 1;
     for (Long64_t i = 0; i < 1e5; i++)
     {
-        if (gRandom->Rndm() > 0.9)
+        weight = gRandom->Rndm();
+        if (weight > 0.9)
         {
             im = fIMSig->GetRandom();
             mm = fMMSig->GetRandom();
