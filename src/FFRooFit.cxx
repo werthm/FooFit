@@ -227,6 +227,34 @@ Bool_t FFRooFit::PrepareFit()
     Int_t maxLen;
 
     //
+    // adjust range of fit variables
+    //
+
+    // loop over fit variables
+    Double_t min, max;
+    for (Int_t i = 0; i < fNVar; i++)
+    {
+        // get range of data set
+        fData->getRange(*fVar[i], min, max);
+
+        // compare minimum values
+        if (fVar[i]->getMin() < min)
+        {
+            Warning("PrepareFit", "Adjusting minimum of variable '%s' to minimum of dataset: %f -> %f",
+                                  fVar[i]->GetName(), fVar[i]->getMin(), min);
+            fVar[i]->setMin(min);
+        }
+
+        // compare maximum values
+        if (fVar[i]->getMax() > max)
+        {
+            Warning("PrepareFit", "Adjusting maximum of variable '%s' to maximum of dataset: %f -> %f",
+                                  fVar[i]->GetName(), fVar[i]->getMax(), max);
+            fVar[i]->setMax(max);
+        }
+    }
+
+    //
     // calculate correlations between fit variables
     //
 
