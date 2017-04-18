@@ -38,13 +38,15 @@ protected:
     RooAbsData* fData;              // dataset
     FFRooModel* fModel;             // model (not owned)
     RooFitResult* fResult;          // result of last fit
+    Int_t fNChi2PreFit;             // number of chi2 pre-fits
 
     Bool_t CheckVarBounds(Int_t var, const Char_t* loc) const;
     Bool_t CheckVariables() const;
     Bool_t ContainsVariable(RooAbsPdf* pdf, Int_t var, Bool_t excl = kFALSE) const;
     virtual Bool_t LoadData() = 0;
-    virtual Bool_t PreFit();
+    virtual Bool_t PrepareFit();
     virtual Bool_t PostFit();
+    Bool_t Chi2PreFit();
 
     static const Color_t fgColors[8];     // some colors
 
@@ -54,7 +56,8 @@ public:
                  fNVarAux(0), fVarAux(0),
                  fNVarCtrl(0), fVarCtrl(0),
                  fData(0), fModel(0),
-                 fResult(0) { }
+                 fResult(0),
+                 fNChi2PreFit(0) { }
     FFRooFit(Int_t nVar, const Char_t* name = "FFRooFit", const Char_t* title = "a FooFit RooFit");
     virtual ~FFRooFit();
 
@@ -64,12 +67,14 @@ public:
     RooAbsData* GetData() const { return fData; }
     FFRooModel* GetModel() const { return fModel; }
     RooFitResult* GetResult() const { return fResult; }
+    Int_t GetNChi2PreFit() const { return fNChi2PreFit; }
 
     void SetVariable(Int_t i, const Char_t* name, const Char_t* title,
                      Double_t min, Double_t max, Int_t nbins = 0);
     void SetModel(FFRooModel* model) { fModel = model; }
     void AddAuxVariable(RooRealVar* aux_var);
     void AddControlVariable(const Char_t* name, const Char_t* title);
+    void SetNChi2PreFit(Int_t n) { fNChi2PreFit = n; }
 
     virtual Bool_t Fit();
     TCanvas* DrawFit();

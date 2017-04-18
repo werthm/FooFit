@@ -15,7 +15,9 @@
 #include "RooAbsData.h"
 #include "RooAbsPdf.h"
 #include "RooPlot.h"
+#include "RooDataHist.h"
 #include "RooFitResult.h"
+#include "RooChi2Var.h"
 #include "TCanvas.h"
 #include "TLegend.h"
 #include "TH2.h"
@@ -47,6 +49,7 @@ FFRooFit::FFRooFit(Int_t nVar, const Char_t* name, const Char_t* title)
     fData = 0;
     fModel = 0;
     fResult = 0;
+    fNChi2PreFit = 0;
 }
 
 //______________________________________________________________________________
@@ -215,7 +218,7 @@ Bool_t FFRooFit::ContainsVariable(RooAbsPdf* pdf, Int_t var, Bool_t excl) const
 }
 
 //______________________________________________________________________________
-Bool_t FFRooFit::PreFit()
+Bool_t FFRooFit::PrepareFit()
 {
     // Perform tasks before fitting.
     // Return kTRUE on success, otherwise kFALSE.
@@ -321,6 +324,106 @@ Bool_t FFRooFit::PostFit()
 }
 
 //______________________________________________________________________________
+Bool_t FFRooFit::Chi2PreFit()
+{
+    // Peform 'fNChi2PreFit' chi2 pre-fits randomizing the fit parameters
+    // within their bounds. Afterwards set the parameters to the values
+    // obtained in the fit that yielded the best chi2 value.
+    // Return kTRUE on success, otherwise kFALSE.
+
+    // check number of fits
+    if (fNChi2PreFit <= 0)
+    {
+        Warning("Chi2PreFit", "No chi2 pre-fits were performed!");
+        return kFALSE;
+    }
+
+    // create argument set of variables
+    RooArgSet varSet;
+    for (Int_t i = 0; i < fNVar; i++) varSet.add(*fVar[i]);
+
+    // create a binned data set
+    RooDataHist* dataBinned = new RooDataHist(TString::Format("%s_binned", fData->GetName()).Data(),
+                                              TString::Format("%s (binned)", fData->GetTitle()).Data(),
+                                              varSet,
+                                              *fData);
+
+    // get a list of the parameters
+    RooArgSet* params = fModel->GetPdf()->getParameters(*fData);
+    TIterator* iter = params->createIterator();
+
+    // variables for best fit
+    const Int_t nPar = params->getSize();
+    Double_t bestChi2;
+    Int_t bestFit;
+    Double_t bestPar[nPar];
+
+    // user info
+    Info("Chi2PreFit", "Performing %d binned chi2 pre-fit(s) to find "
+                       "optimal %d fit parameters", fNChi2PreFit, nPar);
+
+    // perform a number of chi2 fits with random initial parameter values
+    for (Int_t i = 0; i < fNChi2PreFit; i++)
+    {
+        // randomize parameters
+        iter->Reset();
+        while (RooRealVar* var = (RooRealVar*)iter->Next())
+            var->randomize();
+
+        // perform chi2 fit
+        fModel->GetPdf()->chi2FitTo(*dataBinned, RooFit::Extended(),
+                                                 RooFit::Verbose(kFALSE),
+                                                 RooFit::PrintLevel(-1),
+                                                 RooFit::Warnings(kFALSE),
+                                                 RooFit::PrintEvalErrors(-1),
+                                                 FFFooFit::gUseNCPU > 1 ?
+                                                    RooFit::NumCPU(FFFooFit::gUseNCPU, FFFooFit::gParStrat) :
+                                                    RooCmdArg::none());
+
+        // calculate chi2
+        RooChi2Var chi2("prefit-chi2", "prefit-chi2", *fModel->GetPdf(), *dataBinned, RooFit::Extended());
+
+        // print fit result
+        printf("\n");
+        printf("  Chi2 pre-fit %d    chi2 = %e\n\n", i+1, chi2.getVal());
+        printf("  PARAMETER             VALUE\n");
+        printf("  -------------------------------------\n");
+        iter->Reset();
+        while (RooRealVar* var = (RooRealVar*)iter->Next())
+            printf("  %-20s  %e\n", var->GetName(), var->getVal());
+        printf("\n");
+
+        // save best fit
+        if (i == 0 || chi2.getVal() < bestChi2)
+        {
+            bestChi2 = chi2.getVal();
+            bestFit = i;
+            Int_t n = 0;
+            iter->Reset();
+            while (RooRealVar* var = (RooRealVar*)iter->Next())
+                bestPar[n++] = var->getVal();
+        }
+    }
+
+    // set parameters of best fit
+    Int_t n = 0;
+    iter->Reset();
+    while (RooRealVar* var = (RooRealVar*)iter->Next())
+        var->setVal(bestPar[n++]);
+
+    // user info
+    Info("Chi2PreFit", "Take fit parameters from fit %d with chi2 = %e", bestFit+1, bestChi2);
+    Info("Chi2PreFit", "End of binned chi2 pre-fit(s)");
+
+    // clean-up
+    delete iter;
+    delete params;
+    delete dataBinned;
+
+    return kTRUE;
+}
+
+//______________________________________________________________________________
 Bool_t FFRooFit::Fit()
 {
     // Perform a RooFit-based fit.
@@ -356,13 +459,6 @@ Bool_t FFRooFit::Fit()
         }
     }
 
-    // do various things before fitting
-    if (!PreFit())
-    {
-        Error("Fit", "An error occurred during the pre-fit routine!");
-        return kFALSE;
-    }
-
     // check model
     if (!fModel)
     {
@@ -373,9 +469,26 @@ Bool_t FFRooFit::Fit()
     // build the model
     fModel->BuildModel(fVar);
 
+    // do various things before fitting
+    if (!PrepareFit())
+    {
+        Error("Fit", "An error occurred while preparing the fit routine!");
+        return kFALSE;
+    }
+
     // user info
     Info("Fit", "Fitting using %d CPU(s) (Parallelization strategy: %d)",
          FFFooFit::gUseNCPU, FFFooFit::gParStrat);
+
+    // perform chi2 pre-fits
+    if (fNChi2PreFit > 0)
+    {
+        if (!Chi2PreFit())
+        {
+            Error("Fit", "An error occurred in the chi2 pre-fit routine!");
+            return kFALSE;
+        }
+    }
 
     // fit the model to the data
     if (fResult) delete fResult;
