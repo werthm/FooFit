@@ -307,7 +307,7 @@ Bool_t FFRooSPlot::Fit()
 
     // create the sPlot object
     fSPlot = new RooStats::SPlot("splot_fit", "FFRooSPlot Fit", *((RooDataSet*)fData),
-                                 fModel->GetPdf(), yieldParList);
+                                 fModel->GetPdf(), yieldParList, RooArgSet(), kTRUE, kTRUE);
 
     // user info
     for (Int_t i = 0; i < fNSpec; i++)
