@@ -522,6 +522,9 @@ Bool_t FFRooFit::Fit()
     if (fResult) delete fResult;
     fResult = fModel->GetPdf()->fitTo(*fData, RooFit::Extended(),
                                               RooFit::Save(),
+                                              fData->isWeighted() ?
+                                                  RooFit::SumW2Error(kTRUE) :
+                                                  RooCmdArg::none(),
                                               FFFooFit::gUseNCPU > 1 ?
                                                   RooFit::NumCPU(FFFooFit::gUseNCPU, FFFooFit::gParStrat) :
                                                   RooCmdArg::none());
