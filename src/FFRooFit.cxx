@@ -525,6 +525,7 @@ Bool_t FFRooFit::Fit()
                                               fData->isWeighted() ?
                                                   RooFit::SumW2Error(kTRUE) :
                                                   RooCmdArg::none(),
+                                              RooFit::PrintEvalErrors(1),
                                               FFFooFit::gUseNCPU > 1 ?
                                                   RooFit::NumCPU(FFFooFit::gUseNCPU, FFFooFit::gParStrat) :
                                                   RooCmdArg::none());
