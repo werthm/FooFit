@@ -15,6 +15,7 @@
 #define FOOFIT_FFRooFit
 
 #include "TNamed.h"
+#include "RooCmdArg.h"
 
 class RooRealVar;
 class RooAbsData;
@@ -28,6 +29,14 @@ class TH2;
 class FFRooFit : public TNamed
 {
 
+public:
+    // Minimizer types
+    enum EFFMinimizer {
+        kMinuit,
+        kMinuit2_Migrad
+    };
+    typedef EFFMinimizer FFMinimizer_t;
+
 protected:
     Int_t fNVar;                    // number of fit variables
     RooRealVar** fVar;              //[fNVar] array of fit variables
@@ -39,10 +48,12 @@ protected:
     FFRooModel* fModel;             // model (not owned)
     RooFitResult* fResult;          // result of last fit
     Int_t fNChi2PreFit;             // number of chi2 pre-fits
+    FFMinimizer_t fMinimizer;       // type of minimizer
 
     Bool_t CheckVarBounds(Int_t var, const Char_t* loc) const;
     Bool_t CheckVariables() const;
     Bool_t ContainsVariable(RooAbsPdf* pdf, Int_t var, Bool_t excl = kFALSE) const;
+    RooCmdArg CreateMinimizerArg(FFMinimizer_t min);
     virtual Bool_t LoadData() = 0;
     virtual Bool_t PrepareFit();
     virtual Bool_t PostFit();
@@ -58,7 +69,8 @@ public:
                  fNVarCtrl(0), fVarCtrl(0),
                  fData(0), fModel(0),
                  fResult(0),
-                 fNChi2PreFit(0) { }
+                 fNChi2PreFit(0),
+                 fMinimizer(kMinuit2_Migrad) { }
     FFRooFit(Int_t nVar, const Char_t* name = "FFRooFit", const Char_t* title = "a FooFit RooFit");
     virtual ~FFRooFit();
 
@@ -69,6 +81,7 @@ public:
     FFRooModel* GetModel() const { return fModel; }
     RooFitResult* GetResult() const { return fResult; }
     Int_t GetNChi2PreFit() const { return fNChi2PreFit; }
+    FFMinimizer_t GetMinimizer() const { return fMinimizer; }
 
     void SetVariable(Int_t i, const Char_t* name, const Char_t* title,
                      Double_t min, Double_t max, Int_t nbins = 0);
@@ -76,6 +89,7 @@ public:
     void AddAuxVariable(RooRealVar* aux_var);
     void AddControlVariable(const Char_t* name, const Char_t* title);
     void SetNChi2PreFit(Int_t n) { fNChi2PreFit = n; }
+    void SetMinimizer(FFMinimizer_t min) { fMinimizer = min; }
 
     virtual Bool_t Fit();
     TCanvas* DrawFit();

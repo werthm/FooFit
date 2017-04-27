@@ -50,6 +50,7 @@ FFRooFit::FFRooFit(Int_t nVar, const Char_t* name, const Char_t* title)
     fModel = 0;
     fResult = 0;
     fNChi2PreFit = 0;
+    fMinimizer = kMinuit2_Migrad;
 }
 
 //______________________________________________________________________________
@@ -214,6 +215,23 @@ Bool_t FFRooFit::ContainsVariable(RooAbsPdf* pdf, Int_t var, Bool_t excl) const
         // check only the corresponding variable
         if (pdf->getVariables()->find(fVar[var]->GetName())) return kTRUE;
         else return kFALSE;
+    }
+}
+
+//______________________________________________________________________________
+RooCmdArg FFRooFit::CreateMinimizerArg(FFMinimizer_t min)
+{
+    // Create the RooCmdArg for the minimizer type 'min'.
+
+    // check type
+    switch (min)
+    {
+        case kMinuit:
+            return RooFit::Minimizer("Minuit");
+        case kMinuit2_Migrad:
+            return RooFit::Minimizer("Minuit2", "Migrad");
+        default:
+            return RooCmdArg::none();
     }
 }
 
@@ -404,6 +422,7 @@ Bool_t FFRooFit::Chi2PreFit()
                                                  RooFit::PrintLevel(-1),
                                                  RooFit::Warnings(kFALSE),
                                                  RooFit::PrintEvalErrors(-1),
+                                                 CreateMinimizerArg(fMinimizer),
                                                  FFFooFit::gUseNCPU > 1 ?
                                                     RooFit::NumCPU(FFFooFit::gUseNCPU, FFFooFit::gParStrat) :
                                                     RooCmdArg::none());
@@ -522,6 +541,7 @@ Bool_t FFRooFit::Fit()
     if (fResult) delete fResult;
     fResult = fModel->GetPdf()->fitTo(*fData, RooFit::Extended(),
                                               RooFit::Save(),
+                                              CreateMinimizerArg(fMinimizer),
                                               fData->isWeighted() ?
                                                   RooFit::SumW2Error(kTRUE) :
                                                   RooCmdArg::none(),

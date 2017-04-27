@@ -22,6 +22,9 @@
 #pragma link C++ nestedclasses;
 #pragma link C++ nestedtypedef;
 
+#pragma link C++ enum EFFMinimizer;
+#pragma link C++ typedef FFMinimizer_t;
+
 #pragma link C++ namespace FFFooFit;
 #pragma link C++ class FFRooModel+;
 #pragma link C++ class FFRooModelExpo+;
