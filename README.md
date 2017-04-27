@@ -3,7 +3,7 @@
 Intuitive interface to RooFit.
 
 #### Dependencies
-* ROOT 5.34 (with RooFit support)
+* ROOT 5.34 or 6.08.06 (with RooFit and Minuit2 support)
 * CMake 2.8
 
 #### Installation
