@@ -553,6 +553,35 @@ Bool_t FFRooFit::Fit()
     // show fit result
     fResult->Print("v");
 
+    // check fit result: seems to be only working with Minuit2
+    if (fMinimizer == kMinuit2_Migrad)
+    {
+        // loop over fit steps
+        for (UInt_t i = 0; i < fResult->numStatusHistory(); i++)
+        {
+            // check status of fit step
+            if (fResult->statusCodeHistory(i) != 0)
+            {
+                Error("Fit", "An error occurred during the fit routine (step %d (%s) returned status %d)!",
+                             i, fResult->statusLabelHistory(i), fResult->statusCodeHistory(i));
+                return kFALSE;
+            }
+        }
+    }
+
+    // check fit result by looking at the covariance matrix quality (only works for unweighted fits)
+    // quality factor:
+    // 0: Not calculated at all
+    // 1: Diagonal approximation only, not accurate
+    // 2: Full matrix, but forced positive-definite
+    // 3: Full accurate covariance matrix (After MIGRAD, this is the indication of normal
+    //     convergence.)
+    if (!fData->isWeighted() && fResult->covQual() != 3)
+    {
+        Error("Fit", "Poor quality of covariance matrix (%d) - the fit probably failed!", fResult->covQual());
+        return kFALSE;
+    }
+
     // do various things after fitting
     if (!PostFit())
     {
