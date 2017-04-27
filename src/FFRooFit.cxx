@@ -29,8 +29,8 @@
 ClassImp(FFRooFit)
 
 // init static class members
-const Color_t FFRooFit::fgColors[8] = { kBlue, kRed, kMagenta, kCyan,
-                                        kOrange-1, kGray, kYellow-6, 28 };
+const Color_t FFRooFit::fgColors[8] = { 4, 2, 6, 7, 9, 12, 28, 41 };
+const Style_t FFRooFit::fgLStyle[3] = { kSolid, kDashed, kDotted };
 
 //______________________________________________________________________________
 FFRooFit::FFRooFit(Int_t nVar, const Char_t* name, const Char_t* title)
@@ -608,7 +608,7 @@ RooPlot* FFRooFit::PlotDataAndModel(Int_t var)
             // plot component
             sprintf(tmp, "plot_model_%d", n);
             fModel->GetPdf()->plotOn(frame, RooFit::Name(tmp), RooFit::Components(*comp),
-                                     RooFit::LineStyle(kDashed), RooFit::LineColor(fgColors[n%8]));
+                                     RooFit::LineStyle(fgLStyle[n / 8]), RooFit::LineColor(fgColors[n % 8]));
             leg->AddEntry(frame->findObject(tmp), comp->GetTitle(), "l");
 
             // increment counter

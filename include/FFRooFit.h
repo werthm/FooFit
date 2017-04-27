@@ -48,7 +48,8 @@ protected:
     virtual Bool_t PostFit();
     Bool_t Chi2PreFit();
 
-    static const Color_t fgColors[8];     // some colors
+    static const Color_t fgColors[8];    // some colors
+    static const Style_t fgLStyle[3];    // line styles
 
 public:
     FFRooFit() : TNamed(),
