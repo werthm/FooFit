@@ -52,6 +52,7 @@ protected:
 
     Bool_t CheckVarBounds(Int_t var, const Char_t* loc) const;
     Bool_t CheckVariables() const;
+    Bool_t CheckFitResult(RooFitResult* res, Bool_t verbose = kTRUE) const;
     Bool_t ContainsVariable(RooAbsPdf* pdf, Int_t var, Bool_t excl = kFALSE) const;
     RooCmdArg CreateMinimizerArg(FFMinimizer_t min);
     virtual Bool_t LoadData() = 0;

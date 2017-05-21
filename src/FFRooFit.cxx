@@ -185,6 +185,45 @@ Bool_t FFRooFit::CheckVariables() const
 }
 
 //______________________________________________________________________________
+Bool_t FFRooFit::CheckFitResult(RooFitResult* res, Bool_t verbose) const
+{
+    // Check the fit result 'f' and return kFALSE if the fit failed.
+    // If 'verbose' is kFALSE, no messages will be printed.
+
+    // check fit result: seems to be only working with Minuit2
+    if (fMinimizer == kMinuit2_Migrad)
+    {
+        // loop over fit steps
+        for (UInt_t i = 0; i < res->numStatusHistory(); i++)
+        {
+            // check status of fit step
+            if (res->statusCodeHistory(i) != 0)
+            {
+                if (verbose) Error("CheckFitResult", "An error occurred during the fit routine (step %d (%s) returned status %d)!",
+                                                     i, res->statusLabelHistory(i), res->statusCodeHistory(i));
+                return kFALSE;
+            }
+        }
+    }
+
+    // check fit result by looking at the covariance matrix quality (only works for unweighted fits)
+    // quality factor:
+    // 0: Not calculated at all
+    // 1: Diagonal approximation only, not accurate
+    // 2: Full matrix, but forced positive-definite
+    // 3: Full accurate covariance matrix (After MIGRAD, this is the indication of normal
+    //     convergence.)
+    if (!fData->isWeighted() && res->covQual() != 3)
+    {
+        if (verbose) Error("CheckFitResult", "Poor quality of covariance matrix (%d) - the fit probably failed!", res->covQual());
+        return kFALSE;
+    }
+
+    // good fit here
+    return kTRUE;
+}
+
+//______________________________________________________________________________
 Bool_t FFRooFit::ContainsVariable(RooAbsPdf* pdf, Int_t var, Bool_t excl) const
 {
     // Check if the pdf 'pdf' contains the variable with index 'var'.
@@ -409,6 +448,7 @@ Bool_t FFRooFit::Chi2PreFit()
                        "optimal %d fit parameters", fNChi2PreFit, nPar);
 
     // perform a number of chi2 fits with random initial parameter values
+    Int_t nFailed = 0;
     for (Int_t i = 0; i < fNChi2PreFit; i++)
     {
         // randomize parameters
@@ -417,15 +457,26 @@ Bool_t FFRooFit::Chi2PreFit()
             var->randomize();
 
         // perform chi2 fit
-        fModel->GetPdf()->chi2FitTo(*dataBinned, RooFit::Extended(),
-                                                 RooFit::Verbose(kFALSE),
-                                                 RooFit::PrintLevel(-1),
-                                                 RooFit::Warnings(kFALSE),
-                                                 RooFit::PrintEvalErrors(-1),
-                                                 CreateMinimizerArg(fMinimizer),
-                                                 FFFooFit::gUseNCPU > 1 ?
-                                                    RooFit::NumCPU(FFFooFit::gUseNCPU, FFFooFit::gParStrat) :
-                                                    RooCmdArg::none());
+        RooFitResult* fit_res = fModel->GetPdf()->chi2FitTo(*dataBinned, RooFit::Extended(),
+                                                            RooFit::Save(),
+                                                            RooFit::Verbose(kFALSE),
+                                                            RooFit::PrintLevel(-1),
+                                                            RooFit::Warnings(kFALSE),
+                                                            RooFit::PrintEvalErrors(-1),
+                                                            CreateMinimizerArg(fMinimizer),
+                                                            FFFooFit::gUseNCPU > 1 ?
+                                                               RooFit::NumCPU(FFFooFit::gUseNCPU, FFFooFit::gParStrat) :
+                                                               RooCmdArg::none());
+
+        // check fit result and repeat fit if it failed
+        Bool_t fit_res_ok = CheckFitResult(fit_res, kFALSE);
+        delete fit_res;
+        if (!fit_res_ok)
+        {
+            nFailed++;
+            i--;
+            continue;
+        }
 
         // calculate chi2
         RooChi2Var chi2("prefit-chi2", "prefit-chi2", *fModel->GetPdf(), *dataBinned, RooFit::Extended());
@@ -460,6 +511,7 @@ Bool_t FFRooFit::Chi2PreFit()
 
     // user info
     Info("Chi2PreFit", "Take fit parameters from fit %d with chi2 = %e", bestFit+1, bestChi2);
+    Info("Chi2PreFit", "Failed binned chi2 pre-fits: %d", nFailed);
     Info("Chi2PreFit", "End of binned chi2 pre-fit(s)");
 
     // clean-up
@@ -553,34 +605,8 @@ Bool_t FFRooFit::Fit()
     // show fit result
     fResult->Print("v");
 
-    // check fit result: seems to be only working with Minuit2
-    if (fMinimizer == kMinuit2_Migrad)
-    {
-        // loop over fit steps
-        for (UInt_t i = 0; i < fResult->numStatusHistory(); i++)
-        {
-            // check status of fit step
-            if (fResult->statusCodeHistory(i) != 0)
-            {
-                Error("Fit", "An error occurred during the fit routine (step %d (%s) returned status %d)!",
-                             i, fResult->statusLabelHistory(i), fResult->statusCodeHistory(i));
-                return kFALSE;
-            }
-        }
-    }
-
-    // check fit result by looking at the covariance matrix quality (only works for unweighted fits)
-    // quality factor:
-    // 0: Not calculated at all
-    // 1: Diagonal approximation only, not accurate
-    // 2: Full matrix, but forced positive-definite
-    // 3: Full accurate covariance matrix (After MIGRAD, this is the indication of normal
-    //     convergence.)
-    if (!fData->isWeighted() && fResult->covQual() != 3)
-    {
-        Error("Fit", "Poor quality of covariance matrix (%d) - the fit probably failed!", fResult->covQual());
-        return kFALSE;
-    }
+    // check fit result
+    if (!CheckFitResult(fResult)) return kFALSE;
 
     // do various things after fitting
     if (!PostFit())
