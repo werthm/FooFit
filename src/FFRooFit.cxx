@@ -681,8 +681,11 @@ RooPlot* FFRooFit::PlotDataAndModel(Int_t var)
 
             // check if pdf has to contain the variable exclusively - if yes, skip component
             Bool_t drawVarExcl = kTRUE;
-            if (comp->InheritsFrom("RooHistPdf")) drawVarExcl = kFALSE;
+            if (comp->InheritsFrom("RooHistPdf") || comp->InheritsFrom("RooNDKeysPdf")) drawVarExcl = kFALSE;
             if (!ContainsVariable(comp, var, drawVarExcl)) continue;
+
+            // do not draw variable transformations
+            if (comp->InheritsFrom("RooFormulaVar")) continue;
 
             // plot component
             sprintf(tmp, "plot_model_%d", n);
