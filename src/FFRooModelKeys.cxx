@@ -12,7 +12,7 @@
 //////////////////////////////////////////////////////////////////////////
 
 
-#include "TChain.h"
+#include "TTree.h"
 #include "RooRealVar.h"
 #include "RooDataSet.h"
 #include "RooNDKeysPdf.h"
@@ -22,7 +22,7 @@
 ClassImp(FFRooModelKeys)
 
 //______________________________________________________________________________
-FFRooModelKeys::FFRooModelKeys(const Char_t* name, const Char_t* title, Int_t nDim, TChain* chain,
+FFRooModelKeys::FFRooModelKeys(const Char_t* name, const Char_t* title, Int_t nDim, TTree* tree,
                                const Char_t* opt, Double_t rho, Int_t nSigma, Bool_t rotate)
     : FFRooModel(name, title, 0)
 {
@@ -31,7 +31,7 @@ FFRooModelKeys::FFRooModelKeys(const Char_t* name, const Char_t* title, Int_t nD
 
     // init members
     fNDim = nDim;
-    fChain = chain;
+    fTree = tree;
     fDataSet = 0;
     fOpt = new Char_t[256];
     strcpy(fOpt, opt);
@@ -45,6 +45,7 @@ FFRooModelKeys::~FFRooModelKeys()
 {
     // Destructor.
 
+    if (fTree) delete fTree;
     if (fDataSet) delete fDataSet;
     if (fOpt) delete [] fOpt;
 }
@@ -65,11 +66,11 @@ void FFRooModelKeys::BuildModel(RooRealVar** vars)
 
     // create RooFit dataset
     if (fDataSet) delete fDataSet;
-    fDataSet = new RooDataSet(fChain->GetName(), fChain->GetTitle(), varSet, RooFit::Import(*fChain));
+    fDataSet = new RooDataSet(fTree->GetName(), fTree->GetTitle(), varSet, RooFit::Import(*fTree));
 
     // user info
     Int_t nEntries = fDataSet->numEntries();
-    Info("BuildModel", "Entries in data chain     : %.9e", (Double_t)fChain->GetEntries());
+    Info("BuildModel", "Entries in data tree      : %.9e", (Double_t)fTree->GetEntries());
     Info("BuildModel", "Entries in RooFit dataset : %.9e", (Double_t)nEntries);
 
     // create the model pdf
