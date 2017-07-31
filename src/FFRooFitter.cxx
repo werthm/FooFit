@@ -134,12 +134,12 @@ void FFRooFitter::SetMinimizer(FFRooFit::FFMinimizer_t min)
 }
 
 //______________________________________________________________________________
-TCanvas* FFRooFitter::DrawFit()
+TCanvas* FFRooFitter::DrawFit(const Char_t* opt)
 {
     // Wrapper for FFRooFit::DrawFit().
 
     if (fFitter)
-        return fFitter->DrawFit();
+        return fFitter->DrawFit(opt);
     else
         Error("DrawFit", "Fitter not created yet!");
 
@@ -147,12 +147,12 @@ TCanvas* FFRooFitter::DrawFit()
 }
 
 //______________________________________________________________________________
-RooPlot* FFRooFitter::PlotDataAndModel(Int_t var)
+RooPlot* FFRooFitter::PlotDataAndModel(Int_t var, const Char_t* opt)
 {
     // Wrapper for FFRooFit::PlotDataAndModel().
 
     if (fFitter)
-        return fFitter->PlotDataAndModel(var);
+        return fFitter->PlotDataAndModel(var, opt);
     else
         Error("PlotDataAndModel", "Fitter not created yet!");
 

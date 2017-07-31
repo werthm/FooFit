@@ -622,9 +622,13 @@ Bool_t FFRooFit::Fit()
 }
 
 //______________________________________________________________________________
-RooPlot* FFRooFit::PlotDataAndModel(Int_t var)
+RooPlot* FFRooFit::PlotDataAndModel(Int_t var, const Char_t* opt)
 {
     // Plot the data and the model of the fit variable with index 'var'.
+    //
+    // Options:
+    // l    : draw legend on left side (default: right)
+    //
     // NOTE: the returned RooPlot has to be destroyed by the caller.
 
     Char_t tmp[256];
@@ -662,7 +666,11 @@ RooPlot* FFRooFit::PlotDataAndModel(Int_t var)
         frame->SetTitle(tmp);
 
         // create legend
-        TLegend* leg = new TLegend(0.7, 0.5, 0.9, 0.9);
+        TLegend* leg;
+        if (!strcmp(opt, "l"))
+            leg = new TLegend(0.1, 0.5, 0.3, 0.9);
+        else
+            leg = new TLegend(0.7, 0.5, 0.9, 0.9);
         leg->SetTextSize(0.03);
         leg->SetFillColor(0);
         leg->SetTextFont(42);
@@ -696,6 +704,9 @@ RooPlot* FFRooFit::PlotDataAndModel(Int_t var)
             // increment counter
             n++;
         }
+
+        // resize legend
+        leg->SetY1(0.9 - 0.055*n);
 
         // add legend
         frame->addObject(leg);
@@ -780,7 +791,7 @@ TH2* FFRooFit::PlotModel2D(Int_t var0, Int_t var1)
 }
 
 //______________________________________________________________________________
-TCanvas* FFRooFit::DrawFit()
+TCanvas* FFRooFit::DrawFit(const Char_t* opt)
 {
     // Draw the fit results.
     // NOTE: the returned TCanvas has to be destroyed by the caller.
@@ -795,7 +806,7 @@ TCanvas* FFRooFit::DrawFit()
         TCanvas* canvas = new TCanvas(GetName(), tmp, 700, 500);
 
         // plot data and model projection
-        RooPlot* p = PlotDataAndModel(0);
+        RooPlot* p = PlotDataAndModel(0, opt);
         if (p) p->Draw();
 
         return canvas;
@@ -813,7 +824,7 @@ TCanvas* FFRooFit::DrawFit()
         // plot data and model projections
         for (Int_t i = 0; i < fNVar; i++)
         {
-            RooPlot* p = PlotDataAndModel(i);
+            RooPlot* p = PlotDataAndModel(i, opt);
             canvas->cd(nPad++);
             if (p) p->Draw();
         }

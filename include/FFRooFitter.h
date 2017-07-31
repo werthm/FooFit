@@ -54,8 +54,8 @@ public:
 
     Bool_t Fit();
 
-    TCanvas* DrawFit();
-    RooPlot* PlotDataAndModel(Int_t var);
+    TCanvas* DrawFit(const Char_t* opt = "");
+    RooPlot* PlotDataAndModel(Int_t var, const Char_t* opt = "");
     TH2* PlotData2D(Int_t var0, Int_t var1);
     TH2* PlotModel2D(Int_t var0, Int_t var1);
 
