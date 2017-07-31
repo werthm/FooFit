@@ -21,6 +21,7 @@
 #include "TCanvas.h"
 #include "TLegend.h"
 #include "TH2.h"
+#include "TMath.h"
 
 #include "FFRooFit.h"
 #include "FFFooFit.h"
@@ -297,6 +298,7 @@ Bool_t FFRooFit::PrepareFit()
         // compare minimum values
         if (fVar[i]->getMin() < min)
         {
+            min = TMath::Ceil(min);
             Warning("PrepareFit", "Adjusting minimum of variable '%s' to minimum of dataset: %f -> %f",
                                   fVar[i]->GetName(), fVar[i]->getMin(), min);
             fVar[i]->setMin(min);
@@ -305,6 +307,7 @@ Bool_t FFRooFit::PrepareFit()
         // compare maximum values
         if (fVar[i]->getMax() > max)
         {
+            max = TMath::Floor(max);
             Warning("PrepareFit", "Adjusting maximum of variable '%s' to maximum of dataset: %f -> %f",
                                   fVar[i]->GetName(), fVar[i]->getMax(), max);
             fVar[i]->setMax(max);
@@ -558,6 +561,13 @@ Bool_t FFRooFit::Fit()
         }
     }
 
+    // do various things before fitting
+    if (!PrepareFit())
+    {
+        Error("Fit", "An error occurred while preparing the fit routine!");
+        return kFALSE;
+    }
+
     // check model
     if (!fModel)
     {
@@ -567,13 +577,6 @@ Bool_t FFRooFit::Fit()
 
     // build the model
     fModel->BuildModel(fVar);
-
-    // do various things before fitting
-    if (!PrepareFit())
-    {
-        Error("Fit", "An error occurred while preparing the fit routine!");
-        return kFALSE;
-    }
 
     // user info
     Info("Fit", "Fitting using %d CPU(s) (Parallelization strategy: %d)",
