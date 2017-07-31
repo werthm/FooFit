@@ -38,6 +38,9 @@
 #pragma link C++ class FFRooFitHist+;
 #pragma link C++ class FFRooFitTree+;
 #pragma link C++ class FFRooSPlot+;
+#pragma link C++ class FFRooFitter+;
+#pragma link C++ class FFRooFitterTree+;
+#pragma link C++ class FFRooFitterSpecies+;
 
 #endif
 
