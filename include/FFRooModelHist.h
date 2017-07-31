@@ -17,19 +17,29 @@
 #include "FFRooModel.h"
 
 class TH1;
+class TTree;
 class RooDataHist;
 
 class FFRooModelHist : public FFRooModel
 {
 
 protected:
-    TH1* fHist;                     // ROOT data histogram (not owned)
+    Int_t fNDim;                    // number of dimensions
+    TH1* fHist;                     // binned input data
+    TTree* fTree;                   // unbinned input data
+    Char_t* fWeightVar;             // event weight variable for unbin. input data
     RooDataHist* fDataHist;         // data histogram
 
 public:
     FFRooModelHist() : FFRooModel(),
-                       fHist(0), fDataHist(0) { }
-    FFRooModelHist(const Char_t* name, const Char_t* title, TH1* hist);
+                       fNDim(0),
+                       fHist(0), fTree(0),
+                       fWeightVar(0),
+                       fDataHist(0) { }
+    FFRooModelHist(const Char_t* name, const Char_t* title, TH1* hist,
+                   Bool_t addShiftPar = kFALSE);
+    FFRooModelHist(const Char_t* name, const Char_t* title, Int_t Dim, TTree* tree,
+                   const Char_t* weightVar = 0, Bool_t addShiftPar = kFALSE);
     virtual ~FFRooModelHist();
 
     virtual void BuildModel(RooRealVar** vars);
