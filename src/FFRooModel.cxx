@@ -128,6 +128,19 @@ Double_t FFRooModel::GetParameter(Int_t i) const
 }
 
 //______________________________________________________________________________
+Double_t FFRooModel::GetParError(Int_t i) const
+{
+    // Return the error of the value of the parameter at index 'i'.
+
+    // check parameter index
+    if (CheckParBounds(i, "GetParameter()"))
+    {
+        return fPar[i] ? fPar[i]->getError() : 0;
+    }
+    else return 0;
+}
+
+//______________________________________________________________________________
 const Char_t* FFRooModel::GetParName(Int_t i) const
 {
     // Return the name of the parameter at index 'i'.

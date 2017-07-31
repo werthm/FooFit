@@ -24,7 +24,7 @@ class FFRooModel : public TNamed
 {
 
 protected:
-    RooAbsPdf* fPdf;                // model pdf
+    RooAbsPdf* fPdf;                //! model pdf
     Int_t fNPar;                    // number of parameters
     RooRealVar** fPar;              //[fNPar] parameter array
     Int_t fNVarTrans;               // number of variable transformations
@@ -46,6 +46,7 @@ public:
     Int_t GetNPar() const { return fNPar; }
     RooRealVar* GetPar(Int_t i) const;
     Double_t GetParameter(Int_t i) const;
+    Double_t GetParError(Int_t i) const;
     const Char_t* GetParName(Int_t i) const;
     const Char_t* GetParTitle(Int_t i) const;
     Int_t GetNVarTrans() const { return fNVarTrans; }
@@ -60,7 +61,7 @@ public:
 
     virtual void BuildModel(RooRealVar** vars) = 0;
 
-    ClassDef(FFRooModel, 0)  // Abstract RooFit model class
+    ClassDef(FFRooModel, 1)  // Abstract RooFit model class
 };
 
 #endif
