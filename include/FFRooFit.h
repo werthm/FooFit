@@ -93,6 +93,7 @@ public:
     void SetMinimizer(FFMinimizer_t min) { fMinimizer = min; }
 
     virtual Bool_t Fit();
+
     TCanvas* DrawFit();
     RooPlot* PlotDataAndModel(Int_t var);
     TH2* PlotData2D(Int_t var0, Int_t var1);
