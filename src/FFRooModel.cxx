@@ -29,6 +29,8 @@ FFRooModel::FFRooModel(const Char_t* name, const Char_t* title, Int_t nPar)
     fNPar = nPar;
     fPar = new RooRealVar*[fNPar];
     for (Int_t i = 0; i < fNPar; i++) fPar[i] = 0;
+    fNVarTrans = 0;
+    fVarTrans = 0;
 }
 
 //______________________________________________________________________________
@@ -42,6 +44,12 @@ FFRooModel::~FFRooModel()
         for (Int_t i = 0; i < fNPar; i++)
             if (fPar[i]) delete fPar[i];
         delete [] fPar;
+    }
+    if (fVarTrans)
+    {
+        for (Int_t i = 0; i < fNVarTrans; i++)
+            if (fVarTrans[i]) delete fVarTrans[i];
+        delete [] fVarTrans;
     }
 }
 
@@ -73,6 +81,27 @@ void FFRooModel::AddParameter(Int_t i, const Char_t* name, const Char_t* title)
         if (fPar[i]) delete fPar[i];
         fPar[i] = new RooRealVar(name, title, -RooNumber::infinity(), RooNumber::infinity());
     }
+}
+
+//______________________________________________________________________________
+void FFRooModel::AddVarTrans(RooAbsReal* varTrans)
+{
+    // Add the variable transformation 'varTrans'.
+    // Note: The object is not copied into this class, only a pointer is set.
+
+    // backup old list
+    RooAbsReal** old = fVarTrans;
+
+    // create new list
+    fVarTrans = new RooAbsReal*[fNVarTrans+1];
+    for (Int_t i = 0; i < fNVarTrans; i++) fVarTrans[i] = old[i];
+
+    // add new element
+    fVarTrans[fNVarTrans] = varTrans;
+    fNVarTrans++;
+
+    // destroy old list
+    if (old) delete [] old;
 }
 
 //______________________________________________________________________________
