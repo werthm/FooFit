@@ -20,6 +20,12 @@
 #include <unistd.h>
 #endif
 
+#include "TChain.h"
+#include "TSystemFile.h"
+#include "TSystemDirectory.h"
+#include "TSystem.h"
+#include "TError.h"
+
 #include "FFFooFit.h"
 
 namespace FFFooFit
@@ -57,5 +63,106 @@ Int_t FFFooFit::GetNumberOfCPUs()
     #else
     return sysconf(_SC_NPROCESSORS_ONLN);
     #endif
+}
+
+//______________________________________________________________________________
+Bool_t FFFooFit::LoadFilesToChain(const Char_t* loc, TChain* chain)
+{
+    // Add all ROOT files in the location 'loc' to the TChain 'chain'.
+    // Return kTRUE if the loading was successful without any error, otherwise kFALSE.
+
+    Char_t tmp[256];
+
+    // read location
+    Char_t* loc_ex = gSystem->ExpandPathName(loc);
+
+    // check if file exits
+    if (!FileExists(loc_ex))
+    {
+        Error("FFFooFit::LoadFilesToChain", "File or directory '%s' does not exist!", loc_ex);
+        delete loc_ex;
+        return kFALSE;
+    }
+
+    // check if location is a single file
+    TSystemFile file(loc_ex, "rawfile");
+    if (!file.IsDirectory())
+    {
+        // check if it is a ROOT file
+        TString str(loc_ex);
+        if (str.EndsWith(".root"))
+        {
+            Info("FFFooFit::LoadFilesToChain", "[1] Adding '%s' to chain 0", loc_ex);
+            chain->Add(loc_ex);
+            delete loc_ex;
+            return kTRUE;
+        }
+        else
+        {
+            Error("FFFooFit::LoadFilesToChain", "'%s' does not seem to be a ROOT file!", loc_ex);
+            delete loc_ex;
+            return kFALSE;
+        }
+    }
+
+    // try to get directory content
+    TSystemDirectory dir("rawdir", loc_ex);
+    TList* list = dir.GetListOfFiles();
+    if (!list)
+    {
+        Error("FFFooFit::LoadFilesToChain", "'%s' is not a directory!", loc_ex);
+        delete loc_ex;
+        return kFALSE;
+    }
+
+    // sort files
+    list->Sort();
+
+    // loop over directory content
+    Int_t n = 0;
+    TIter next(list);
+    TSystemFile* f;
+    while ((f = (TSystemFile*)next()))
+    {
+        // look for ROOT files
+        TString str(f->GetName());
+        if (str.EndsWith(".root"))
+        {
+            // full path
+            sprintf(tmp, "%s/%s", loc_ex, f->GetName());
+
+            // user information
+            Info("FFFooFit::LoadFilesToChain", "[%d] Adding '%s' to chain", n+1, tmp);
+
+            // add file to chains
+            chain->Add(tmp);
+
+            // count file
+            n++;
+        }
+    }
+
+    // clean-up
+    delete list;
+    delete loc_ex;
+
+    return kTRUE;
+}
+
+//______________________________________________________________________________
+Bool_t FFFooFit::FileExists(const Char_t* f)
+{
+    // Return kTRUE if the file 'f' exists, otherwise return kFALSE.
+
+    Char_t fn[256];
+
+    // expand filename
+    Char_t* fnt = gSystem->ExpandPathName(f);
+    strcpy(fn, fnt);
+    delete fnt;
+
+    // check file
+    if (!gSystem->AccessPathName(fn)) return kTRUE;
+    else return kFALSE;
 }
 
