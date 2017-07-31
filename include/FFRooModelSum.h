@@ -22,6 +22,8 @@ class FFRooModelSum : public FFRooModel
 protected:
     FFRooModel** fModelList;                //[fNPar] list of models to sum (elements not owned)
 
+    Bool_t CheckModelBounds(Int_t mod, const Char_t* loc) const;
+
 public:
     FFRooModelSum() : FFRooModel(),
                       fModelList(0) { }
@@ -29,6 +31,7 @@ public:
     virtual ~FFRooModelSum();
 
     void SetModelList(FFRooModel** list);
+    void SetModel(Int_t i, FFRooModel* model);
 
     virtual void BuildModel(RooRealVar** vars);
 

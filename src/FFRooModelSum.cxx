@@ -65,6 +65,33 @@ void FFRooModelSum::SetModelList(FFRooModel** list)
 }
 
 //______________________________________________________________________________
+void FFRooModelSum::SetModel(Int_t i, FFRooModel* model)
+{
+    // Set the pointer to the model with index 'i' to 'model'.
+
+    // check model index
+    if (CheckModelBounds(i, "SetModel()"))
+        fModelList[i] = model;
+}
+
+//______________________________________________________________________________
+Bool_t FFRooModelSum::CheckModelBounds(Int_t mod, const Char_t* loc) const
+{
+    // Check if the model index 'mod' is within valid bounds.
+    // Return kTRUE if the index 'mod' is valid, otherwise kFALSE.
+    // Use 'loc' to set the location of the error.
+
+    // check index range
+    if (mod < 0 || mod >= fNPar)
+    {
+        Error("CheckModelBounds", "%s: Invalid model index %d (number of models: %d)",
+              loc, mod, fNPar);
+        return kFALSE;
+    }
+    else return kTRUE;
+}
+
+//______________________________________________________________________________
 void FFRooModelSum::BuildModel(RooRealVar** vars)
 {
     // Build the model using the variables 'vars'.
