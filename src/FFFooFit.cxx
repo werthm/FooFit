@@ -1,5 +1,5 @@
 /*************************************************************************
- * Author: Dominik Werthmueller, 2015
+ * Author: Dominik Werthmueller, 2015-2017
  *************************************************************************/
 
 //////////////////////////////////////////////////////////////////////////
@@ -164,5 +164,69 @@ Bool_t FFFooFit::FileExists(const Char_t* f)
     // check file
     if (!gSystem->AccessPathName(fn)) return kTRUE;
     else return kFALSE;
+}
+
+//______________________________________________________________________________
+Int_t FFFooFit::LastIndexOf(const Char_t* s, Char_t c)
+{
+    // Returns the position of the last occurrence of the character c
+    // in the string s. Returns -1 if c was not found.
+
+    const Char_t* pos = strrchr(s, (Int_t)c);
+    if (pos)
+        return pos-s;
+    else
+        return -1;
+}
+
+//______________________________________________________________________________
+TString FFFooFit::ExpandPath(const Char_t* s)
+{
+    // Expand all shell variables in the string 's' and return the result.
+
+    return TString(gSystem->ExpandPathName(s));
+}
+
+//______________________________________________________________________________
+TString FFFooFit::ExtractFileName(const Char_t* s)
+{
+    // Extracts the file name of a file given by its full Unix paths in
+    // the string s.
+
+    // create TString
+    TString out(s);
+
+    // search last slash
+    Int_t pos = LastIndexOf(s, '/');
+
+    // remove leading path
+    if (pos != -1)
+        out.Remove(0, pos+1);
+
+    return out;
+}
+
+//______________________________________________________________________________
+TString FFFooFit::ExtractDirectory(const Char_t* s)
+{
+    // Extracts the parent directory out of the full Unix path 's'.
+
+    // create TString
+    TString out(s);
+
+    // search last slash
+    Int_t pos = LastIndexOf(s, '/');
+
+    // format directory
+    if (pos == -1)
+        out = ".";
+    else
+    {
+        out.Remove(pos, strlen(s)-pos);
+        if (!out.Length())
+            out = ".";
+    }
+
+    return out;
 }
 
