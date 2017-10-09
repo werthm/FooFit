@@ -66,52 +66,61 @@ Int_t FFFooFit::GetNumberOfCPUs()
 }
 
 //______________________________________________________________________________
-Bool_t FFFooFit::LoadFilesToChain(const Char_t* loc, TChain* chain)
+Bool_t FFFooFit::LoadFilesToChain(const Char_t* loc, TChain* chain,
+                                  const Char_t* wildCard)
 {
     // Add all ROOT files in the location 'loc' to the TChain 'chain'.
+    // If 'loc' is a single ROOT file, it will be added to the first chain.
+    // If 'wildCard' is non-zero, look for files in 'loc' using this file wild card.
     // Return kTRUE if the loading was successful without any error, otherwise kFALSE.
 
     Char_t tmp[256];
 
     // read location
-    Char_t* loc_ex = gSystem->ExpandPathName(loc);
+    TString loc_ex = ExpandPath(loc);
 
-    // check if file exits
-    if (!FileExists(loc_ex))
+    // check if file exists
+    if (!FileExists(loc_ex.Data()) && wildCard == 0)
     {
-        Error("FFFooFit::LoadFilesToChain", "File or directory '%s' does not exist!", loc_ex);
-        delete loc_ex;
-        return kFALSE;
+        // try to use parent directory and file name as wild card
+        TString file = ExtractFileName(loc_ex.Data());
+        TString parent = ExtractDirectory(loc_ex.Data());
+        if (!LoadFilesToChain(parent.Data(), chain, file.Data()))
+        {
+            Error("FFFooFit::LoadFilesToChain", "File or directory '%s' does not exist!", loc_ex.Data());
+            return kFALSE;
+        }
+        else
+        {
+            return kTRUE;
+        }
     }
 
     // check if location is a single file
-    TSystemFile file(loc_ex, "rawfile");
+    TSystemFile file(loc_ex.Data(), "rawfile");
     if (!file.IsDirectory())
     {
         // check if it is a ROOT file
-        TString str(loc_ex);
+        TString str(loc_ex.Data());
         if (str.EndsWith(".root"))
         {
-            Info("FFFooFit::LoadFilesToChain", "[1] Adding '%s' to chain 0", loc_ex);
-            chain->Add(loc_ex);
-            delete loc_ex;
+            Info("FFFooFit::LoadFilesToChain", "[1] Adding '%s' to chain 0", loc_ex.Data());
+            chain->Add(loc_ex.Data());
             return kTRUE;
         }
         else
         {
-            Error("FFFooFit::LoadFilesToChain", "'%s' does not seem to be a ROOT file!", loc_ex);
-            delete loc_ex;
+            Error("FFFooFit::LoadFilesToChain", "'%s' does not seem to be a ROOT file!", loc_ex.Data());
             return kFALSE;
         }
     }
 
     // try to get directory content
-    TSystemDirectory dir("rawdir", loc_ex);
+    TSystemDirectory dir("rawdir", loc_ex.Data());
     TList* list = dir.GetListOfFiles();
     if (!list)
     {
-        Error("FFFooFit::LoadFilesToChain", "'%s' is not a directory!", loc_ex);
-        delete loc_ex;
+        Error("FFFooFit::LoadFilesToChain", "'%s' is not a directory!", loc_ex.Data());
         return kFALSE;
     }
 
@@ -129,7 +138,11 @@ Bool_t FFFooFit::LoadFilesToChain(const Char_t* loc, TChain* chain)
         if (str.EndsWith(".root"))
         {
             // full path
-            sprintf(tmp, "%s/%s", loc_ex, f->GetName());
+            sprintf(tmp, "%s/%s", loc_ex.Data(), f->GetName());
+
+            // check wild card
+            if (wildCard && !str.Contains(wildCard))
+                continue;
 
             // user information
             Info("FFFooFit::LoadFilesToChain", "[%d] Adding '%s' to chain", n+1, tmp);
@@ -144,7 +157,6 @@ Bool_t FFFooFit::LoadFilesToChain(const Char_t* loc, TChain* chain)
 
     // clean-up
     delete list;
-    delete loc_ex;
 
     return kTRUE;
 }

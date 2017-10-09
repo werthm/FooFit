@@ -24,7 +24,8 @@ namespace FFFooFit
     extern Int_t gParStrat;     // parallelization strategy
 
     Int_t GetNumberOfCPUs();
-    Bool_t LoadFilesToChain(const Char_t* loc, TChain* chain);
+    Bool_t LoadFilesToChain(const Char_t* loc, TChain* chain,
+                            const Char_t* wildCard = 0);
     Bool_t FileExists(const Char_t* f);
 
     Int_t LastIndexOf(const Char_t* s, Char_t c);
