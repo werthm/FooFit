@@ -126,3 +126,23 @@ void FFRooModelSum::BuildModel(RooRealVar** vars)
     fPdf = new RooAddPdf(GetName(), GetTitle(), modelList, coeffList);
 }
 
+//______________________________________________________________________________
+void FFRooModelSum::Print(Option_t* option) const
+{
+    // Print out the content of this class.
+
+    // call parent method
+    FFRooModel::Print(option);
+
+    printf("%sFFRooModelSum content:\n", option);
+    if (fNPar)
+    {
+        printf("%sModel summands\n", option);
+        for (Int_t i = 0; i < fNPar; i++)
+        {
+            printf("%s  Summand %2d:\n", option, i);
+            fModelList[i]->Print(TString::Format("%s    ", option).Data());
+        }
+    }
+}
+

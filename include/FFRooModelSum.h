@@ -35,6 +35,8 @@ public:
 
     virtual void BuildModel(RooRealVar** vars);
 
+    virtual void Print(Option_t* option = "") const;
+
     ClassDef(FFRooModelSum, 0)  // RooFit sum of models class
 };
 
