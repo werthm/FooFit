@@ -218,6 +218,39 @@ Bool_t FFRooFitterTree::AddSpeciesHistPdf(const Char_t* name, const Char_t* titl
 }
 
 //______________________________________________________________________________
+Bool_t FFRooFitterTree::AddSpeciesHistPdf(const Char_t* name, const Char_t* title, TH1* hist,
+                                          Bool_t addShiftPar)
+{
+    // Add the species with name 'name', title 'title' and histogram 'hist'
+    // to the list of species to be fit using a histogram pdf.
+    // Add a shift parameter if 'addShiftPar' is kTRUE.
+    // Return kTRUE if the species was added, otherwise return kFALSE.
+
+    // models for all fit variables
+    FFRooModel* models[fFitter->GetNVariable()];
+
+    // loop over fit variables
+    Char_t tmp[256] = "";
+    for (Int_t i = 0; i < fFitter->GetNVariable(); i++)
+    {
+        strcat(tmp, fFitter->GetVariable(i)->GetName());
+        strcat(tmp, "_");
+    }
+
+    // create the model
+    FFRooModel* tot_model = new FFRooModelHist(TString::Format("%s%s", tmp, name).Data(),
+                                               title, hist, addShiftPar);
+
+    // create species
+    FFRooFitterSpecies* spec = new FFRooFitterSpecies(name, title, tot_model);
+
+    // add species
+    AddSpecies(spec);
+
+    return kTRUE;
+}
+
+//______________________________________________________________________________
 Bool_t FFRooFitterTree::AddSpeciesKeysPdf(const Char_t* name, const Char_t* title, const Char_t* treeLoc,
                                           const Char_t* opt, Double_t rho, Int_t nSigma, Bool_t rotate)
 {
