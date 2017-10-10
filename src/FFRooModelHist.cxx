@@ -32,7 +32,7 @@ FFRooModelHist::FFRooModelHist(const Char_t* name, const Char_t* title, TH1* his
     Char_t tmp[256];
 
     // init members
-    fNDim = fHist->GetDimension();
+    fNDim = hist->GetDimension();
     fHist = hist;
     fTree = 0;
     fWeightVar = 0;
