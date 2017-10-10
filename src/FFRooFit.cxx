@@ -295,6 +295,10 @@ Bool_t FFRooFit::PrepareFit()
         // get range of data set
         fData->getRange(*fVar[i], min, max);
 
+        // round to next integer
+        min = TMath::Floor(min);
+        max = TMath::Ceil(max);
+
         // compare minimum values
         if (fVar[i]->getMin() < min)
         {
