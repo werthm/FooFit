@@ -247,3 +247,29 @@ void FFRooModel::FixParameter(Int_t i, Double_t v)
     }
 }
 
+//______________________________________________________________________________
+void FFRooModel::Print(Option_t* option) const
+{
+    // Print out the content of this class.
+
+    printf("%sFFRooModel content:\n", option);
+    printf("%sName                       : %s\n", option, GetName());
+    printf("%sTitle                      : %s\n", option, GetTitle());
+    printf("%sNumber of parameters       : %d\n", option, fNPar);
+    printf("%sNumber of variable transf. : %d\n", option, fNVarTrans);
+    printf("%sModel PDF name             : 0x%x\n", option, fPdf);
+    if (fNPar)
+    {
+        printf("%sParameters\n", option);
+        for (Int_t i = 0; i < fNPar; i++)
+        {
+            printf("%s  Par %2d: %s (%s)\n",
+                   option, i, fPar[i]->GetName(), fPar[i]->GetTitle());
+            printf("%s          Value: %14.7e  Error: %14.7e\n",
+                   option, fPar[i]->getVal(), fPar[i]->getError());
+            printf("%s          Min  : %14.7e  Max  : %14.7e\n",
+                   option, fPar[i]->getMin(), fPar[i]->getMax());
+        }
+    }
+}
+

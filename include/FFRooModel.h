@@ -61,6 +61,8 @@ public:
 
     virtual void BuildModel(RooRealVar** vars) = 0;
 
+    virtual void Print(Option_t* option = "") const;
+
     ClassDef(FFRooModel, 1)  // Abstract RooFit model class
 };
 
