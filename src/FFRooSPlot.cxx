@@ -169,10 +169,33 @@ const Char_t* FFRooSPlot::GetSpeciesName(Int_t i) const
 
     // check species index
     if (CheckSpecBounds(i, "GetSpeciesName()"))
-    {
         return fModel->GetParTitle(i);
-    }
-    else return 0;
+    else
+        return 0;
+}
+
+//______________________________________________________________________________
+Double_t FFRooSPlot::GetSpeciesYield(Int_t i) const
+{
+    // Return the yield of the species at index 'i'.
+
+    // check species index
+    if (CheckSpecBounds(i, "GetSpeciesYield()"))
+        fModel->GetParameter(i);
+    else
+        return 0;
+}
+
+//______________________________________________________________________________
+Double_t FFRooSPlot::GetSpeciesYieldError(Int_t i) const
+{
+    // Return the yield error of the species at index 'i'.
+
+    // check species index
+    if (CheckSpecBounds(i, "GetSpeciesYieldError()"))
+        fModel->GetParError(i);
+    else
+        return 0;
 }
 
 //______________________________________________________________________________

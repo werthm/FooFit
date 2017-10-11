@@ -48,6 +48,8 @@ public:
     FFRooModel** GetSpeciesModels() const { return fSpecModel; }
     FFRooModel* GetSpeciesModel(Int_t i) const { return fSpecModel[i]; }
     const Char_t* GetSpeciesName(Int_t i) const;
+    Double_t GetSpeciesYield(Int_t i) const;
+    Double_t GetSpeciesYieldError(Int_t i) const;
 
     void SetSpeciesModel(Int_t i, FFRooModel* model);
     void SetSpeciesYield(Int_t i, Double_t v);
