@@ -17,6 +17,7 @@
 #include "FFRooFitter.h"
 
 class TTree;
+class TH1;
 
 class FFRooFitterTree : public FFRooFitter
 {
