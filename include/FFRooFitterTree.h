@@ -25,8 +25,6 @@ protected:
     TTree* fTree;                   // input tree
     Char_t* fWeightVar;             // name of event weight variable
 
-    virtual Bool_t PrepareFit();
-
 public:
     FFRooFitterTree(): FFRooFitter(),
                        fTree(0),

@@ -293,12 +293,3 @@ Bool_t FFRooFitterTree::AddSpeciesKeysPdf(const Char_t* name, const Char_t* titl
     return kTRUE;
 }
 
-//______________________________________________________________________________
-Bool_t FFRooFitterTree::PrepareFit()
-{
-    // Prepare the fit.
-    // Return kFALSE if an error occurred, otherwise kTRUE.
-
-    return kTRUE;
-}
-
