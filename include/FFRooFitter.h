@@ -30,7 +30,6 @@ protected:
     FFRooFitterSpecies** fSpec;     //[fNSpec] array of species
 
     Bool_t BuildModel();
-    virtual Bool_t PrepareFit() = 0;
 
 public:
     FFRooFitter(): TNamed(),
@@ -52,7 +51,7 @@ public:
     void SetNChi2PreFit(Int_t n);
     void SetMinimizer(FFRooFit::FFMinimizer_t min);
 
-    Bool_t Fit();
+    virtual Bool_t Fit();
 
     TCanvas* DrawFit(const Char_t* opt = "");
     RooPlot* PlotDataAndModel(Int_t var, const Char_t* opt = "");

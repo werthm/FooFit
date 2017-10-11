@@ -238,13 +238,6 @@ Bool_t FFRooFitter::Fit()
         return kFALSE;
     }
 
-    // do various things before fitting
-    if (!PrepareFit())
-    {
-        Error("Fit", "An error occurred while preparing the fit routine!");
-        return kFALSE;
-    }
-
     // perform the fit
     Bool_t res = fFitter->Fit();
 
