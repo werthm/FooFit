@@ -30,6 +30,9 @@ protected:
     Char_t* fWeightVar;             // event weight variable for unbin. input data
     RooDataHist* fDataHist;         // data histogram
 
+    void DetermineHistoBinning(RooRealVar* var, RooRealVar* par,
+                               Int_t* nBin, Double_t* min, Double_t* max);
+
 public:
     FFRooModelHist() : FFRooModel(),
                        fNDim(0),

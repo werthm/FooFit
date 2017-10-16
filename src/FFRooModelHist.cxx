@@ -100,6 +100,36 @@ FFRooModelHist::~FFRooModelHist()
 }
 
 //______________________________________________________________________________
+void FFRooModelHist::DetermineHistoBinning(RooRealVar* var, RooRealVar* par,
+                                           Int_t* nBin, Double_t* min, Double_t* max)
+{
+    // Determine the binning of the histogram used to construct the pdf for
+    // the variable 'var' taking into account the parameter 'par'.
+    // Return the number of bins and the lower and upper bounds via 'nBin',
+    // 'min', and 'max', respectively.
+
+    // calculate the binning
+    RooAbsBinning& binning = var->getBinning();
+    Double_t binw = binning.averageBinWidth();
+
+    // different binning if shift parameter is present
+    if (par)
+    {
+        *min = TMath::Min(binning.lowBound() - par->getMin(), binning.lowBound() - par->getMax());
+        *max = TMath::Max(binning.highBound() - par->getMin(), binning.highBound() - par->getMax());
+        *min = TMath::Min(*min, binning.lowBound() - binw);
+        *max = TMath::Max(*max, binning.lowBound() + binw);
+        *nBin = (*max - *min) / binw;
+    }
+    else
+    {
+        *min = binning.lowBound() - binw;
+        *max = binning.highBound() + binw;
+        *nBin = binning.numBins() + 2;
+    }
+}
+
+//______________________________________________________________________________
 void FFRooModelHist::BuildModel(RooRealVar** vars)
 {
     // Build the model using the variables 'vars'.
