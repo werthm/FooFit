@@ -147,15 +147,21 @@ void FFRooModelHist::BuildModel(RooRealVar** vars)
         // check dimension
         if (fNDim == 1)
         {
+            // calculate the binning
+            Int_t nbin_0 = 0;
+            Double_t min_0 = 0, max_0 = 0;
+            if (fNPar)
+                DetermineHistoBinning(vars[0], fPar[0], &nbin_0, &min_0, &max_0);
+            else
+                DetermineHistoBinning(vars[0], 0, &nbin_0, &min_0, &max_0);
+
             // create the histogram
             fHist = new TH1F(TString::Format("hist_%s_%s",
                                              vars[0]->GetName(),
                                              GetName()).Data(),
                              TString::Format("Histogram variable '%s' of species '%s'",
                              vars[0]->GetTitle(), GetTitle()).Data(),
-                             vars[0]->getBinning().numBins(),
-                             vars[0]->getBinning().lowBound(),
-                             vars[0]->getBinning().highBound());
+                             nbin_0, min_0, max_0);
 
             // fill the histogram
             fTree->Draw(TString::Format("%s>>hist_%s_%s",
@@ -166,6 +172,22 @@ void FFRooModelHist::BuildModel(RooRealVar** vars)
         }
         else if (fNDim == 2)
         {
+            // calculate the binning
+            Int_t nbin_0 = 0;
+            Int_t nbin_1 = 0;
+            Double_t min_0 = 0, max_0 = 0;
+            Double_t min_1 = 0, max_1 = 0;
+            if (fNPar)
+            {
+                DetermineHistoBinning(vars[0], fPar[0], &nbin_0, &min_0, &max_0);
+                DetermineHistoBinning(vars[1], fPar[1], &nbin_1, &min_1, &max_1);
+            }
+            else
+            {
+                DetermineHistoBinning(vars[0], 0, &nbin_0, &min_0, &max_0);
+                DetermineHistoBinning(vars[1], 0, &nbin_1, &min_1, &max_1);
+            }
+
             // create the histogram
             fHist = new TH2F(TString::Format("hist_%s_%s_%s",
                                              vars[0]->GetName(),
@@ -173,12 +195,8 @@ void FFRooModelHist::BuildModel(RooRealVar** vars)
                                              GetName()).Data(),
                              TString::Format("Histogram variables '%s' and '%s' of species '%s'",
                              vars[0]->GetTitle(), vars[1]->GetTitle(), GetTitle()).Data(),
-                             vars[0]->getBinning().numBins(),
-                             vars[0]->getBinning().lowBound(),
-                             vars[0]->getBinning().highBound(),
-                             vars[1]->getBinning().numBins(),
-                             vars[1]->getBinning().lowBound(),
-                             vars[1]->getBinning().highBound());
+                             nbin_0, min_0, max_0,
+                             nbin_1, min_1, max_1);
 
             // fill the histogram
             fTree->Draw(TString::Format("%s:%s>>hist_%s_%s_%s",
@@ -191,6 +209,26 @@ void FFRooModelHist::BuildModel(RooRealVar** vars)
         }
         else if (fNDim == 3)
         {
+            // calculate the binning
+            Int_t nbin_0 = 0;
+            Int_t nbin_1 = 0;
+            Int_t nbin_2 = 0;
+            Double_t min_0 = 0, max_0 = 0;
+            Double_t min_1 = 0, max_1 = 0;
+            Double_t min_2 = 0, max_2 = 0;
+            if (fNPar)
+            {
+                DetermineHistoBinning(vars[0], fPar[0], &nbin_0, &min_0, &max_0);
+                DetermineHistoBinning(vars[1], fPar[1], &nbin_1, &min_1, &max_1);
+                DetermineHistoBinning(vars[2], fPar[2], &nbin_2, &min_2, &max_2);
+            }
+            else
+            {
+                DetermineHistoBinning(vars[0], 0, &nbin_0, &min_0, &max_0);
+                DetermineHistoBinning(vars[1], 0, &nbin_1, &min_1, &max_1);
+                DetermineHistoBinning(vars[2], 0, &nbin_2, &min_2, &max_2);
+            }
+
             // create the histogram
             fHist = new TH3F(TString::Format("hist_%s_%s_%s_%s",
                                              vars[0]->GetName(),
@@ -199,15 +237,9 @@ void FFRooModelHist::BuildModel(RooRealVar** vars)
                                              GetName()).Data(),
                              TString::Format("Histogram variables '%s', '%s' and '%s' of species '%s'",
                              vars[0]->GetTitle(), vars[1]->GetTitle(), vars[2]->GetTitle(), GetTitle()).Data(),
-                             vars[0]->getBinning().numBins(),
-                             vars[0]->getBinning().lowBound(),
-                             vars[0]->getBinning().highBound(),
-                             vars[1]->getBinning().numBins(),
-                             vars[1]->getBinning().lowBound(),
-                             vars[1]->getBinning().highBound(),
-                             vars[2]->getBinning().numBins(),
-                             vars[2]->getBinning().lowBound(),
-                             vars[2]->getBinning().highBound());
+                             nbin_0, min_0, max_0,
+                             nbin_1, min_1, max_1,
+                             nbin_2, min_2, max_2);
 
             // fill the histogram
             fTree->Draw(TString::Format("%s:%s:%s>>hist_%s_%s_%s_%s",
