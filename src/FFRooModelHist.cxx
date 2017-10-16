@@ -259,11 +259,30 @@ void FFRooModelHist::BuildModel(RooRealVar** vars)
         }
     }
 
+    // backup binning of variables as RooDataHist annoyingly alters that
+    Int_t vbins[fNDim];
+    Double_t vmin[fNDim];
+    Double_t vmax[fNDim];
+    for (Int_t i = 0; i < fNDim; i++)
+    {
+        vbins[i] = vars[i]->getBinning().numBins();
+        vmin[i] = vars[i]->getBinning().lowBound();
+        vmax[i] = vars[i]->getBinning().highBound();
+    }
+
     // create RooFit histogram
     if (fDataHist) delete fDataHist;
     fDataHist = new RooDataHist(TString::Format("%s_RooFit", fHist->GetName()),
                                 TString::Format("%s (RooFit)", fHist->GetTitle()),
                                 varSet, RooFit::Import(*fHist));
+
+    // restore binning of variables
+    for (Int_t i = 0; i < fNDim; i++)
+    {
+        vars[i]->setBins(vbins[i]);
+        vars[i]->setMin(vmin[i]);
+        vars[i]->setMax(vmax[i]);
+    }
 
     // add shift transformation
     RooArgSet varSetTrans;
