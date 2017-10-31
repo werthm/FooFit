@@ -886,3 +886,51 @@ TCanvas* FFRooFit::DrawFit(const Char_t* opt)
     }
 }
 
+//______________________________________________________________________________
+TCanvas* FFRooFit::DrawCorrelations(const Char_t* opt)
+{
+    // Draw correlations between fit and control variables.
+    // NOTE: the returned TCanvas has to be destroyed by the caller.
+
+    // total number of variables
+    Int_t nvar = fNVar + fNVarCtrl;
+
+    // create the canvas
+    TCanvas* canvas = new TCanvas(TString::Format("%s_Correl", GetName()).Data(),
+                                  TString::Format("Variable correlations of %s", GetTitle()).Data(),
+                                  700, 500);
+    canvas->Divide(nvar, nvar, 0.001, 0.001);
+
+    // create list of variables
+    RooRealVar* vars[nvar];
+    for (Int_t i = 0; i < fNVar; i++)
+        vars[i] = fVar[i];
+    for (Int_t i = 0; i < fNVarCtrl; i++)
+        vars[fNVar + i] = fVarCtrl[i];
+
+    // loop over variables
+    Int_t n = 1;
+    for (Int_t i = 0; i < nvar; i++)
+    {
+        // loop over variables
+        for (Int_t j = 0; j < nvar; j++)
+        {
+            // create histogram
+            TH2* h = (TH2*) fData->createHistogram(TString::Format("%s_vs_%s",
+                                                   vars[j]->GetName(), vars[i]->GetName()).Data(),
+                                                   *vars[i], RooFit::AutoBinning(100, 0.05),
+                                                   RooFit::YVar(*vars[j], RooFit::AutoBinning(100, 0.05)));
+            h->SetTitle(TString::Format("%s vs. %s", vars[j]->GetTitle(), vars[i]->GetTitle()).Data());
+
+            // draw histogram
+            canvas->cd(n);
+            h->Draw(opt);
+
+            // increment counter
+            n++;
+        }
+    }
+
+    return canvas;
+}
+
