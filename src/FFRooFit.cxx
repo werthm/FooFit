@@ -806,8 +806,9 @@ TCanvas* FFRooFit::DrawFit(const Char_t* opt)
     if (fNVar == 1)
     {
         // create the canvas
-        sprintf(tmp, "Result of %s", GetTitle());
-        TCanvas* canvas = new TCanvas(GetName(), tmp, 700, 500);
+        TCanvas* canvas = new TCanvas(TString::Format("%s_Result", GetName()).Data(),
+                                      TString::Format("Result of %s", GetTitle()).Data(),
+                                      700, 500);
 
         // plot data and model projection
         RooPlot* p = PlotDataAndModel(0, opt);
@@ -820,8 +821,10 @@ TCanvas* FFRooFit::DrawFit(const Char_t* opt)
     {
         // create the canvas
         Int_t nPad = 1;
-        sprintf(tmp, "Result of %s", GetTitle());
-        TCanvas* canvas = new TCanvas(GetName(), tmp, 900, 800);
+        TCanvas* canvas = new TCanvas(TString::Format("%s_Result", GetName()).Data(),
+                                      TString::Format("Result of %s", GetTitle()).Data(),
+                                      900, 800);
+
         if (fNVar == 2) canvas->Divide(2, 3);
         else if (fNVar == 3) canvas->Divide(3, 4);
 
