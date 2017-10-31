@@ -147,6 +147,19 @@ TCanvas* FFRooFitter::DrawFit(const Char_t* opt)
 }
 
 //______________________________________________________________________________
+TCanvas* FFRooFitter::DrawCorrelations(const Char_t* opt)
+{
+    // Wrapper for FFRooFit::DrawCorrelations().
+
+    if (fFitter)
+        return fFitter->DrawCorrelations(opt);
+    else
+        Error("DrawCorrelations", "Fitter not created yet!");
+
+    return 0;
+}
+
+//______________________________________________________________________________
 RooPlot* FFRooFitter::PlotDataAndModel(Int_t var, const Char_t* opt)
 {
     // Wrapper for FFRooFit::PlotDataAndModel().
