@@ -94,7 +94,7 @@ public:
 
     virtual Bool_t Fit();
 
-    TCanvas* DrawFit(const Char_t* opt = "");
+    TCanvas* DrawFit(const Char_t* opt = "", Int_t var = -1);
     TCanvas* DrawCorrelations(const Char_t* opt = "");
     RooPlot* PlotDataAndModel(Int_t var, const Char_t* opt = "");
     TH2* PlotData2D(Int_t var0, Int_t var1);

@@ -795,23 +795,37 @@ TH2* FFRooFit::PlotModel2D(Int_t var0, Int_t var1)
 }
 
 //______________________________________________________________________________
-TCanvas* FFRooFit::DrawFit(const Char_t* opt)
+TCanvas* FFRooFit::DrawFit(const Char_t* opt, Int_t var)
 {
     // Draw the fit results.
+    // If 'var' is different to -1, plot only the variable with this index.
     // NOTE: the returned TCanvas has to be destroyed by the caller.
 
     Char_t tmp[256];
 
     // 1-dimensional fit
-    if (fNVar == 1)
+    if (fNVar == 1 || var != -1)
     {
         // create the canvas
-        TCanvas* canvas = new TCanvas(TString::Format("%s_Result", GetName()).Data(),
-                                      TString::Format("Result of %s", GetTitle()).Data(),
-                                      700, 500);
+        TCanvas* canvas;
+        Int_t v;
+        if (var != -1)
+        {
+            canvas = new TCanvas(TString::Format("%s_Result_Var_%d", GetName(), var).Data(),
+                                 TString::Format("Result of %s (Variable %s)", GetTitle(), fVar[var]->GetTitle()).Data(),
+                                 700, 500);
+            v = var;
+        }
+        else
+        {
+            canvas = new TCanvas(TString::Format("%s_Result", GetName()).Data(),
+                                 TString::Format("Result of %s", GetTitle()).Data(),
+                                 700, 500);
+            v = 0;
+        }
 
         // plot data and model projection
-        RooPlot* p = PlotDataAndModel(0, opt);
+        RooPlot* p = PlotDataAndModel(v, opt);
         if (p) p->Draw();
 
         return canvas;
