@@ -17,7 +17,6 @@
 #include "FFRooFit.h"
 
 class FFRooFit;
-class RRFooModel;
 class FFRooFitterSpecies;
 
 class FFRooFitter : public TNamed
@@ -39,7 +38,6 @@ public:
     FFRooFitter(const Char_t* name, const Char_t* title);
     virtual ~FFRooFitter();
 
-    FFRooFit* GetFitter() const { return fFitter; }
     Int_t GetNSpecies() const { return fNSpec; }
     FFRooFitterSpecies* GetSpecies(Int_t i) const;
 
