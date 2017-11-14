@@ -257,7 +257,7 @@ void FFRooModel::Print(Option_t* option) const
     printf("%sTitle                      : %s\n", option, GetTitle());
     printf("%sNumber of parameters       : %d\n", option, fNPar);
     printf("%sNumber of variable transf. : %d\n", option, fNVarTrans);
-    printf("%sModel PDF name             : 0x%x\n", option, fPdf);
+    printf("%sModel PDF                  : 0x%x\n", option, fPdf);
     if (fNPar)
     {
         printf("%sParameters\n", option);
