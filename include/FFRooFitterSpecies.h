@@ -22,7 +22,7 @@ class FFRooFitterSpecies : public TNamed
 {
 
 protected:
-    FFRooModel* fModel;             //! RooFit model
+    FFRooModel* fModel;             // RooFit model
     Double_t fYieldInit;            // initial value of yield parameter
     Double_t fYieldFit;             // fitted value of yield parameter
     Double_t fYieldFitError;        // error of fitted value of yield parameter
