@@ -381,3 +381,78 @@ Double_t FFRooSPlot::GetSpeciesWeight(Int_t event, Int_t i) const
     else return 0;
 }
 
+//______________________________________________________________________________
+TTree* FFRooSPlot::GetSpeciesWeightsTree(const Char_t* name,
+                                         Int_t nSpec, Int_t* spec) const
+{
+    // Return a tree named 'name' containing the species weights for all events.
+    // If 'nSpec' and 'spec' are non-zero, save only the weights for the 'nSpec'
+    // species with indices 'spec' to the tree.
+
+    // check fit
+    if (!fSPlot)
+        return 0;
+
+    // number of events
+    Int_t nEvents = GetNEvents();
+
+    // check species
+    Int_t specIdx[nSpec];
+    if (!nSpec && !spec)
+    {
+        for (Int_t i = 0; i < fNSpec; i++)
+            specIdx[i] = i;
+        nSpec = fNSpec;
+        spec = specIdx;
+    }
+
+    // set tree name
+    TString tname;
+    if (name)
+        tname = name;
+    else
+        tname = TString::Format("%s_sweights", GetName());
+
+    // create the tree title listing the species
+    TString ttitle = "Species: ";
+    for (Int_t i = 0; i < nSpec; i++)
+    {
+        ttitle += GetSpeciesName(spec[i]);
+        ttitle += TString::Format("(%d)", spec[i]);
+        if (i != nSpec-1) ttitle += ",";
+    }
+
+    // create the tree
+    TTree* tree = new TTree(tname.Data(), ttitle.Data());
+
+    // create branches
+    Double_t event_id;
+    Float_t weights[nSpec];
+    tree->Branch("event_id", &event_id, "event_id/D");
+    for (Int_t i = 0; i < nSpec; i++)
+    {
+        tree->Branch(TString::Format("sweights_%d", spec[i]).Data(),
+                     &weights[i],
+                     TString::Format("sweights_%d/F", spec[i]).Data());
+    }
+
+    // loop over fitted events
+    for (Int_t i = 0; i < nEvents; i++)
+    {
+        // read event ID
+        event_id = GetEventID(i);
+
+        // loop over species
+        for (Int_t j = 0; j < nSpec; j++)
+        {
+            // get weight for species
+            weights[j] = GetSpeciesWeight(i, spec[j]);
+        }
+
+        // fill tree
+        tree->Fill();
+    }
+
+    return tree;
+}
+

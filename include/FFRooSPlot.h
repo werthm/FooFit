@@ -61,6 +61,8 @@ public:
     Int_t GetNEvents() const;
     Double_t GetEventID(Int_t event) const;
     Double_t GetSpeciesWeight(Int_t event, Int_t i) const;
+    TTree* GetSpeciesWeightsTree(const Char_t* name = 0,
+                                 Int_t nSpec = 0, Int_t* spec = 0) const;
 
     ClassDef(FFRooSPlot, 0)  // perform sPlot fits with RooFit
 };
