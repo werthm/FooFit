@@ -77,3 +77,17 @@ Bool_t FFRooFitterSPlot::Fit()
     return res;
 }
 
+//______________________________________________________________________________
+TTree* FFRooFitterSPlot::GetSpeciesWeightsTree(const Char_t* name,
+                                               Int_t nSpec, Int_t* spec) const
+{
+    // Wrapper for FFRooSPlot::GetSpeciesWeightsTree().
+
+    if (fFitter)
+        return ((FFRooSPlot*)fFitter)->GetSpeciesWeightsTree(name, nSpec, spec);
+    else
+        Error("GetSpeciesWeightsTree", "Fitter not created yet!");
+
+    return 0;
+}
+

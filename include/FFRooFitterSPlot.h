@@ -34,6 +34,9 @@ public:
 
     virtual Bool_t Fit();
 
+    TTree* GetSpeciesWeightsTree(const Char_t* name = 0,
+                                 Int_t nSpec = 0, Int_t* spec = 0) const;
+
     ClassDef(FFRooFitterSPlot, 0)  // Class for species fitting/weighting using tree data
 };
 
