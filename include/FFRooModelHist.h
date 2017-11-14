@@ -27,7 +27,7 @@ protected:
     Int_t fNDim;                    // number of dimensions
     TH1* fHist;                     // binned input data
     TTree* fTree;                   // unbinned input data
-    Char_t* fWeightVar;             // event weight variable for unbin. input data
+    TString fWeightVar;             // event weight variable for unbin. input data
     RooDataHist* fDataHist;         // data histogram
 
     void DetermineHistoBinning(RooRealVar* var, RooRealVar* par,
@@ -37,7 +37,7 @@ public:
     FFRooModelHist() : FFRooModel(),
                        fNDim(0),
                        fHist(0), fTree(0),
-                       fWeightVar(0),
+                       fWeightVar(""),
                        fDataHist(0) { }
     FFRooModelHist(const Char_t* name, const Char_t* title, TH1* hist,
                    Bool_t addShiftPar = kFALSE);

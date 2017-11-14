@@ -35,7 +35,7 @@ FFRooModelHist::FFRooModelHist(const Char_t* name, const Char_t* title, TH1* his
     fNDim = hist->GetDimension();
     fHist = hist;
     fTree = 0;
-    fWeightVar = 0;
+    fWeightVar = "";
     fDataHist = 0;
 
     // add shift parameters
@@ -64,15 +64,9 @@ FFRooModelHist::FFRooModelHist(const Char_t* name, const Char_t* title, Int_t nD
     fNDim = nDim;
     fHist = 0;
     fTree = tree;
+    fWeightVar = "";
     if (weightVar)
-    {
-        fWeightVar = new Char_t[256];
-        strcpy(fWeightVar, weightVar);
-    }
-    else
-    {
-        fWeightVar = 0;
-    }
+        fWeightVar = weightVar;
     fDataHist = 0;
 
     // add shift parameters
@@ -95,7 +89,6 @@ FFRooModelHist::~FFRooModelHist()
 
     if (fHist) delete fHist;
     if (fTree) delete fTree;
-    if (fWeightVar) delete [] fWeightVar;
     if (fDataHist) delete fDataHist;
 }
 
@@ -168,7 +161,7 @@ void FFRooModelHist::BuildModel(RooRealVar** vars)
                                         vars[0]->GetName(),
                                         vars[0]->GetName(),
                                         GetName()).Data(),
-                        fWeightVar);
+                        fWeightVar.Data());
         }
         else if (fNDim == 2)
         {
@@ -205,7 +198,7 @@ void FFRooModelHist::BuildModel(RooRealVar** vars)
                                         vars[0]->GetName(),
                                         vars[1]->GetName(),
                                         GetName()).Data(),
-                        fWeightVar);
+                        fWeightVar.Data());
         }
         else if (fNDim == 3)
         {
@@ -250,7 +243,7 @@ void FFRooModelHist::BuildModel(RooRealVar** vars)
                                         vars[1]->GetName(),
                                         vars[2]->GetName(),
                                         GetName()).Data(),
-                        fWeightVar);
+                        fWeightVar.Data());
         }
         else
         {
