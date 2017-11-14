@@ -33,8 +33,7 @@ FFRooModelKeys::FFRooModelKeys(const Char_t* name, const Char_t* title, Int_t nD
     fNDim = nDim;
     fTree = tree;
     fDataSet = 0;
-    fOpt = new Char_t[256];
-    strcpy(fOpt, opt);
+    fOpt = opt;
     fRho = rho;
     fNSigma = nSigma;
     fRotate = rotate;
@@ -47,7 +46,6 @@ FFRooModelKeys::~FFRooModelKeys()
 
     if (fTree) delete fTree;
     if (fDataSet) delete fDataSet;
-    if (fOpt) delete [] fOpt;
 }
 
 //______________________________________________________________________________
@@ -75,6 +73,6 @@ void FFRooModelKeys::BuildModel(RooRealVar** vars)
 
     // create the model pdf
     if (fPdf) delete fPdf;
-    fPdf = new RooNDKeysPdf(GetName(), GetTitle(), varList, *fDataSet, fOpt, fRho, fNSigma, fRotate);
+    fPdf = new RooNDKeysPdf(GetName(), GetTitle(), varList, *fDataSet, fOpt.Data(), fRho, fNSigma, fRotate);
 }
 

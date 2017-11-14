@@ -27,7 +27,7 @@ protected:
     Int_t fNDim;                    // number of dimensions
     TTree* fTree;                   // event tree
     RooDataSet* fDataSet;           // RooFit dataset
-    Char_t* fOpt;                   // option for RooNDKeysPdf
+    TString fOpt;                   // option for RooNDKeysPdf
     Double_t fRho;                  // rho parameter for RooNDKeysPdf
     Int_t fNSigma;                  // nSigma parameter for RooNDKeysPdf
     Bool_t fRotate;                 // rotate parameter for RooNDKeysPdf
@@ -36,7 +36,7 @@ public:
     FFRooModelKeys() : FFRooModel(),
                        fNDim(0),
                        fTree(0), fDataSet(0),
-                       fOpt(0), fRho(0), fNSigma(0), fRotate(kTRUE) { }
+                       fOpt(""), fRho(0), fNSigma(0), fRotate(kTRUE) { }
     FFRooModelKeys(const Char_t* name, const Char_t* title, Int_t nDim, TTree* tree,
                    const Char_t* opt = "a", Double_t rho = 1, Int_t nSigma = 3, Bool_t rotate = kTRUE);
     virtual ~FFRooModelKeys();
