@@ -38,3 +38,27 @@ root [0] .include /some/directory/FooFit/build/include
 root [1] .x FooFitMacro.C++
 ```
 
+#### List of classes
+```
+FFRooModel            : base model pdf class
+  FFRooModelPol       : polynomial function model
+  FFRooModelExpo      : exponential function model
+  FFRooModelGauss     : Gaussian function model
+  FFRooModelHist      : histogram-based model
+  FFRooModelKeys      : model using kernel estimation
+  FFRooModelSum       : sum of models
+  FFRooModelProd      : product of models
+
+FFRooFit              : base fit class
+  FFRooFitHist        : class for fitting binned data
+  FFRooFitTree        : class for fitting unbinned data
+    FFRooSPlot        : class for sPlot fits of unbinned data
+
+FFRooFitter           : base high-level fit class
+  FFRooFitterTree     : class for high-level fitting of unbinned data
+    FFRooFitterSPlot  : class for high-level sPlot fits of unbinned data
+FFRooFitterSpecies    : class representing a fit species
+
+FFFooFit              : namespace for utility methods
+```
+
