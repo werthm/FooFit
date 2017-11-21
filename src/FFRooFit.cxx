@@ -449,6 +449,7 @@ Bool_t FFRooFit::Chi2PreFit()
     Double_t bestChi2;
     Int_t bestFit;
     Double_t bestPar[nPar];
+    Double_t bestParErr[nPar];
 
     // user info
     Info("Chi2PreFit", "Performing %d binned chi2 pre-fit(s) to find "
@@ -491,11 +492,11 @@ Bool_t FFRooFit::Chi2PreFit()
         // print fit result
         printf("\n");
         printf("  Chi2 pre-fit %d    chi2 = %e\n\n", i+1, chi2.getVal());
-        printf("  PARAMETER             VALUE\n");
-        printf("  -------------------------------------\n");
+        printf("  PARAMETER                         VALUE         ERROR\n");
+        printf("  ------------------------------------------------------------\n");
         iter->Reset();
         while (RooRealVar* var = (RooRealVar*)iter->Next())
-            printf("  %-20s  %e\n", var->GetName(), var->getVal());
+            printf("  %-32s  %e  %e\n", var->GetName(), var->getVal(), var->getError());
         printf("\n");
 
         // save best fit
@@ -506,7 +507,11 @@ Bool_t FFRooFit::Chi2PreFit()
             Int_t n = 0;
             iter->Reset();
             while (RooRealVar* var = (RooRealVar*)iter->Next())
-                bestPar[n++] = var->getVal();
+            {
+                bestPar[n] = var->getVal();
+                bestParErr[n] = var->getError();
+                n++;
+            }
         }
     }
 
@@ -514,7 +519,11 @@ Bool_t FFRooFit::Chi2PreFit()
     Int_t n = 0;
     iter->Reset();
     while (RooRealVar* var = (RooRealVar*)iter->Next())
-        var->setVal(bestPar[n++]);
+    {
+        var->setVal(bestPar[n]);
+        var->setError(bestParErr[n]);
+        n++;
+    }
 
     // user info
     Info("Chi2PreFit", "Take fit parameters from fit %d with chi2 = %e", bestFit+1, bestChi2);
