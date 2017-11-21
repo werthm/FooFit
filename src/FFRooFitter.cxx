@@ -259,6 +259,7 @@ Bool_t FFRooFitter::Fit()
     {
         fSpec[i]->SetYieldFit(fModel->GetParameter(i));
         fSpec[i]->SetYieldFitError(fModel->GetParError(i));
+        fSpec[i]->UpdateModelParameters();
     }
 
     return res;
