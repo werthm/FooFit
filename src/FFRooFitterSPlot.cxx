@@ -72,6 +72,7 @@ Bool_t FFRooFitterSPlot::Fit()
     {
         fSpec[i]->SetYieldFit(splot->GetSpeciesYield(i));
         fSpec[i]->SetYieldFitError(splot->GetSpeciesYieldError(i));
+        fSpec[i]->UpdateModelParameters();
     }
 
     return res;
