@@ -30,10 +30,33 @@ class FFRooFit : public TNamed
 {
 
 public:
-    // Minimizer types
+    // Minimizer types (https://root.cern.ch/fitting)
     enum EFFMinimizer {
-        kMinuit,
-        kMinuit2_Migrad
+        // Minuit
+        kMinuit_Migrad,
+        kMinuit_Simplex,
+        kMinuit_Minimize,
+        kMinuit_Scan,
+        kMinuit_Seek,
+        // Fumili
+        kFumili,
+        // Minuit2
+        kMinuit2_Migrad,
+        kMinuit2_Simplex,
+        kMinuit2_Minimize,
+        kMinuit2_Scan,
+        kMinuit2_Combined,
+        kMinuit2_Fumili2,
+        // GSL
+        kGSLMultiFit_LevenMarq,
+        kGSLMultiMin_conjugatefr,
+        kGSLMultiMin_conjugatepr,
+        kGSLMultiMin_bfgs,
+        kGSLMultiMin_bfgs2,
+        kGSLMultiMin_SteepestDescent,
+        kGSLSimAn,
+        // Other
+        kGenetic
     };
     typedef EFFMinimizer FFMinimizer_t;
 

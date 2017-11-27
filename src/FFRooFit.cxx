@@ -266,10 +266,51 @@ RooCmdArg FFRooFit::CreateMinimizerArg(FFMinimizer_t min)
     // check type
     switch (min)
     {
-        case kMinuit:
-            return RooFit::Minimizer("Minuit");
+        // Minuit
+        case kMinuit_Migrad:
+            return RooFit::Minimizer("Minuit", "Migrad");
+        case kMinuit_Simplex:
+            return RooFit::Minimizer("Minuit", "Simplex");
+        case kMinuit_Minimize:
+            return RooFit::Minimizer("Minuit", "Minimize");
+        case kMinuit_Scan:
+            return RooFit::Minimizer("Minuit", "Scan");
+        case kMinuit_Seek:
+            return RooFit::Minimizer("Minuit", "Seek");
+        // Fumili
+        case kFumili:
+            return RooFit::Minimizer("Fumili");
+        // Minuit2
         case kMinuit2_Migrad:
             return RooFit::Minimizer("Minuit2", "Migrad");
+        case kMinuit2_Simplex:
+            return RooFit::Minimizer("Minuit2", "Simplex");
+        case kMinuit2_Minimize:
+            return RooFit::Minimizer("Minuit2", "Minimize");
+        case kMinuit2_Scan:
+            return RooFit::Minimizer("Minuit2", "Scan");
+        case kMinuit2_Combined:
+            return RooFit::Minimizer("Minuit2", "Combined");
+        case kMinuit2_Fumili2:
+            return RooFit::Minimizer("Minuit2", "Fumili2");
+        // GSL
+        case kGSLMultiFit_LevenMarq:
+            return RooFit::Minimizer("GSLMultiFit");
+        case kGSLMultiMin_conjugatefr:
+            return RooFit::Minimizer("GSLMultiMin", "conjugatefr");
+        case kGSLMultiMin_conjugatepr:
+            return RooFit::Minimizer("GSLMultiMin", "conjugatepr");
+        case kGSLMultiMin_bfgs:
+            return RooFit::Minimizer("GSLMultiMin", "bfgs");
+        case kGSLMultiMin_bfgs2:
+            return RooFit::Minimizer("GSLMultiMin", "bfgs2");
+        case kGSLMultiMin_SteepestDescent:
+            return RooFit::Minimizer("GSLMultiMin", "SteepestDescent");
+        case kGSLSimAn:
+            return RooFit::Minimizer("GSLSimAn");
+        // Other
+        case kGenetic:
+            return RooFit::Minimizer("Genetic");
         default:
             return RooCmdArg::none();
     }
