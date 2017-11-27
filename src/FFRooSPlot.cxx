@@ -18,6 +18,7 @@
 
 #include "FFRooSPlot.h"
 #include "FFRooModelSum.h"
+#include "FFFooFit.h"
 
 ClassImp(FFRooSPlot)
 
@@ -266,6 +267,10 @@ void FFRooSPlot::SetSpeciesModel(Int_t i, FFRooModel* model)
 Bool_t FFRooSPlot::Fit(const Char_t* opt)
 {
     // Perform the sPlot fit.
+    //
+    // Options to be set via 'opt':
+    // 'nosplot'     : skip the sPlot fit (only perform first-level fit)
+    //
     // Return kTRUE on success, otherwise kFALSE.
 
     // check species models
@@ -282,11 +287,15 @@ Bool_t FFRooSPlot::Fit(const Char_t* opt)
     ((FFRooModelSum*)fModel)->SetModelList(fSpecModel);
 
     // perform first level fit
-    if (!FFRooFitTree::Fit())
+    if (!FFRooFitTree::Fit(opt))
     {
         Error("Fit", "An error occurred during the first level fit!");
         return kFALSE;
     }
+
+    // check for skipping sPlot fit
+    if (FFFooFit::IndexOf(opt, "nosplot") != -1)
+        return kTRUE;
 
     // fix all parameters for the sPlot fit except the fit variables and species yields
     TIterator* iter = fModel->GetPdf()->getVariables()->createIterator();
