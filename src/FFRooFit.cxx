@@ -533,11 +533,11 @@ Bool_t FFRooFit::Chi2PreFit()
         // print fit result
         printf("\n");
         printf("  Chi2 pre-fit %d    chi2 = %e\n\n", i+1, chi2.getVal());
-        printf("  PARAMETER                         VALUE         ERROR\n");
-        printf("  ------------------------------------------------------------\n");
+        printf("  PARAMETER                          VALUE          ERROR\n");
+        printf("  --------------------------------------------------------------\n");
         iter->Reset();
         while (RooRealVar* var = (RooRealVar*)iter->Next())
-            printf("  %-32s  %e  %e\n", var->GetName(), var->getVal(), var->getError());
+            printf("  %-32s  %13.6e  %13.6e\n", var->GetName(), var->getVal(), var->getError());
         printf("\n");
 
         // save best fit
