@@ -47,7 +47,7 @@ FFRooFitterSPlot::FFRooFitterSPlot(const Char_t* treeName, const Char_t* treeLoc
 }
 
 //______________________________________________________________________________
-Bool_t FFRooFitterSPlot::Fit()
+Bool_t FFRooFitterSPlot::Fit(const Char_t* opt)
 {
     // Perform the fit.
 
@@ -65,7 +65,7 @@ Bool_t FFRooFitterSPlot::Fit()
     }
 
     // perform the fit
-    Bool_t res = splot->Fit();
+    Bool_t res = splot->Fit(opt);
 
     // copy yield parameters
     for (Int_t i = 0; i < fNSpec; i++)

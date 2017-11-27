@@ -115,7 +115,7 @@ public:
     void SetNChi2PreFit(Int_t n) { fNChi2PreFit = n; }
     void SetMinimizer(FFMinimizer_t min) { fMinimizer = min; }
 
-    virtual Bool_t Fit();
+    virtual Bool_t Fit(const Char_t* opt = "");
 
     TCanvas* DrawFit(const Char_t* opt = "", Int_t var = -1);
     TCanvas* DrawCorrelations(const Char_t* opt = "");

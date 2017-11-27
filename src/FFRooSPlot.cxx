@@ -263,7 +263,7 @@ void FFRooSPlot::SetSpeciesModel(Int_t i, FFRooModel* model)
 }
 
 //______________________________________________________________________________
-Bool_t FFRooSPlot::Fit()
+Bool_t FFRooSPlot::Fit(const Char_t* opt)
 {
     // Perform the sPlot fit.
     // Return kTRUE on success, otherwise kFALSE.

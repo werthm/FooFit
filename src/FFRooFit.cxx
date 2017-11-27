@@ -580,7 +580,7 @@ Bool_t FFRooFit::Chi2PreFit()
 }
 
 //______________________________________________________________________________
-Bool_t FFRooFit::Fit()
+Bool_t FFRooFit::Fit(const Char_t* opt)
 {
     // Perform a RooFit-based fit.
     // Return kTRUE on success, otherwise kFALSE.

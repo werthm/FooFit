@@ -49,7 +49,7 @@ public:
     void SetNChi2PreFit(Int_t n);
     void SetMinimizer(FFRooFit::FFMinimizer_t min);
 
-    virtual Bool_t Fit();
+    virtual Bool_t Fit(const Char_t* opt = "");
 
     TCanvas* DrawFit(const Char_t* opt = "", Int_t var = -1);
     TCanvas* DrawCorrelations(const Char_t* opt = "");

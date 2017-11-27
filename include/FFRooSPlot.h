@@ -57,7 +57,7 @@ public:
     void SetSpeciesYieldLimits(Int_t i, Double_t min, Double_t max);
     void SetSpeciesName(Int_t i, const Char_t* name);
 
-    virtual Bool_t Fit();
+    virtual Bool_t Fit(const Char_t* opt = "");
     Int_t GetNEvents() const;
     Double_t GetEventID(Int_t event) const;
     Double_t GetSpeciesWeight(Int_t event, Int_t i) const;

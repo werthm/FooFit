@@ -240,7 +240,7 @@ Bool_t FFRooFitter::BuildModel()
 }
 
 //______________________________________________________________________________
-Bool_t FFRooFitter::Fit()
+Bool_t FFRooFitter::Fit(const Char_t* opt)
 {
     // Perform the fit.
 
@@ -252,7 +252,7 @@ Bool_t FFRooFitter::Fit()
     }
 
     // perform the fit
-    Bool_t res = fFitter->Fit();
+    Bool_t res = fFitter->Fit(opt);
 
     // copy yield parameters
     for (Int_t i = 0; i < fNSpec; i++)
