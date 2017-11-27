@@ -583,6 +583,10 @@ Bool_t FFRooFit::Chi2PreFit()
 Bool_t FFRooFit::Fit(const Char_t* opt)
 {
     // Perform a RooFit-based fit.
+    //
+    // Options to be set via 'opt':
+    // 'bchi2'     : perform a binned chi2 fit
+    //
     // Return kTRUE on success, otherwise kFALSE.
 
     // check fit variables
@@ -646,18 +650,53 @@ Bool_t FFRooFit::Fit(const Char_t* opt)
         }
     }
 
+    // delete old fit result
+    if (fResult)
+        delete fResult;
+
     // fit the model to the data
-    if (fResult) delete fResult;
-    fResult = fModel->GetPdf()->fitTo(*fData, RooFit::Extended(),
+    if (FFFooFit::IndexOf(opt, "bchi2") != -1)
+    {
+        Info("Fit", "Performing binned chi2 fit");
+
+        // create argument set of variables
+        RooArgSet varSet;
+        for (Int_t i = 0; i < fNVar; i++) varSet.add(*fVar[i]);
+
+        // create a binned data set
+        RooDataHist* dataBinned = new RooDataHist(TString::Format("%s_binned", fData->GetName()).Data(),
+                                                  TString::Format("%s (binned)", fData->GetTitle()).Data(),
+                                                  varSet,
+                                                  *fData);
+
+        // perform binned chi2 fit
+        fResult = fModel->GetPdf()->chi2FitTo(*dataBinned, RooFit::Extended(),
                                               RooFit::Save(),
                                               CreateMinimizerArg(fMinimizer),
-                                              fData->isWeighted() ?
-                                                  RooFit::SumW2Error(kTRUE) :
-                                                  RooCmdArg::none(),
                                               RooFit::PrintEvalErrors(1),
                                               FFFooFit::gUseNCPU > 1 ?
                                                   RooFit::NumCPU(FFFooFit::gUseNCPU, FFFooFit::gParStrat) :
                                                   RooCmdArg::none());
+
+        // clean-up
+        delete dataBinned;
+    }
+    else
+    {
+        Info("Fit", "Performing maximum likelihood fit");
+
+        // perform maximum likelihood fit
+        fResult = fModel->GetPdf()->fitTo(*fData, RooFit::Extended(),
+                                          RooFit::Save(),
+                                          CreateMinimizerArg(fMinimizer),
+                                          fData->isWeighted() ?
+                                              RooFit::SumW2Error(kTRUE) :
+                                              RooCmdArg::none(),
+                                          RooFit::PrintEvalErrors(1),
+                                          FFFooFit::gUseNCPU > 1 ?
+                                              RooFit::NumCPU(FFFooFit::gUseNCPU, FFFooFit::gParStrat) :
+                                              RooCmdArg::none());
+    }
 
     // show fit result
     fResult->Print("v");
