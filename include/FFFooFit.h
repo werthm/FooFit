@@ -28,6 +28,7 @@ namespace FFFooFit
                             const Char_t* wildCard = 0);
     Bool_t FileExists(const Char_t* f);
 
+    Int_t IndexOf(const Char_t* s1, const Char_t* s2, UInt_t p = 0);
     Int_t LastIndexOf(const Char_t* s, Char_t c);
     TString ExpandPath(const Char_t* s);
     TString ExtractFileName(const Char_t* s);
