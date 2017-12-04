@@ -1,5 +1,5 @@
 /*************************************************************************
- * Author: Dominik Werthmueller, 2015
+ * Author: Dominik Werthmueller, 2015-2017
  *************************************************************************/
 
 //////////////////////////////////////////////////////////////////////////
@@ -14,24 +14,15 @@
 #ifndef FOOFIT_FFRooModelSum
 #define FOOFIT_FFRooModelSum
 
-#include "FFRooModel.h"
+#include "FFRooModelComp.h"
 
-class FFRooModelSum : public FFRooModel
+class FFRooModelSum : public FFRooModelComp
 {
 
-protected:
-    FFRooModel** fModelList;                //[fNPar] list of models to sum (elements not owned)
-
-    Bool_t CheckModelBounds(Int_t mod, const Char_t* loc) const;
-
 public:
-    FFRooModelSum() : FFRooModel(),
-                      fModelList(0) { }
+    FFRooModelSum() : FFRooModelComp() { }
     FFRooModelSum(const Char_t* name, const Char_t* title, Int_t n, FFRooModel** list = 0);
-    virtual ~FFRooModelSum();
-
-    void SetModelList(FFRooModel** list);
-    void SetModel(Int_t i, FFRooModel* model);
+    virtual ~FFRooModelSum() { }
 
     virtual void BuildModel(RooRealVar** vars);
 

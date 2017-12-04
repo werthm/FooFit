@@ -1,5 +1,5 @@
 /*************************************************************************
- * Author: Dominik Werthmueller, 2015
+ * Author: Dominik Werthmueller, 2015-2017
  *************************************************************************/
 
 //////////////////////////////////////////////////////////////////////////
@@ -20,75 +20,16 @@ ClassImp(FFRooModelSum)
 
 //______________________________________________________________________________
 FFRooModelSum::FFRooModelSum(const Char_t* name, const Char_t* title, Int_t n, FFRooModel** list)
-    : FFRooModel(name, title, n)
+    : FFRooModelComp(name, title, n, n, list)
 {
     // Constructor.
 
-    Char_t tmp[256];
-
-    // init members
-    fModelList = new FFRooModel*[fNPar];
-
-    // loop over models to sum
-    for (Int_t i = 0; i < fNPar; i++)
+    // add coefficient parameters
+    for (Int_t i = 0; i < fNModel; i++)
     {
-        // add the coefficient parameter
-        sprintf(tmp, "%s_Coeff_%d", GetName(), i);
-        AddParameter(i, tmp, tmp);
-
-        // set model pointer
-        if (list) fModelList[i] = list[i];
-        else fModelList[i] = 0;
+        TString tmp = TString::Format("%s_Coeff_%d", GetName(), i);
+        AddParameter(i, tmp.Data(), tmp.Data());
     }
-}
-
-//______________________________________________________________________________
-FFRooModelSum::~FFRooModelSum()
-{
-    // Destructor.
-
-    if (fModelList) delete [] fModelList;
-}
-
-//______________________________________________________________________________
-void FFRooModelSum::SetModelList(FFRooModel** list)
-{
-    // Set all elements of the model list by setting pointers to the elements
-    // of the array 'list'.
-
-    // loop over model list length
-    for (Int_t i = 0; i < fNPar; i++)
-    {
-        // set model pointer
-        fModelList[i] = list[i];
-    }
-}
-
-//______________________________________________________________________________
-void FFRooModelSum::SetModel(Int_t i, FFRooModel* model)
-{
-    // Set the pointer to the model with index 'i' to 'model'.
-
-    // check model index
-    if (CheckModelBounds(i, "SetModel()"))
-        fModelList[i] = model;
-}
-
-//______________________________________________________________________________
-Bool_t FFRooModelSum::CheckModelBounds(Int_t mod, const Char_t* loc) const
-{
-    // Check if the model index 'mod' is within valid bounds.
-    // Return kTRUE if the index 'mod' is valid, otherwise kFALSE.
-    // Use 'loc' to set the location of the error.
-
-    // check index range
-    if (mod < 0 || mod >= fNPar)
-    {
-        Error("CheckModelBounds", "%s: Invalid model index %d (number of models: %d)",
-              loc, mod, fNPar);
-        return kFALSE;
-    }
-    else return kTRUE;
 }
 
 //______________________________________________________________________________
@@ -97,7 +38,7 @@ void FFRooModelSum::BuildModel(RooRealVar** vars)
     // Build the model using the variables 'vars'.
 
     // check model list elements
-    for (Int_t i = 0; i < fNPar; i++)
+    for (Int_t i = 0; i < fNModel; i++)
     {
         if (!fModelList[i])
         {
@@ -109,7 +50,7 @@ void FFRooModelSum::BuildModel(RooRealVar** vars)
     // prepare models to sum
     RooArgList modelList;
     RooArgList coeffList;
-    for (Int_t i = 0; i < fNPar; i++)
+    for (Int_t i = 0; i < fNModel; i++)
     {
         // build model and set fit variables
         fModelList[i]->BuildModel(vars);
@@ -135,10 +76,10 @@ void FFRooModelSum::Print(Option_t* option) const
     FFRooModel::Print(option);
 
     printf("%sFFRooModelSum content:\n", option);
-    if (fNPar)
+    if (fNModel)
     {
         printf("%sModel summands\n", option);
-        for (Int_t i = 0; i < fNPar; i++)
+        for (Int_t i = 0; i < fNModel; i++)
         {
             printf("%s  Summand %2d:\n", option, i);
             fModelList[i]->Print(TString::Format("%s    ", option).Data());
