@@ -1,5 +1,5 @@
 /*************************************************************************
- * Author: Dominik Werthmueller, 2015
+ * Author: Dominik Werthmueller, 2015-2017
  *************************************************************************/
 
 //////////////////////////////////////////////////////////////////////////
@@ -12,7 +12,6 @@
 
 
 #include "RooProdPdf.h"
-#include "RooRealVar.h"
 
 #include "FFRooModelProd.h"
 
@@ -20,43 +19,10 @@ ClassImp(FFRooModelProd)
 
 //______________________________________________________________________________
 FFRooModelProd::FFRooModelProd(const Char_t* name, const Char_t* title, Int_t n, FFRooModel** list)
-    : FFRooModel(name, title, 0)
+    : FFRooModelComp(name, title, 0, n, list)
 {
     // Constructor.
 
-    // init members
-    fNModel = n;
-    fModelList = new FFRooModel*[fNModel];
-
-    // loop over models to multiply
-    for (Int_t i = 0; i < fNModel; i++)
-    {
-        // set model pointer
-        if (list) fModelList[i] = list[i];
-        else fModelList[i] = 0;
-    }
-}
-
-//______________________________________________________________________________
-FFRooModelProd::~FFRooModelProd()
-{
-    // Destructor.
-
-    if (fModelList) delete [] fModelList;
-}
-
-//______________________________________________________________________________
-void FFRooModelProd::SetModelList(FFRooModel** list)
-{
-    // Set all elements of the model list by setting pointers to the elements
-    // of the array 'list'.
-
-    // loop over model list length
-    for (Int_t i = 0; i < fNModel; i++)
-    {
-        // set model pointer
-        fModelList[i] = list[i];
-    }
 }
 
 //______________________________________________________________________________

@@ -1,5 +1,5 @@
 /*************************************************************************
- * Author: Dominik Werthmueller, 2015
+ * Author: Dominik Werthmueller, 2015-2017
  *************************************************************************/
 
 //////////////////////////////////////////////////////////////////////////
@@ -14,22 +14,15 @@
 #ifndef FOOFIT_FFRooModelProd
 #define FOOFIT_FFRooModelProd
 
-#include "FFRooModel.h"
+#include "FFRooModelComp.h"
 
-class FFRooModelProd : public FFRooModel
+class FFRooModelProd : public FFRooModelComp
 {
 
-protected:
-    Int_t fNModel;                          // number of models to multiply
-    FFRooModel** fModelList;                //[fNModel] list of models to multiply (elements not owned)
-
 public:
-    FFRooModelProd() : FFRooModel(),
-                       fNModel(0), fModelList(0) { }
+    FFRooModelProd() : FFRooModelComp() { }
     FFRooModelProd(const Char_t* name, const Char_t* title, Int_t n, FFRooModel** list = 0);
-    virtual ~FFRooModelProd();
-
-    void SetModelList(FFRooModel** list);
+    virtual ~FFRooModelProd() { }
 
     virtual void BuildModel(RooRealVar** vars);
 
