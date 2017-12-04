@@ -46,8 +46,9 @@ FFRooModel            : base model pdf class
   FFRooModelGauss     : Gaussian function model
   FFRooModelHist      : histogram-based model
   FFRooModelKeys      : model using kernel estimation
-  FFRooModelSum       : sum of models
-  FFRooModelProd      : product of models
+  FFRooModelComp      : base class for composite models
+    FFRooModelSum     : sum of models
+    FFRooModelProd    : product of models
 
 FFRooFit              : base fit class
   FFRooFitHist        : class for fitting binned data
