@@ -182,7 +182,7 @@ Double_t FFRooSPlot::GetSpeciesYield(Int_t i) const
 
     // check species index
     if (CheckSpecBounds(i, "GetSpeciesYield()"))
-        fModel->GetParameter(i);
+        return fModel->GetParameter(i);
     else
         return 0;
 }
@@ -194,7 +194,7 @@ Double_t FFRooSPlot::GetSpeciesYieldError(Int_t i) const
 
     // check species index
     if (CheckSpecBounds(i, "GetSpeciesYieldError()"))
-        fModel->GetParError(i);
+        return fModel->GetParError(i);
     else
         return 0;
 }
