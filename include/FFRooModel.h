@@ -51,6 +51,7 @@ public:
     const RooRealVar* GetPar(Int_t i) const;
     Double_t GetParameter(Int_t i) const;
     Double_t GetParError(Int_t i) const;
+    Bool_t IsParConstant(Int_t i) const;
     const Char_t* GetParName(Int_t i) const;
     const Char_t* GetParTitle(Int_t i) const;
     Int_t GetNVarTrans() const { return fNVarTrans; }

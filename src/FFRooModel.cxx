@@ -171,6 +171,19 @@ Double_t FFRooModel::GetParError(Int_t i) const
 }
 
 //______________________________________________________________________________
+Bool_t FFRooModel::IsParConstant(Int_t i) const
+{
+    // Check if the parameter at index 'i' is marked as constant.
+
+    // check parameter index
+    if (CheckParBounds(i, "IsParConstant()"))
+    {
+        return fPar[i] ? fPar[i]->isConstant() : kFALSE;
+    }
+    else return kFALSE;
+}
+
+//______________________________________________________________________________
 const Char_t* FFRooModel::GetParName(Int_t i) const
 {
     // Return the name of the parameter at index 'i'.
