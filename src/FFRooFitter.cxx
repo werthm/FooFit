@@ -112,6 +112,17 @@ void FFRooFitter::AddControlVariable(const Char_t* name, const Char_t* title)
 }
 
 //______________________________________________________________________________
+void FFRooFitter::AddConstraint(FFRooModel* c)
+{
+    // Wrapper for FFRooFit::AddConstraint().
+
+    if (fFitter)
+        fFitter->AddConstraint(c);
+    else
+        Error("AddConstraint", "Fitter not created yet!");
+}
+
+//______________________________________________________________________________
 void FFRooFitter::SetNChi2PreFit(Int_t n)
 {
     // Wrapper for FFRooFit::SetNChi2PreFit().
@@ -225,6 +236,12 @@ Bool_t FFRooFitter::BuildModel()
             Double_t max = fSpec[i]->GetYieldMax();
             if (init != 0 || min != 0 || max != 0)
                 fModel->SetParameter(i, init, min, max);
+
+            // set yield Gaussian constraint
+            if (fSpec[i]->GetYieldConstrGSigma() != 0)
+                fModel->AddParConstrGauss(i,
+                                          fSpec[i]->GetYieldConstrGMean(),
+                                          fSpec[i]->GetYieldConstrGSigma());
         }
 
         // set total model

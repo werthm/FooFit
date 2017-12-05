@@ -46,6 +46,7 @@ public:
                      Double_t min, Double_t max, Int_t nbins);
     void AddAuxVariable(RooRealVar* aux_var);
     void AddControlVariable(const Char_t* name, const Char_t* title);
+    void AddConstraint(FFRooModel* c);
     void SetNChi2PreFit(Int_t n);
     void SetMinimizer(FFRooFit::FFMinimizer_t min);
 
