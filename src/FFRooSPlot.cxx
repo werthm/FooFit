@@ -183,10 +183,10 @@ Bool_t FFRooSPlot::Fit(const Char_t* opt)
         }
         if (skip) continue;
 
-        // check for yield parameter
+        // check for yield parameter that were not fixed before
         for (Int_t i = 0; i < fNSpec; i++)
         {
-            if (var == fModel->GetPar(i))
+            if (var == fModel->GetPar(i) && !var->isConstant())
             {
                 skip = kTRUE;
                 break;
@@ -196,15 +196,19 @@ Bool_t FFRooSPlot::Fit(const Char_t* opt)
 
         // fix parameter
         var->setConstant();
-        Info("Fit", "Fixing parameter '%s' for sPlot fit", var->GetName());
+        Info("Fit", "Parameter '%s' is fixed in sPlot fit", var->GetName());
     }
 
     // clean-up
     delete iter;
 
-    // create argument set of species yield parameters
+    // create argument set of non-constant species yield parameters
     RooArgList yieldParList;
-    for (Int_t i = 0; i < fNSpec; i++) yieldParList.add(*fModel->GetPar(i));
+    for (Int_t i = 0; i < fNSpec; i++)
+    {
+        if (!fModel->IsParConstant(i))
+            yieldParList.add(*fModel->GetPar(i));
+    }
 
     // create the sPlot object
     fSPlot = new RooStats::SPlot("splot_fit", "FFRooSPlot Fit", *((RooDataSet*)fData),
@@ -213,9 +217,13 @@ Bool_t FFRooSPlot::Fit(const Char_t* opt)
     // user info
     for (Int_t i = 0; i < fNSpec; i++)
     {
-        Info("Fit", "Species '%s' yield: %e (%s)  %e (SPlot)",
-             fModel->GetParTitle(i), fModel->GetParameter(i), fModel->GetParName(i),
-             fSPlot->GetYieldFromSWeight(fModel->GetParName(i)));
+        // only non-constant yield parameters
+        if (!fModel->IsParConstant(i))
+        {
+            Info("Fit", "Species '%s' yield: %e (%s)  %e (SPlot)",
+                 fModel->GetParTitle(i), fModel->GetParameter(i), fModel->GetParName(i),
+                fSPlot->GetYieldFromSWeight(fModel->GetParName(i)));
+        }
     }
 
     return kTRUE;
@@ -251,7 +259,7 @@ Double_t FFRooSPlot::GetSpeciesWeight(Int_t event, Int_t i) const
     // check species index
     if (CheckSpecBounds(i, "GetSpeciesWeight()"))
     {
-        if (fSPlot)
+        if (fSPlot && !fModel->IsParConstant(i))
             return fSPlot->GetSWeight(event, fModel->GetParName(i));
         else
             return 0;
