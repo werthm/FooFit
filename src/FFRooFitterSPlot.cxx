@@ -15,6 +15,7 @@
 #include "FFRooFitterSPlot.h"
 #include "FFRooSPlot.h"
 #include "FFRooFitterSpecies.h"
+#include "FFRooModel.h"
 
 ClassImp(FFRooFitterSPlot)
 
@@ -62,6 +63,11 @@ Bool_t FFRooFitterSPlot::Fit(const Char_t* opt)
         splot->SetSpeciesYield(i, fSpec[i]->GetYieldInit(),
                                   fSpec[i]->GetYieldMin(),
                                   fSpec[i]->GetYieldMax());
+         // set yield Gaussian constraint
+        if (fSpec[i]->GetYieldConstrGSigma() != 0)
+            splot->GetModel()->AddParConstrGauss(i,
+                                                 fSpec[i]->GetYieldConstrGMean(),
+                                                 fSpec[i]->GetYieldConstrGSigma());
     }
 
     // perform the fit
