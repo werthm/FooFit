@@ -231,14 +231,13 @@ Bool_t FFRooFitter::BuildModel()
             fModel->SetParTitle(i, TString::Format("Yield of species '%s'", fSpec[i]->GetTitle()));
 
             // configure yield parameter
-            Double_t init = fSpec[i]->GetYieldInit();
-            Double_t min = fSpec[i]->GetYieldMin();
-            Double_t max = fSpec[i]->GetYieldMax();
-            if (init != 0 || min != 0 || max != 0)
-                fModel->SetParameter(i, init, min, max);
+            fModel->SetParameter(i,
+                                 fSpec[i]->GetYieldInit(),
+                                 fSpec[i]->GetYieldMin(),
+                                 fSpec[i]->GetYieldMax());
 
             // set yield Gaussian constraint
-            if (fSpec[i]->GetYieldConstrGSigma() != 0)
+            if (!fModel->IsParConstant(i) && fSpec[i]->GetYieldConstrGSigma() != 0)
                 fModel->AddParConstrGauss(i,
                                           fSpec[i]->GetYieldConstrGMean(),
                                           fSpec[i]->GetYieldConstrGSigma());
