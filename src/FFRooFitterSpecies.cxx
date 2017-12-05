@@ -34,6 +34,8 @@ FFRooFitterSpecies::FFRooFitterSpecies(const Char_t* name, const Char_t* title)
     fYieldFitError = 0;
     fYieldMin = 0;
     fYieldMax = 0;
+    fYieldConstrGMean = 0;
+    fYieldConstrGSigma = 0;
 }
 
 //______________________________________________________________________________
@@ -55,6 +57,8 @@ FFRooFitterSpecies::FFRooFitterSpecies(const Char_t* name, const Char_t* title,
     fYieldFitError = 0;
     fYieldMin = 0;
     fYieldMax = 0;
+    fYieldConstrGMean = 0;
+    fYieldConstrGSigma = 0;
 }
 
 //______________________________________________________________________________
@@ -133,6 +137,8 @@ void FFRooFitterSpecies::Print(Option_t* option) const
     printf("Fitted yield error              : %e\n", fYieldFitError);
     printf("Yield minimum                   : %e\n", fYieldMin);
     printf("Yield maximum                   : %e\n", fYieldMax);
+    printf("Yield constraint Gaussian mean  : %e\n", fYieldConstrGMean);
+    printf("Yield constraint Gaussian sigma : %e\n", fYieldConstrGSigma);
     printf("Model class name                : %s\n", fModelClass.Data());
     printf("Model parameters                : %d\n", fNModelPar);
     if (fNModelPar)
