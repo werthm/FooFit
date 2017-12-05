@@ -17,7 +17,7 @@
 #include "RooAbsPdf.h"
 
 #include "FFRooSPlot.h"
-#include "FFRooModelSum.h"
+#include "FFRooModel.h"
 #include "FFFooFit.h"
 
 ClassImp(FFRooSPlot)
@@ -38,22 +38,8 @@ FFRooSPlot::FFRooSPlot(TTree* tree, Int_t nVar, Int_t nSpec,
 
     // init members
     fNSpec = nSpec;
-    fSpecModel = new FFRooModel*[fNSpec];
-    for (Int_t i = 0; i < fNSpec; i++) fSpecModel[i] = 0;
     fEventID = new RooRealVar(evIDVar, "Event ID", 0, 9.99999999999999e14);
     fSPlot = 0;
-
-    // create model
-    fModel = new FFRooModelSum("total_model", "total model", fNSpec);
-
-    // overwrite parameter names
-    for (Int_t i = 0; i < fNSpec; i++)
-    {
-        sprintf(tmp, "Yield_Species_%d", i);
-        fModel->SetParName(i, tmp);
-        sprintf(tmp, "Species_%d", i);
-        fModel->SetParTitle(i, tmp);
-    }
 
     // check number of entries (RooDataSet uses Int_t as entry number)
     const Long64_t max_int = ~(1 << 31);
@@ -79,10 +65,6 @@ FFRooSPlot::~FFRooSPlot()
 {
     // Destructor.
 
-    // delete locally owned parent member
-    if (fModel) delete fModel;
-
-    if (fSpecModel) delete [] fSpecModel;
     if (fEventID) delete fEventID;
     if (fSPlot) delete fSPlot;
 }
@@ -164,106 +146,6 @@ Bool_t FFRooSPlot::CheckSpecBounds(Int_t spec, const Char_t* loc) const
 }
 
 //______________________________________________________________________________
-const Char_t* FFRooSPlot::GetSpeciesName(Int_t i) const
-{
-    // Return the name of the species at index 'i'.
-
-    // check species index
-    if (CheckSpecBounds(i, "GetSpeciesName()"))
-        return fModel->GetParTitle(i);
-    else
-        return 0;
-}
-
-//______________________________________________________________________________
-Double_t FFRooSPlot::GetSpeciesYield(Int_t i) const
-{
-    // Return the yield of the species at index 'i'.
-
-    // check species index
-    if (CheckSpecBounds(i, "GetSpeciesYield()"))
-        return fModel->GetParameter(i);
-    else
-        return 0;
-}
-
-//______________________________________________________________________________
-Double_t FFRooSPlot::GetSpeciesYieldError(Int_t i) const
-{
-    // Return the yield error of the species at index 'i'.
-
-    // check species index
-    if (CheckSpecBounds(i, "GetSpeciesYieldError()"))
-        return fModel->GetParError(i);
-    else
-        return 0;
-}
-
-//______________________________________________________________________________
-void FFRooSPlot::SetSpeciesYield(Int_t i, Double_t v)
-{
-    // Set the yield for the species at index 'i' to the value 'v'.
-
-    // check species index
-    if (CheckSpecBounds(i, "SetSpeciesYield()"))
-    {
-        fModel->SetParameter(i, v);
-    }
-}
-
-//______________________________________________________________________________
-void FFRooSPlot::SetSpeciesYield(Int_t i, Double_t v, Double_t min, Double_t max)
-{
-    // Set the yield for the species at index 'i' to the value 'v' and set the
-    // range to the interval [min,max].
-
-    // check species index
-    if (CheckSpecBounds(i, "SetSpeciesYield()"))
-    {
-        fModel->SetParameter(i, v, min, max);
-    }
-}
-
-//______________________________________________________________________________
-void FFRooSPlot::SetSpeciesYieldLimits(Int_t i, Double_t min, Double_t max)
-{
-    // Set the range of the yield for the species at index 'i' to the interval [min,max].
-
-    // check species index
-    if (CheckSpecBounds(i, "SetSpeciesYieldLimits()"))
-    {
-        fModel->SetParLimits(i, min, max);
-    }
-}
-
-//______________________________________________________________________________
-void FFRooSPlot::SetSpeciesName(Int_t i, const Char_t* name)
-{
-    // Set the name of the species at index 'i' to 'name'.
-
-    // check species index
-    if (CheckSpecBounds(i, "SetSpeciesName()"))
-    {
-        Char_t tmp[256];
-        sprintf(tmp, "Yield_%s", name);
-        fModel->SetParName(i, tmp);
-        fModel->SetParTitle(i, name);
-    }
-}
-
-//______________________________________________________________________________
-void FFRooSPlot::SetSpeciesModel(Int_t i, FFRooModel* model)
-{
-    // Set the model for the species at index 'i' to 'model'.
-
-    // check species index
-    if (CheckSpecBounds(i, "SetSpeciesModel()"))
-    {
-        fSpecModel[i] = model;
-    }
-}
-
-//______________________________________________________________________________
 Bool_t FFRooSPlot::Fit(const Char_t* opt)
 {
     // Perform the sPlot fit.
@@ -272,19 +154,6 @@ Bool_t FFRooSPlot::Fit(const Char_t* opt)
     // 'nosplot'     : skip the sPlot fit (only perform first-level fit)
     //
     // Return kTRUE on success, otherwise kFALSE.
-
-    // check species models
-    for (Int_t i = 0; i < fNSpec; i++)
-    {
-        if (!fSpecModel[i])
-        {
-            Error("Fit", "No model was added for species %d!", i);
-            return kFALSE;
-        }
-    }
-
-    // set species models in total model list
-    ((FFRooModelSum*)fModel)->SetModelList(fSpecModel);
 
     // perform first level fit
     if (!FFRooFitTree::Fit(opt))
@@ -426,7 +295,9 @@ TTree* FFRooSPlot::GetSpeciesWeightsTree(const Char_t* name,
     TString ttitle = "Species: ";
     for (Int_t i = 0; i < nSpec; i++)
     {
-        ttitle += GetSpeciesName(spec[i]);
+        TString pname = fModel->GetParName(i);
+        pname.ReplaceAll("Yield_", "");
+        ttitle += pname;
         ttitle += TString::Format("(%d)", spec[i]);
         if (i != nSpec-1) ttitle += ",";
     }

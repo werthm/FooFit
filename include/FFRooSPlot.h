@@ -28,7 +28,6 @@ class FFRooSPlot : public FFRooFitTree
 
 protected:
     Int_t fNSpec;                   // number of species
-    FFRooModel** fSpecModel;        //[fNSpec] array of models (objects not owned)
     RooRealVar* fEventID;           // event ID variable
     RooStats::SPlot* fSPlot;        // sPlot object
 
@@ -37,25 +36,13 @@ protected:
 
 public:
     FFRooSPlot() : FFRooFitTree(),
-                   fNSpec(0), fSpecModel(0),
-                   fEventID(0), fSPlot(0) { }
+                   fNSpec(0), fEventID(0), fSPlot(0) { }
     FFRooSPlot(TTree* tree, Int_t nVar, Int_t nSpec,
                const Char_t* name = "FFRooSPlot", const Char_t* title = "a FooFit RooFit",
                const Char_t* evIDVar = "event_id", const Char_t* weightVar = 0);
     virtual ~FFRooSPlot();
 
     Int_t GetNSpecies() const { return fNSpec; }
-    FFRooModel** GetSpeciesModels() const { return fSpecModel; }
-    FFRooModel* GetSpeciesModel(Int_t i) const { return fSpecModel[i]; }
-    const Char_t* GetSpeciesName(Int_t i) const;
-    Double_t GetSpeciesYield(Int_t i) const;
-    Double_t GetSpeciesYieldError(Int_t i) const;
-
-    void SetSpeciesModel(Int_t i, FFRooModel* model);
-    void SetSpeciesYield(Int_t i, Double_t v);
-    void SetSpeciesYield(Int_t i, Double_t v, Double_t min, Double_t max);
-    void SetSpeciesYieldLimits(Int_t i, Double_t min, Double_t max);
-    void SetSpeciesName(Int_t i, const Char_t* name);
 
     virtual Bool_t Fit(const Char_t* opt = "");
     Int_t GetNEvents() const;
