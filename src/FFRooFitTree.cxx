@@ -119,10 +119,10 @@ Bool_t FFRooFitTree::LoadData()
             Double_t w = fData->weight();
 
             if (w == 0)
-                Warning("LoadData", "Event weight at row %lld is zero", i);
+                Warning("LoadData", "Event weight at row %d is zero", i);
             if (TMath::IsNaN(w))
             {
-                Error("LoadData", "Event weight at row %lld is NaN!", i);
+                Error("LoadData", "Event weight at row %d is NaN!", i);
                 badData = kTRUE;
             }
         }
