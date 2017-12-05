@@ -1,5 +1,5 @@
 /*************************************************************************
- * Author: Dominik Werthmueller, 2015-2016
+ * Author: Dominik Werthmueller, 2015-2017
  *************************************************************************/
 
 //////////////////////////////////////////////////////////////////////////
@@ -67,6 +67,8 @@ protected:
     RooRealVar** fVarAux;           //[fNVarAux] array of auxiliary variables (elements not owned)
     Int_t fNVarCtrl;                // number of control variables
     RooRealVar** fVarCtrl;          //[fNCtrlVar] array of control variables (subset of aux. vars.)
+    Int_t fNConstr;                 // number of constraints
+    FFRooModel** fConstr;           //[fNConstr] array of constraints (elements not owned)
     RooAbsData* fData;              // dataset
     FFRooModel* fModel;             // model (not owned)
     RooFitResult* fResult;          // result of last fit
@@ -91,6 +93,7 @@ public:
                  fNVar(0), fVar(0),
                  fNVarAux(0), fVarAux(0),
                  fNVarCtrl(0), fVarCtrl(0),
+                 fNConstr(0), fConstr(0),
                  fData(0), fModel(0),
                  fResult(0),
                  fNChi2PreFit(0),
@@ -112,6 +115,7 @@ public:
     void SetModel(FFRooModel* model) { fModel = model; }
     void AddAuxVariable(RooRealVar* aux_var);
     void AddControlVariable(const Char_t* name, const Char_t* title);
+    void AddConstraint(FFRooModel* c);
     void SetNChi2PreFit(Int_t n) { fNChi2PreFit = n; }
     void SetMinimizer(FFMinimizer_t min) { fMinimizer = min; }
 
