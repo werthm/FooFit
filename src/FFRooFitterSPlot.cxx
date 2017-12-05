@@ -15,7 +15,6 @@
 #include "FFRooFitterSPlot.h"
 #include "FFRooSPlot.h"
 #include "FFRooFitterSpecies.h"
-#include "FFRooModel.h"
 
 ClassImp(FFRooFitterSPlot)
 
@@ -45,43 +44,6 @@ FFRooFitterSPlot::FFRooFitterSPlot(const Char_t* treeName, const Char_t* treeLoc
     // replace fitter created in FFRooFitterTree::FFRooFitterTree()
     delete fFitter;
     fFitter = new FFRooSPlot(fTree, nVar, nSpec, GetName(), GetTitle(), evIDVar, fWeightVar);
-}
-
-//______________________________________________________________________________
-Bool_t FFRooFitterSPlot::Fit(const Char_t* opt)
-{
-    // Perform the fit.
-
-    // cast fitter
-    FFRooSPlot* splot = (FFRooSPlot*)fFitter;
-
-    // configure the species
-    for (Int_t i = 0; i < fNSpec; i++)
-    {
-        splot->SetSpeciesModel(i, fSpec[i]->GetModel());
-        splot->SetSpeciesName(i, fSpec[i]->GetName());
-        splot->SetSpeciesYield(i, fSpec[i]->GetYieldInit(),
-                                  fSpec[i]->GetYieldMin(),
-                                  fSpec[i]->GetYieldMax());
-         // set yield Gaussian constraint
-        if (fSpec[i]->GetYieldConstrGSigma() != 0)
-            splot->GetModel()->AddParConstrGauss(i,
-                                                 fSpec[i]->GetYieldConstrGMean(),
-                                                 fSpec[i]->GetYieldConstrGSigma());
-    }
-
-    // perform the fit
-    Bool_t res = splot->Fit(opt);
-
-    // copy yield parameters
-    for (Int_t i = 0; i < fNSpec; i++)
-    {
-        fSpec[i]->SetYieldFit(splot->GetSpeciesYield(i));
-        fSpec[i]->SetYieldFitError(splot->GetSpeciesYieldError(i));
-        fSpec[i]->UpdateModelParameters();
-    }
-
-    return res;
 }
 
 //______________________________________________________________________________
