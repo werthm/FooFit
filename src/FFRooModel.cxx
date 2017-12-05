@@ -1,5 +1,5 @@
 /*************************************************************************
- * Author: Dominik Werthmueller, 2015
+ * Author: Dominik Werthmueller, 2015-2017
  *************************************************************************/
 
 //////////////////////////////////////////////////////////////////////////
@@ -15,6 +15,8 @@
 #include "RooRealVar.h"
 
 #include "FFRooModel.h"
+#include "FFRooModelComp.h"
+#include "FFRooModelGauss.h"
 
 ClassImp(FFRooModel)
 
@@ -31,6 +33,8 @@ FFRooModel::FFRooModel(const Char_t* name, const Char_t* title, Int_t nPar)
     for (Int_t i = 0; i < fNPar; i++) fPar[i] = 0;
     fNVarTrans = 0;
     fVarTrans = 0;
+    fNConstr = 0;
+    fConstr = 0;
 }
 
 //______________________________________________________________________________
@@ -50,6 +54,12 @@ FFRooModel::~FFRooModel()
         for (Int_t i = 0; i < fNVarTrans; i++)
             if (fVarTrans[i]) delete fVarTrans[i];
         delete [] fVarTrans;
+    }
+    if (fConstr)
+    {
+        for (Int_t i = 0; i < fNConstr; i++)
+            if (fConstr[i]) delete fConstr[i];
+        delete [] fConstr;
     }
 }
 
@@ -105,7 +115,27 @@ void FFRooModel::AddVarTrans(RooAbsReal* varTrans)
 }
 
 //______________________________________________________________________________
-RooRealVar* FFRooModel::GetPar(Int_t i) const
+void FFRooModel::AddConstraint(FFRooModel* c)
+{
+    // Add the model pdf 'c' as fit constraint.
+
+    // backup old array
+    FFRooModel** old = fConstr;
+
+    // create new array
+    fConstr = new FFRooModel*[fNConstr+1];
+    for (Int_t i = 0; i < fNConstr; i++) fConstr[i] = old[i];
+
+    // add new element
+    fConstr[fNConstr] = c;
+    fNConstr++;
+
+    // destroy old list
+    if (old) delete [] old;
+}
+
+//______________________________________________________________________________
+const RooRealVar* FFRooModel::GetPar(Int_t i) const
 {
     // Return the parameter at index 'i'.
 
@@ -189,8 +219,19 @@ void FFRooModel::SetParameter(Int_t i, Double_t v, Double_t min, Double_t max)
     {
         if (fPar[i])
         {
-            fPar[i]->setVal(v);
-            fPar[i]->setRange(min, max);
+            // check if parameter should be fixed
+            if (v == min && v == max)
+            {
+                Warning("SetParameter", "Setting parameter %s to a constant value of %f",
+                        fPar[i]->GetName(), v);
+                fPar[i]->setVal(v);
+                fPar[i]->setConstant(kTRUE);
+            }
+            else
+            {
+                fPar[i]->setVal(v);
+                fPar[i]->setRange(min, max);
+            }
         }
     }
 }
@@ -203,7 +244,21 @@ void FFRooModel::SetParLimits(Int_t i, Double_t min, Double_t max)
     // check parameter index
     if (CheckParBounds(i, "SetParLimits()"))
     {
-        if (fPar[i]) fPar[i]->setRange(min, max);
+        if (fPar[i])
+        {
+            // check if parameter should be fixed
+            if (min == max)
+            {
+                Warning("SetParLimits", "Setting parameter %s to a constant value of %f",
+                        fPar[i]->GetName(), min);
+                fPar[i]->setVal(min);
+                fPar[i]->setConstant(kTRUE);
+            }
+            else
+            {
+                fPar[i]->setRange(min, max);
+            }
+        }
     }
 }
 
@@ -248,6 +303,54 @@ void FFRooModel::FixParameter(Int_t i, Double_t v)
 }
 
 //______________________________________________________________________________
+void FFRooModel::AddParConstrGauss(Int_t i, Double_t mean, Double_t sigma)
+{
+    // Add a Gaussian fit constraint to the parameter with index 'i' using
+    // the 'mean' and 'sigma' values.
+
+    // check parameter index
+    if (!CheckParBounds(i, "AddParConstrGauss()"))
+        return;
+
+    // create constraint model
+    FFRooModelGauss* c = new FFRooModelGauss(TString::Format("Gauss_Constr_Par_%s",
+                                                             fPar[i]->GetName()).Data(),
+                                             TString::Format("Gaussian constraint on parameter %s",
+                                                             fPar[i]->GetTitle()).Data());
+
+    // set constraint parameters
+    c->FixParameter(0, mean);
+    c->FixParameter(1, sigma);
+
+    // build the constraint model
+    c->BuildModel(fPar + i);
+
+    // add constraint
+    AddConstraint(c);
+}
+
+//______________________________________________________________________________
+void FFRooModel::FindAllConstraints(TList* list)
+{
+    // Recursive method to find all constraints that were added to this model.
+    // All constraints will be added to the list 'list'.
+
+    // loop over constraints
+    for (Int_t i = 0; i < fNConstr; i++)
+        list->Add(fConstr[i]);
+
+    // check for models with sub-models
+    if (this->InheritsFrom("FFRooModelComp"))
+    {
+        FFRooModelComp* m = (FFRooModelComp*)this;
+
+        // loop over sub-models
+        for (Int_t i = 0; i < m->GetNModel(); i++)
+            m->GetModel(i)->FindAllConstraints(list);
+    }
+}
+
+//______________________________________________________________________________
 void FFRooModel::Print(Option_t* option) const
 {
     // Print out the content of this class.
@@ -257,6 +360,7 @@ void FFRooModel::Print(Option_t* option) const
     printf("%sTitle                      : %s\n", option, GetTitle());
     printf("%sNumber of parameters       : %d\n", option, fNPar);
     printf("%sNumber of variable transf. : %d\n", option, fNVarTrans);
+    printf("%sNumber of constraints      : %d\n", option, fNConstr);
     printf("%sModel PDF                  : 0x%x\n", option, fPdf);
     if (fNPar)
     {
