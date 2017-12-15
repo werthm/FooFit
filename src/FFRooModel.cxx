@@ -30,7 +30,12 @@ FFRooModel::FFRooModel(const Char_t* name, const Char_t* title, Int_t nPar)
     fPdf = 0;
     fNPar = nPar;
     fPar = new RooRealVar*[fNPar];
-    for (Int_t i = 0; i < fNPar; i++) fPar[i] = 0;
+    fParIsOwned = new Bool_t[fNPar];
+    for (Int_t i = 0; i < fNPar; i++)
+    {
+        fPar[i] = 0;
+        fParIsOwned[i] = kFALSE;
+    }
     fNVarTrans = 0;
     fVarTrans = 0;
     fNConstr = 0;
@@ -46,7 +51,7 @@ FFRooModel::~FFRooModel()
     if (fPar)
     {
         for (Int_t i = 0; i < fNPar; i++)
-            if (fPar[i]) delete fPar[i];
+            if (fPar[i] && fParIsOwned[i]) delete fPar[i];
         delete [] fPar;
     }
     if (fVarTrans)
@@ -88,8 +93,10 @@ void FFRooModel::AddParameter(Int_t i, const Char_t* name, const Char_t* title)
     // check parameter index
     if (CheckParBounds(i, "AddParameter()"))
     {
-        if (fPar[i]) delete fPar[i];
+        if (fPar[i] && fParIsOwned[i])
+            delete fPar[i];
         fPar[i] = new RooRealVar(name, title, -RooNumber::infinity(), RooNumber::infinity());
+        fParIsOwned[i] = kTRUE;
     }
 }
 
@@ -135,7 +142,7 @@ void FFRooModel::AddConstraint(FFRooModel* c)
 }
 
 //______________________________________________________________________________
-const RooRealVar* FFRooModel::GetPar(Int_t i) const
+RooRealVar* FFRooModel::GetPar(Int_t i) const
 {
     // Return the parameter at index 'i'.
 
@@ -207,6 +214,20 @@ const Char_t* FFRooModel::GetParTitle(Int_t i) const
         return fPar[i] ? fPar[i]->GetTitle() : 0;
     }
     else return 0;
+}
+
+//______________________________________________________________________________
+void FFRooModel::SetParameter(Int_t i, RooRealVar* par)
+{
+    // Set the parameter at index 'i' to the external (not owned) parameter 'par'.
+
+    // delete old parameter
+    if (fPar[i] && fParIsOwned[i])
+        delete fPar[i];
+
+    // set external parameter
+    fPar[i] = par;
+    fParIsOwned[i] = kFALSE;
 }
 
 //______________________________________________________________________________
@@ -372,6 +393,17 @@ void FFRooModel::Print(Option_t* option) const
     printf("%sName                       : %s\n", option, GetName());
     printf("%sTitle                      : %s\n", option, GetTitle());
     printf("%sNumber of parameters       : %d\n", option, fNPar);
+    printf("%sParameter owned            : ", option);
+    for (Int_t i = 0; i < fNPar; i++)
+    {
+        if (fParIsOwned[i])
+            printf("yes");
+        else
+            printf("no");
+        if (i != fNPar-1)
+            printf(", ");
+    }
+    printf("\n");
     printf("%sNumber of variable transf. : %d\n", option, fNVarTrans);
     printf("%sNumber of constraints      : %d\n", option, fNConstr);
     printf("%sModel PDF                  : 0x%x\n", option, fPdf);

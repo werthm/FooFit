@@ -27,6 +27,7 @@ protected:
     RooAbsPdf* fPdf;                //! model pdf
     Int_t fNPar;                    // number of parameters
     RooRealVar** fPar;              //[fNPar] parameter array
+    Bool_t* fParIsOwned;            //[fNPar] flag for parameter ownership
     Int_t fNVarTrans;               // number of variable transformations
     RooAbsReal** fVarTrans;         //[fNVarTrans] variable transformation array
     Int_t fNConstr;                 // number of constraints
@@ -40,7 +41,7 @@ protected:
 public:
     FFRooModel() : TNamed(),
                    fPdf(0),
-                   fNPar(0), fPar(0),
+                   fNPar(0), fPar(0), fParIsOwned(0),
                    fNVarTrans(0), fVarTrans(0),
                    fNConstr(0), fConstr(0) { }
     FFRooModel(const Char_t* name, const Char_t* title, Int_t nPar);
@@ -48,7 +49,7 @@ public:
 
     RooAbsPdf* GetPdf() const { return fPdf; }
     Int_t GetNPar() const { return fNPar; }
-    const RooRealVar* GetPar(Int_t i) const;
+    RooRealVar* GetPar(Int_t i) const;
     Double_t GetParameter(Int_t i) const;
     Double_t GetParError(Int_t i) const;
     Bool_t IsParConstant(Int_t i) const;
@@ -57,6 +58,7 @@ public:
     Int_t GetNVarTrans() const { return fNVarTrans; }
     RooAbsReal* GetVarTrans(Int_t i) const { return fVarTrans[i]; }
 
+    void SetParameter(Int_t i, RooRealVar* par);
     void SetParameter(Int_t i, Double_t v);
     void SetParameter(Int_t i, Double_t v, Double_t min, Double_t max);
     void SetParLimits(Int_t i, Double_t min, Double_t max);
