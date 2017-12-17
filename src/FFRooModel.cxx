@@ -393,17 +393,20 @@ void FFRooModel::Print(Option_t* option) const
     printf("%sName                       : %s\n", option, GetName());
     printf("%sTitle                      : %s\n", option, GetTitle());
     printf("%sNumber of parameters       : %d\n", option, fNPar);
-    printf("%sParameter owned            : ", option);
-    for (Int_t i = 0; i < fNPar; i++)
+    if (fNPar)
     {
-        if (fParIsOwned[i])
-            printf("yes");
-        else
-            printf("no");
-        if (i != fNPar-1)
-            printf(", ");
+        printf("%sParameter owned            : ", option);
+        for (Int_t i = 0; i < fNPar; i++)
+        {
+            if (fParIsOwned[i])
+                printf("yes");
+            else
+                printf("no");
+            if (i != fNPar-1)
+                printf(", ");
+        }
+        printf("\n");
     }
-    printf("\n");
     printf("%sNumber of variable transf. : %d\n", option, fNVarTrans);
     printf("%sNumber of constraints      : %d\n", option, fNConstr);
     printf("%sModel PDF                  : 0x%x\n", option, fPdf);
