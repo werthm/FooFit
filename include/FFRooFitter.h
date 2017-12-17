@@ -38,6 +38,7 @@ public:
     FFRooFitter(const Char_t* name, const Char_t* title);
     virtual ~FFRooFitter();
 
+    FFRooModel* GetModel() const { return fModel; }
     Int_t GetNSpecies() const { return fNSpec; }
     FFRooFitterSpecies* GetSpecies(Int_t i) const;
 
