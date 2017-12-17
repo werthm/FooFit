@@ -286,7 +286,7 @@ void FFRooModelHist::BuildModel(RooRealVar** vars)
         {
             // add shift transformation
             sprintf(tmp, "%s - %s", vars[i]->GetName(), GetPar(i)->GetName());
-            RooFormulaVar* trans = new RooFormulaVar(TString::Format("Trans_Shift_%s", vars[i]->GetName()).Data(),
+            RooFormulaVar* trans = new RooFormulaVar(TString::Format("Trans_Shift_%s_Var_%s", GetName(), vars[i]->GetName()).Data(),
                                                      tmp, RooArgSet(*vars[i], *GetPar(i)));
             AddVarTrans(trans);
             varSetTrans.add(*trans);
