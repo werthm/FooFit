@@ -145,6 +145,17 @@ void FFRooFitter::SetMinimizer(FFRooFit::FFMinimizer_t min)
 }
 
 //______________________________________________________________________________
+void FFRooFitter::SetMinimizerPreFit(FFRooFit::FFMinimizer_t min)
+{
+    // Wrapper for FFRooFit::SetMinimizerPreFit().
+
+    if (fFitter)
+        fFitter->SetMinimizerPreFit(min);
+    else
+        Error("SetMinimizerPreFit", "Fitter not created yet!");
+}
+
+//______________________________________________________________________________
 TCanvas* FFRooFitter::DrawFit(const Char_t* opt, Int_t var)
 {
     // Wrapper for FFRooFit::DrawFit().

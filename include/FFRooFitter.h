@@ -49,6 +49,7 @@ public:
     void AddConstraint(FFRooModel* c);
     void SetNChi2PreFit(Int_t n);
     void SetMinimizer(FFRooFit::FFMinimizer_t min);
+    void SetMinimizerPreFit(FFRooFit::FFMinimizer_t min);
 
     virtual Bool_t Fit(const Char_t* opt = "");
 
