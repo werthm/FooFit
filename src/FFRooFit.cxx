@@ -54,6 +54,7 @@ FFRooFit::FFRooFit(Int_t nVar, const Char_t* name, const Char_t* title)
     fResult = 0;
     fNChi2PreFit = 0;
     fMinimizer = kMinuit2_Migrad;
+    fMinimizerPreFit = kMinuit2_Migrad;
 }
 
 //______________________________________________________________________________
@@ -209,13 +210,15 @@ Bool_t FFRooFit::CheckVariables() const
 }
 
 //______________________________________________________________________________
-Bool_t FFRooFit::CheckFitResult(RooFitResult* res, Bool_t verbose) const
+Bool_t FFRooFit::CheckFitResult(RooFitResult* res, FFMinimizer_t minimizer,
+                                Bool_t verbose) const
 {
-    // Check the fit result 'f' and return kFALSE if the fit failed.
+    // Check the fit result 'f' obtained using the minimizer 'minimizer' and
+    // return kFALSE if the fit failed.
     // If 'verbose' is kFALSE, no messages will be printed.
 
     // check fit result: seems to be only working with Minuit2
-    if (fMinimizer == kMinuit2_Migrad)
+    if (minimizer == kMinuit2_Migrad)
     {
         // loop over fit steps
         for (UInt_t i = 0; i < res->numStatusHistory(); i++)
@@ -528,7 +531,7 @@ Bool_t FFRooFit::Chi2PreFit()
     fitArgs.Add(new RooCmdArg(RooFit::PrintLevel(-1)));
     fitArgs.Add(new RooCmdArg(RooFit::Warnings(kFALSE)));
     fitArgs.Add(new RooCmdArg(RooFit::PrintEvalErrors(-1)));
-    fitArgs.Add(new RooCmdArg(CreateMinimizerArg(fMinimizer)));
+    fitArgs.Add(new RooCmdArg(CreateMinimizerArg(fMinimizerPreFit)));
     if (FFFooFit::gUseNCPU > 1)
         fitArgs.Add(new RooCmdArg(RooFit::NumCPU(FFFooFit::gUseNCPU, FFFooFit::gParStrat)));
 
@@ -549,7 +552,7 @@ Bool_t FFRooFit::Chi2PreFit()
         RooFitResult* fit_res = fModel->GetPdf()->chi2FitTo(*dataBinned, fitArgs);
 
         // check fit result and repeat fit if it failed
-        Bool_t fit_res_ok = CheckFitResult(fit_res, kFALSE);
+        Bool_t fit_res_ok = CheckFitResult(fit_res, fMinimizerPreFit, kFALSE);
         delete fit_res;
         if (!fit_res_ok)
         {
@@ -761,7 +764,8 @@ Bool_t FFRooFit::Fit(const Char_t* opt)
     fResult->Print("v");
 
     // check fit result
-    if (!CheckFitResult(fResult)) return kFALSE;
+    if (!CheckFitResult(fResult, fMinimizer))
+        return kFALSE;
 
     // do various things after fitting
     if (!PostFit())

@@ -74,10 +74,12 @@ protected:
     RooFitResult* fResult;          // result of last fit
     Int_t fNChi2PreFit;             // number of chi2 pre-fits
     FFMinimizer_t fMinimizer;       // type of minimizer
+    FFMinimizer_t fMinimizerPreFit; // type of minimizer (chi2 pre-fit)
 
     Bool_t CheckVarBounds(Int_t var, const Char_t* loc) const;
     Bool_t CheckVariables() const;
-    Bool_t CheckFitResult(RooFitResult* res, Bool_t verbose = kTRUE) const;
+    Bool_t CheckFitResult(RooFitResult* res, FFMinimizer_t minimizer,
+                          Bool_t verbose = kTRUE) const;
     Bool_t ContainsVariable(RooAbsPdf* pdf, Int_t var, Bool_t excl = kFALSE) const;
     RooCmdArg CreateMinimizerArg(FFMinimizer_t min);
     virtual Bool_t LoadData() = 0;
@@ -97,7 +99,8 @@ public:
                  fData(0), fModel(0),
                  fResult(0),
                  fNChi2PreFit(0),
-                 fMinimizer(kMinuit2_Migrad) { }
+                 fMinimizer(kMinuit2_Migrad),
+                 fMinimizerPreFit(kMinuit2_Migrad) { }
     FFRooFit(Int_t nVar, const Char_t* name = "FFRooFit", const Char_t* title = "a FooFit RooFit");
     virtual ~FFRooFit();
 
@@ -109,6 +112,7 @@ public:
     RooFitResult* GetResult() const { return fResult; }
     Int_t GetNChi2PreFit() const { return fNChi2PreFit; }
     FFMinimizer_t GetMinimizer() const { return fMinimizer; }
+    FFMinimizer_t GetMinimizerPreFit() const { return fMinimizerPreFit; }
 
     void SetVariable(Int_t i, const Char_t* name, const Char_t* title,
                      Double_t min, Double_t max, Int_t nbins = 0);
@@ -118,6 +122,7 @@ public:
     void AddConstraint(FFRooModel* c);
     void SetNChi2PreFit(Int_t n) { fNChi2PreFit = n; }
     void SetMinimizer(FFMinimizer_t min) { fMinimizer = min; }
+    void SetMinimizerPreFit(FFMinimizer_t min) { fMinimizerPreFit = min; }
 
     virtual Bool_t Fit(const Char_t* opt = "");
 
