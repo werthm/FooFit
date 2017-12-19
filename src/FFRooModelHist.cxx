@@ -24,7 +24,7 @@ ClassImp(FFRooModelHist)
 
 //______________________________________________________________________________
 FFRooModelHist::FFRooModelHist(const Char_t* name, const Char_t* title, TH1* hist,
-                               Bool_t addShiftPar)
+                               Bool_t addShiftPar, Int_t intOrder)
     : FFRooModel(name, title, addShiftPar ? hist->GetDimension() : 0)
 {
     // Constructor.
@@ -36,6 +36,7 @@ FFRooModelHist::FFRooModelHist(const Char_t* name, const Char_t* title, TH1* his
     fHist = hist;
     fTree = 0;
     fWeightVar = "";
+    fInterpolOrder = intOrder;
     fDataHist = 0;
 
     // add shift parameters
@@ -53,7 +54,7 @@ FFRooModelHist::FFRooModelHist(const Char_t* name, const Char_t* title, TH1* his
 
 //______________________________________________________________________________
 FFRooModelHist::FFRooModelHist(const Char_t* name, const Char_t* title, Int_t nDim, TTree* tree,
-                               const Char_t* weightVar, Bool_t addShiftPar)
+                               const Char_t* weightVar, Bool_t addShiftPar, Int_t intOrder)
     : FFRooModel(name, title, addShiftPar ? nDim : 0)
 {
     // Constructor.
@@ -65,6 +66,7 @@ FFRooModelHist::FFRooModelHist(const Char_t* name, const Char_t* title, Int_t nD
     fHist = 0;
     fTree = tree;
     fWeightVar = "";
+    fInterpolOrder = intOrder;
     if (weightVar)
         fWeightVar = weightVar;
     fDataHist = 0;
@@ -310,8 +312,8 @@ void FFRooModelHist::BuildModel(RooRealVar** vars)
     // create the model pdf
     if (fPdf) delete fPdf;
     if (fNPar)
-        fPdf = new RooHistPdf(GetName(), GetTitle(), varSetTrans, varSet, *fDataHist, 1);
+        fPdf = new RooHistPdf(GetName(), GetTitle(), varSetTrans, varSet, *fDataHist, fInterpolOrder);
     else
-        fPdf = new RooHistPdf(GetName(), GetTitle(), varSet, *fDataHist);
+        fPdf = new RooHistPdf(GetName(), GetTitle(), varSet, *fDataHist, fInterpolOrder);
 }
 
