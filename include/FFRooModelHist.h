@@ -45,6 +45,9 @@ public:
                    const Char_t* weightVar = 0, Bool_t addShiftPar = kFALSE);
     virtual ~FFRooModelHist();
 
+    TH1* GetHistogram() const { return fHist; }
+    RooDataHist* GetDataHistogram() const { return fDataHist; }
+
     virtual void BuildModel(RooRealVar** vars);
 
     ClassDef(FFRooModelHist, 0)  // RooFit histogram model class
