@@ -173,11 +173,12 @@ void FFRooFitterTree::SetVariableAutoRange(Int_t i, const Char_t* name, const Ch
 
 //______________________________________________________________________________
 Bool_t FFRooFitterTree::AddSpeciesHistPdf(const Char_t* name, const Char_t* title, const Char_t* treeLoc,
-                                          Bool_t addShiftPar)
+                                          Bool_t addShiftPar, Int_t intOrder)
 {
     // Add the species with name 'name', title 'title' and tree location 'treeLoc'
     // to the list of species to be fit using a histogram pdf.
     // Add a shift parameter if 'addShiftPar' is kTRUE.
+    // The order of the histogram interpolation can be specified via 'intOrder'.
     // Return kTRUE if the species was added, otherwise return kFALSE.
 
     // models for all fit variables
@@ -206,7 +207,7 @@ Bool_t FFRooFitterTree::AddSpeciesHistPdf(const Char_t* name, const Char_t* titl
     // create the model
     FFRooModel* tot_model = new FFRooModelHist(TString::Format("%s%s", tmp, name).Data(),
                                                title, fFitter->GetNVariable(), chain, fWeightVar,
-                                               addShiftPar);
+                                               addShiftPar, intOrder);
 
     // create species
     FFRooFitterSpecies* spec = new FFRooFitterSpecies(name, title, tot_model);
@@ -219,11 +220,12 @@ Bool_t FFRooFitterTree::AddSpeciesHistPdf(const Char_t* name, const Char_t* titl
 
 //______________________________________________________________________________
 Bool_t FFRooFitterTree::AddSpeciesHistPdf(const Char_t* name, const Char_t* title, TH1* hist,
-                                          Bool_t addShiftPar)
+                                          Bool_t addShiftPar, Int_t intOrder)
 {
     // Add the species with name 'name', title 'title' and histogram 'hist'
     // to the list of species to be fit using a histogram pdf.
     // Add a shift parameter if 'addShiftPar' is kTRUE.
+    // The order of the histogram interpolation can be specified via 'intOrder'.
     // Return kTRUE if the species was added, otherwise return kFALSE.
 
     // models for all fit variables
@@ -239,7 +241,7 @@ Bool_t FFRooFitterTree::AddSpeciesHistPdf(const Char_t* name, const Char_t* titl
 
     // create the model
     FFRooModel* tot_model = new FFRooModelHist(TString::Format("%s%s", tmp, name).Data(),
-                                               title, hist, addShiftPar);
+                                               title, hist, addShiftPar, intOrder);
 
     // create species
     FFRooFitterSpecies* spec = new FFRooFitterSpecies(name, title, tot_model);
