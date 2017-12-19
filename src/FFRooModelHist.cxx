@@ -108,10 +108,15 @@ void FFRooModelHist::DetermineHistoBinning(RooRealVar* var, RooRealVar* par,
     // different binning if shift parameter is present
     if (par)
     {
-        *min = TMath::Min(binning.lowBound() - par->getMin(), binning.lowBound() - par->getMax());
-        *max = TMath::Max(binning.highBound() - par->getMin(), binning.highBound() - par->getMax());
-        *min = TMath::Min(*min, binning.lowBound() - binw);
-        *max = TMath::Max(*max, binning.lowBound() + binw);
+        // extend range due to shift parameter
+        Double_t lmin = TMath::Min(binning.lowBound() - par->getMin(), binning.lowBound() - par->getMax());
+        Double_t lmax = TMath::Max(binning.highBound() - par->getMin(), binning.highBound() - par->getMax());
+        *min = binning.lowBound() - binw;
+        *max = binning.highBound() + binw;
+
+        // extend range to original binning
+        while (*min > lmin) *min -= binw;
+        while (*max < lmax) *max += binw;
         *nBin = (*max - *min) / binw;
     }
     else
@@ -252,7 +257,7 @@ void FFRooModelHist::BuildModel(RooRealVar** vars)
         }
     }
 
-    // backup binning of variables as RooDataHist annoyingly alters that
+    // backup binning of variables
     Int_t vbins[fNDim];
     Double_t vmin[fNDim];
     Double_t vmax[fNDim];
@@ -261,6 +266,15 @@ void FFRooModelHist::BuildModel(RooRealVar** vars)
         vbins[i] = vars[i]->getBinning().numBins();
         vmin[i] = vars[i]->getBinning().lowBound();
         vmax[i] = vars[i]->getBinning().highBound();
+    }
+
+    // extend variables to range of histogram
+    TAxis* haxes[3] = { fHist->GetXaxis(), fHist->GetYaxis(), fHist->GetZaxis() };
+    for (Int_t i = 0; i < fNDim; i++)
+    {
+        vars[i]->setBins(haxes[i]->GetNbins());
+        vars[i]->setMin(haxes[i]->GetXmin());
+        vars[i]->setMax(haxes[i]->GetXmax());
     }
 
     // create RooFit histogram
