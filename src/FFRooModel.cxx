@@ -259,6 +259,7 @@ void FFRooModel::SetParameter(Int_t i, Double_t v, Double_t min, Double_t max)
                 Warning("SetParameter", "Setting parameter %s to a constant value of %f",
                         fPar[i]->GetName(), v);
                 fPar[i]->setVal(v);
+                fPar[i]->setRange(min, max);
                 fPar[i]->setConstant(kTRUE);
             }
             else
@@ -286,6 +287,7 @@ void FFRooModel::SetParLimits(Int_t i, Double_t min, Double_t max)
                 Warning("SetParLimits", "Setting parameter %s to a constant value of %f",
                         fPar[i]->GetName(), min);
                 fPar[i]->setVal(min);
+                fPar[i]->setRange(min, max);
                 fPar[i]->setConstant(kTRUE);
             }
             else
@@ -331,6 +333,7 @@ void FFRooModel::FixParameter(Int_t i, Double_t v)
         if (fPar[i])
         {
             fPar[i]->setVal(v);
+            fPar[i]->setRange(v, v);
             fPar[i]->setConstant(kTRUE);
         }
     }
