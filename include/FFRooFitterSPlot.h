@@ -32,6 +32,7 @@ public:
                      const Char_t* evIDVar = "event_id", const Char_t* weightVar = 0);
     virtual ~FFRooFitterSPlot() { }
 
+    Double_t GetSpeciesWeight(Int_t event, Int_t i) const;
     TTree* GetSpeciesWeightsTree(const Char_t* name = 0,
                                  Int_t nSpec = 0, Int_t* spec = 0) const;
 

@@ -47,6 +47,19 @@ FFRooFitterSPlot::FFRooFitterSPlot(const Char_t* treeName, const Char_t* treeLoc
 }
 
 //______________________________________________________________________________
+Double_t FFRooFitterSPlot::GetSpeciesWeight(Int_t event, Int_t i) const
+{
+    // Wrapper for FFRooSPlot::GetSpeciesWeight().
+
+    if (fFitter)
+        return ((FFRooSPlot*)fFitter)->GetSpeciesWeight(event, i);
+    else
+        Error("GetSpeciesWeight", "Fitter not created yet!");
+
+    return 0;
+}
+
+//______________________________________________________________________________
 TTree* FFRooFitterSPlot::GetSpeciesWeightsTree(const Char_t* name,
                                                Int_t nSpec, Int_t* spec) const
 {
