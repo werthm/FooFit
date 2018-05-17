@@ -15,13 +15,13 @@
 #ifndef FOOFIT_FFRooFitterSPlot
 #define FOOFIT_FFRooFitterSPlot
 
-#include "FFRooFitterTree.h"
+#include "FFRooFitterUnbinned.h"
 
-class FFRooFitterSPlot : public FFRooFitterTree
+class FFRooFitterSPlot : public FFRooFitterUnbinned
 {
 
 public:
-    FFRooFitterSPlot() : FFRooFitterTree() { }
+    FFRooFitterSPlot() : FFRooFitterUnbinned() { }
     FFRooFitterSPlot(TTree* tree,
                      Int_t nVar, Int_t nSpec,
                      const Char_t* name, const Char_t* title,

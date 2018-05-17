@@ -56,8 +56,9 @@ FFRooFit              : base fit class
     FFRooSPlot        : class for sPlot fits of unbinned data
 
 FFRooFitter           : base high-level fit class
-  FFRooFitterTree     : class for high-level fitting of unbinned data
+  FFRooFitterUnbinned : class for high-level fitting of unbinned data
     FFRooFitterSPlot  : class for high-level sPlot fits of unbinned data
+  FFRooFitterBinned   : class for high-level fitting of binned data
 FFRooFitterSpecies    : class representing a fit species
 
 FFFooFit              : namespace for utility methods

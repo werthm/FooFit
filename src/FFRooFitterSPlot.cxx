@@ -23,11 +23,11 @@ FFRooFitterSPlot::FFRooFitterSPlot(TTree* tree,
                                    Int_t nVar, Int_t nSpec,
                                    const Char_t* name, const Char_t* title,
                                    const Char_t* evIDVar, const Char_t* weightVar)
-    : FFRooFitterTree(tree, nVar, name, title, weightVar)
+    : FFRooFitterUnbinned(tree, nVar, name, title, weightVar)
 {
     // Constructor.
 
-    // replace fitter created in FFRooFitterTree::FFRooFitterTree()
+    // replace fitter created in FFRooFitterUnbinned::FFRooFitterUnbinned()
     delete fFitter;
     fFitter = new FFRooSPlot(fTree, nVar, nSpec, GetName(), GetTitle(), evIDVar, fWeightVar);
 }
@@ -37,11 +37,11 @@ FFRooFitterSPlot::FFRooFitterSPlot(const Char_t* treeName, const Char_t* treeLoc
                                    Int_t nVar, Int_t nSpec,
                                    const Char_t* name, const Char_t* title,
                                    const Char_t* evIDVar, const Char_t* weightVar)
-    : FFRooFitterTree(treeName, treeLoc, nVar, name, title, weightVar)
+    : FFRooFitterUnbinned(treeName, treeLoc, nVar, name, title, weightVar)
 {
     // Constructor.
 
-    // replace fitter created in FFRooFitterTree::FFRooFitterTree()
+    // replace fitter created in FFRooFitterUnbinned::FFRooFitterUnbinned()
     delete fFitter;
     fFitter = new FFRooSPlot(fTree, nVar, nSpec, GetName(), GetTitle(), evIDVar, fWeightVar);
 }

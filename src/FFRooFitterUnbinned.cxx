@@ -1,12 +1,12 @@
 /*************************************************************************
- * Author: Dominik Werthmueller, 2017
+ * Author: Dominik Werthmueller, 2017-2018
  *************************************************************************/
 
 //////////////////////////////////////////////////////////////////////////
 //                                                                      //
-// FFRooFitterTree                                                      //
+// FFRooFitterUnbinned                                                  //
 //                                                                      //
-// Class for fitting multiple species to data in a tree.                //
+// Class for fitting multiple species to unbinned data.                 //
 //                                                                      //
 //////////////////////////////////////////////////////////////////////////
 
@@ -17,7 +17,7 @@
 #include "TMath.h"
 #include "RooRealVar.h"
 
-#include "FFRooFitterTree.h"
+#include "FFRooFitterUnbinned.h"
 #include "FFRooFitterSpecies.h"
 #include "FFRooFitTree.h"
 #include "FFFooFit.h"
@@ -25,12 +25,12 @@
 #include "FFRooModelKeys.h"
 #include "FFRooModelProd.h"
 
-ClassImp(FFRooFitterTree)
+ClassImp(FFRooFitterUnbinned)
 
 //______________________________________________________________________________
-FFRooFitterTree::FFRooFitterTree(TTree* tree, Int_t nVar,
-                                 const Char_t* name, const Char_t* title,
-                                 const Char_t* weightVar)
+FFRooFitterUnbinned::FFRooFitterUnbinned(TTree* tree, Int_t nVar,
+                                         const Char_t* name, const Char_t* title,
+                                         const Char_t* weightVar)
     : FFRooFitter(name, title)
 {
     // Constructor.
@@ -50,9 +50,9 @@ FFRooFitterTree::FFRooFitterTree(TTree* tree, Int_t nVar,
 }
 
 //______________________________________________________________________________
-FFRooFitterTree::FFRooFitterTree(const Char_t* treeName, const Char_t* treeLoc, Int_t nVar,
-                                 const Char_t* name, const Char_t* title,
-                                 const Char_t* weightVar)
+FFRooFitterUnbinned::FFRooFitterUnbinned(const Char_t* treeName, const Char_t* treeLoc, Int_t nVar,
+                                         const Char_t* name, const Char_t* title,
+                                         const Char_t* weightVar)
     : FFRooFitter(name, title)
 {
     // Constructor.
@@ -76,7 +76,7 @@ FFRooFitterTree::FFRooFitterTree(const Char_t* treeName, const Char_t* treeLoc, 
 }
 
 //______________________________________________________________________________
-FFRooFitterTree::~FFRooFitterTree()
+FFRooFitterUnbinned::~FFRooFitterUnbinned()
 {
     // Destructor.
 
@@ -85,8 +85,8 @@ FFRooFitterTree::~FFRooFitterTree()
 }
 
 //______________________________________________________________________________
-void FFRooFitterTree::SetVariableAutoRange(Int_t i, const Char_t* name, const Char_t* title,
-                                           Int_t nbins)
+void FFRooFitterUnbinned::SetVariableAutoRange(Int_t i, const Char_t* name, const Char_t* title,
+                                               Int_t nbins)
 {
     // Wrapper for FFRooFit::SetVariable() which automatically determines the
     // range of the variable 'i'.
@@ -172,8 +172,8 @@ void FFRooFitterTree::SetVariableAutoRange(Int_t i, const Char_t* name, const Ch
 }
 
 //______________________________________________________________________________
-Bool_t FFRooFitterTree::AddSpeciesHistPdf(const Char_t* name, const Char_t* title, const Char_t* treeLoc,
-                                          Bool_t addShiftPar, Int_t intOrder)
+Bool_t FFRooFitterUnbinned::AddSpeciesHistPdf(const Char_t* name, const Char_t* title, const Char_t* treeLoc,
+                                              Bool_t addShiftPar, Int_t intOrder)
 {
     // Add the species with name 'name', title 'title' and tree location 'treeLoc'
     // to the list of species to be fit using a histogram pdf.
@@ -219,8 +219,8 @@ Bool_t FFRooFitterTree::AddSpeciesHistPdf(const Char_t* name, const Char_t* titl
 }
 
 //______________________________________________________________________________
-Bool_t FFRooFitterTree::AddSpeciesHistPdf(const Char_t* name, const Char_t* title, TH1* hist,
-                                          Bool_t addShiftPar, Int_t intOrder)
+Bool_t FFRooFitterUnbinned::AddSpeciesHistPdf(const Char_t* name, const Char_t* title, TH1* hist,
+                                              Bool_t addShiftPar, Int_t intOrder)
 {
     // Add the species with name 'name', title 'title' and histogram 'hist'
     // to the list of species to be fit using a histogram pdf.
@@ -253,8 +253,8 @@ Bool_t FFRooFitterTree::AddSpeciesHistPdf(const Char_t* name, const Char_t* titl
 }
 
 //______________________________________________________________________________
-Bool_t FFRooFitterTree::AddSpeciesKeysPdf(const Char_t* name, const Char_t* title, const Char_t* treeLoc,
-                                          const Char_t* opt, Double_t rho, Int_t nSigma, Bool_t rotate)
+Bool_t FFRooFitterUnbinned::AddSpeciesKeysPdf(const Char_t* name, const Char_t* title, const Char_t* treeLoc,
+                                              const Char_t* opt, Double_t rho, Int_t nSigma, Bool_t rotate)
 {
     // Add the species with name 'name', title 'title' and tree location 'treeLoc'
     // to the list of species to be fit using a kernel estimation pdf.
