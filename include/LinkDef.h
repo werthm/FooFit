@@ -1,5 +1,5 @@
 /*************************************************************************
- * Author: Dominik Werthmueller, 2015
+ * Author: Dominik Werthmueller, 2015-2018
  *************************************************************************/
 
 //////////////////////////////////////////////////////////////////////////
@@ -41,6 +41,7 @@
 #pragma link C++ class FFRooSPlot+;
 #pragma link C++ class FFRooFitter+;
 #pragma link C++ class FFRooFitterUnbinned+;
+#pragma link C++ class FFRooFitterBinned+;
 #pragma link C++ class FFRooFitterSPlot+;
 #pragma link C++ class FFRooFitterSpecies+;
 
