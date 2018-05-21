@@ -1,5 +1,5 @@
 /*************************************************************************
- * Author: Dominik Werthmueller, 2017
+ * Author: Dominik Werthmueller, 2017-2018
  *************************************************************************/
 
 //////////////////////////////////////////////////////////////////////////
@@ -11,9 +11,18 @@
 //////////////////////////////////////////////////////////////////////////
 
 
+#include "TChain.h"
+#include "TLeaf.h"
+#include "TMath.h"
+#include "TH1.h"
+#include "RooRealVar.h"
+
 #include "FFRooFitter.h"
+#include "FFRooModelHist.h"
 #include "FFRooModelSum.h"
+#include "FFRooModelKeys.h"
 #include "FFRooFitterSpecies.h"
+#include "FFFooFit.h"
 
 ClassImp(FFRooFitter)
 
@@ -24,6 +33,9 @@ FFRooFitter::FFRooFitter(const Char_t* name, const Char_t* title)
     // Constructor.
 
     // init members
+    fTree = 0;
+    fHist = 0;
+    fWeightVar = "";
     fFitter = 0;
     fModel = 0;
     fNSpec = 0;
@@ -35,6 +47,8 @@ FFRooFitter::~FFRooFitter()
 {
     // Destructor.
 
+    if (fTree) delete fTree;
+    if (fHist) delete fHist;
     if (fFitter) delete fFitter;
     if (fModel) delete fModel;
     if (fSpec)
@@ -78,6 +92,145 @@ FFRooFitterSpecies* FFRooFitter::GetSpecies(Int_t i) const
 }
 
 //______________________________________________________________________________
+Bool_t FFRooFitter::AddSpeciesHistPdf(const Char_t* name, const Char_t* title, const Char_t* treeLoc,
+                                      Bool_t addShiftPar, Int_t intOrder)
+{
+    // Add the species with name 'name', title 'title' and tree location 'treeLoc'
+    // to the list of species to be fit using a histogram pdf.
+    // Add a shift parameter if 'addShiftPar' is kTRUE.
+    // The order of the histogram interpolation can be specified via 'intOrder'.
+    // Return kTRUE if the species was added, otherwise return kFALSE.
+
+    // check if unbinned data is present
+    if (!fTree)
+    {
+        Error("AddSpeciesHistPdf", "Unbinned input data (tree) needed to extract tree name!");
+        return kFALSE;
+    }
+
+    // models for all fit variables
+    FFRooModel* models[fFitter->GetNVariable()];
+
+    // load tree
+    TChain* chain = new TChain(fTree->GetName());
+    FFFooFit::LoadFilesToChain(treeLoc, chain);
+
+    // check entries
+    if (!chain->GetEntries())
+    {
+        Warning("AddSpeciesHistPdf", "Not adding species %s as no entries were found in tree %s!", name, treeLoc);
+        delete chain;
+        return kFALSE;
+    }
+
+    // loop over fit variables
+    Char_t tmp[256] = "";
+    for (Int_t i = 0; i < fFitter->GetNVariable(); i++)
+    {
+        strcat(tmp, fFitter->GetVariable(i)->GetName());
+        strcat(tmp, "_");
+    }
+
+    // create the model
+    FFRooModel* tot_model = new FFRooModelHist(TString::Format("%s%s", tmp, name).Data(),
+                                               title, fFitter->GetNVariable(), chain,
+                                               fWeightVar == "" ? 0 : fWeightVar.Data(),
+                                               addShiftPar, intOrder);
+
+    // create species
+    FFRooFitterSpecies* spec = new FFRooFitterSpecies(name, title, tot_model);
+
+    // add species
+    AddSpecies(spec);
+
+    return kTRUE;
+}
+
+//______________________________________________________________________________
+Bool_t FFRooFitter::AddSpeciesHistPdf(const Char_t* name, const Char_t* title, TH1* hist,
+                                      Bool_t addShiftPar, Int_t intOrder)
+{
+    // Add the species with name 'name', title 'title' and histogram 'hist'
+    // to the list of species to be fit using a histogram pdf.
+    // Add a shift parameter if 'addShiftPar' is kTRUE.
+    // The order of the histogram interpolation can be specified via 'intOrder'.
+    // Return kTRUE if the species was added, otherwise return kFALSE.
+
+    // models for all fit variables
+    FFRooModel* models[fFitter->GetNVariable()];
+
+    // loop over fit variables
+    Char_t tmp[256] = "";
+    for (Int_t i = 0; i < fFitter->GetNVariable(); i++)
+    {
+        strcat(tmp, fFitter->GetVariable(i)->GetName());
+        strcat(tmp, "_");
+    }
+
+    // create the model
+    FFRooModel* tot_model = new FFRooModelHist(TString::Format("%s%s", tmp, name).Data(),
+                                               title, hist, addShiftPar, intOrder);
+
+    // create species
+    FFRooFitterSpecies* spec = new FFRooFitterSpecies(name, title, tot_model);
+
+    // add species
+    AddSpecies(spec);
+
+    return kTRUE;
+}
+
+//______________________________________________________________________________
+Bool_t FFRooFitter::AddSpeciesKeysPdf(const Char_t* name, const Char_t* title, const Char_t* treeLoc,
+                                      const Char_t* opt, Double_t rho, Int_t nSigma, Bool_t rotate)
+{
+    // Add the species with name 'name', title 'title' and tree location 'treeLoc'
+    // to the list of species to be fit using a kernel estimation pdf.
+    // See RooNDKeysPdf for meaning of parameters 'opt', 'rho', 'nSigma' and 'rotate'.
+    // Return kTRUE if the species was added, otherwise return kFALSE.
+
+    // check if unbinned data is present
+    if (!fTree)
+    {
+        Error("AddSpeciesKeysPdf", "Unbinned input data (tree) needed to extract tree name!");
+        return kFALSE;
+    }
+
+    // load tree
+    TChain* chain = new TChain(fTree->GetName());
+    FFFooFit::LoadFilesToChain(treeLoc, chain);
+
+    // check entries
+    if (!chain->GetEntries())
+    {
+        Warning("AddSpeciesKeysPdf", "Not adding species %s as no entries were found in tree %s!", name, treeLoc);
+        delete chain;
+        return kFALSE;
+    }
+
+    // loop over fit variables
+    Char_t tmp[256] = "";
+    for (Int_t i = 0; i < fFitter->GetNVariable(); i++)
+    {
+        strcat(tmp, fFitter->GetVariable(i)->GetName());
+        strcat(tmp, "_");
+    }
+
+    // create the model
+    FFRooModel* tot_model = new FFRooModelKeys(TString::Format("%s%s", tmp, name).Data(),
+                                               title, fFitter->GetNVariable(), chain,
+                                               opt, rho, nSigma, rotate);
+
+    // create species
+    FFRooFitterSpecies* spec = new FFRooFitterSpecies(name, title, tot_model);
+
+    // add species
+    AddSpecies(spec);
+
+    return kTRUE;
+}
+
+//______________________________________________________________________________
 void FFRooFitter::SetVariable(Int_t i, const Char_t* name, const Char_t* title,
                               Double_t min, Double_t max, Int_t nbins)
 {
@@ -87,6 +240,100 @@ void FFRooFitter::SetVariable(Int_t i, const Char_t* name, const Char_t* title,
         fFitter->SetVariable(i, name, title, min, max, nbins);
     else
         Error("SetVariable", "Fitter not created yet!");
+}
+
+//______________________________________________________________________________
+void FFRooFitter::SetVariableAutoRange(Int_t i, const Char_t* name, const Char_t* title,
+                                       Int_t nbins)
+{
+    // Wrapper for FFRooFit::SetVariable() which automatically determines the
+    // range of the variable 'i'.
+
+    //
+    // look for minimum and maximum variable value in tree
+    // (TTree::GetMinimum() is crashing)
+    //
+
+    // check if unbinned data is present
+    if (!fTree)
+    {
+        Error("SetVariableAutoRange", "No unbinned input data (tree) was specified!");
+        return;
+    }
+
+    // try to find the leaf
+    TLeaf* leaf = fTree->FindLeaf(name);
+    if (!leaf)
+    {
+        Error("Error", "Variable '%s' not found in data tree!", name);
+        return;
+    }
+
+    // do not read other branches
+    fTree->SetBranchStatus("*", 0);
+    fTree->SetBranchStatus(name, 1);
+
+    // loop over events
+    Double_t min = 1e30;
+    Double_t max = 1e-30;
+    for (Long64_t i = 0; i < fTree->GetEntries(); i++)
+    {
+        // read entry
+        fTree->GetEntry(i);
+
+        // update leaf
+        leaf = fTree->FindLeaf(name);
+
+        // get minimum/maximum
+        min = TMath::Min(min, leaf->GetValue(0));
+        max = TMath::Max(max, leaf->GetValue(0));
+    }
+
+    // reset branch addresses
+    fTree->ResetBranchAddresses();
+    fTree->SetBranchStatus("*", 1);
+
+    // create histogram of data
+    TH1* h = new TH1F("h_det_range", "h_det_range", nbins, min, max);
+    fTree->Draw(TString::Format("%s>>h_det_range", name).Data(), fWeightVar == "" ? 0 : fWeightVar.Data());
+
+    // get bin with maximum
+    Int_t maxBin = h->GetMaximumBin();
+
+    // determine minimum
+    for (Int_t i = maxBin-1; i > 1; i--)
+    {
+        // calculate integrals
+        Double_t int_low = h->Integral(1, i);
+        Double_t int_tot = h->Integral(1, h->GetNbinsX());
+
+        // leave if ratio is below threshold
+        if (int_low/int_tot < 0.005)
+        {
+            min = h->GetBinCenter(i);
+            break;
+        }
+    }
+
+    // determine maximum
+    for (Int_t i = maxBin+1; i <= h->GetNbinsX(); i++)
+    {
+        if (h->GetBinContent(i) == 0)
+        {
+            max = h->GetBinCenter(i-1);
+            break;
+        }
+    }
+
+    // clean-up
+    delete h;
+
+    // round values
+    min = TMath::Ceil(min);
+    max = TMath::Floor(max);
+
+    // set variable
+    fFitter->SetVariable(i, name, title, min, max, nbins);
 }
 
 //______________________________________________________________________________

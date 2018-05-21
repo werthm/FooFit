@@ -1,5 +1,5 @@
 /*************************************************************************
- * Author: Dominik Werthmueller, 2017
+ * Author: Dominik Werthmueller, 2017-2018
  *************************************************************************/
 
 //////////////////////////////////////////////////////////////////////////
@@ -16,6 +16,8 @@
 
 #include "FFRooFit.h"
 
+class TTree;
+class TH1;
 class FFRooFit;
 class FFRooFitterSpecies;
 
@@ -23,6 +25,9 @@ class FFRooFitter : public TNamed
 {
 
 protected:
+    TTree* fTree;                   // unbinned input data
+    TH1* fHist;                     // binned input data
+    TString fWeightVar;             // name of event weight variable
     FFRooFit* fFitter;              // RooFit fitter
     FFRooModel* fModel;             // total model
     Int_t fNSpec;                   // number of species
@@ -32,6 +37,8 @@ protected:
 
 public:
     FFRooFitter(): TNamed(),
+                   fTree(0), fHist(0),
+                   fWeightVar(""),
                    fFitter(0),
                    fModel(0),
                    fNSpec(0), fSpec(0) { }
@@ -43,8 +50,17 @@ public:
     FFRooFitterSpecies* GetSpecies(Int_t i) const;
 
     void AddSpecies(FFRooFitterSpecies* spec);
+    Bool_t AddSpeciesHistPdf(const Char_t* name, const Char_t* title, const Char_t* treeLoc,
+                             Bool_t addShiftPar = kFALSE, Int_t intOrder = 0);
+    Bool_t AddSpeciesHistPdf(const Char_t* name, const Char_t* title, TH1* hist,
+                             Bool_t addShiftPar = kFALSE, Int_t intOrder = 0);
+    Bool_t AddSpeciesKeysPdf(const Char_t* name, const Char_t* title, const Char_t* treeLoc,
+                             const Char_t* opt = "a", Double_t rho = 1, Int_t nSigma = 3, Bool_t rotate = kTRUE);
+
     void SetVariable(Int_t i, const Char_t* name, const Char_t* title,
                      Double_t min, Double_t max, Int_t nbins);
+    void SetVariableAutoRange(Int_t i, const Char_t* name, const Char_t* title,
+                              Int_t nbins);
     void AddAuxVariable(RooRealVar* aux_var);
     void AddControlVariable(const Char_t* name, const Char_t* title);
     void AddConstraint(FFRooModel* c);
