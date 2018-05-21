@@ -1,5 +1,5 @@
 /*************************************************************************
- * Author: Dominik Werthmueller, 2015-2017
+ * Author: Dominik Werthmueller, 2015-2018
  *************************************************************************/
 
 //////////////////////////////////////////////////////////////////////////
@@ -618,10 +618,6 @@ Bool_t FFRooFit::Chi2PreFit()
 Bool_t FFRooFit::Fit(const Char_t* opt)
 {
     // Perform a RooFit-based fit.
-    //
-    // Options to be set via 'opt':
-    // 'bchi2'     : perform a binned chi2 fit
-    //
     // Return kTRUE on success, otherwise kFALSE.
 
     // check fit variables
@@ -689,76 +685,44 @@ Bool_t FFRooFit::Fit(const Char_t* opt)
     if (fResult)
         delete fResult;
 
+    //
     // fit the model to the data
-    if (FFFooFit::IndexOf(opt, "bchi2") != -1)
+    //
+
+    // look for additional constraints in the model
+    TList* constrList = new TList();
+    fModel->FindAllConstraints(constrList);
+    TIter next(constrList);
+    while (FFRooModel* c = (FFRooModel*)next())
+        AddConstraint(c);
+    delete constrList;
+
+    // create argument set of constraints
+    RooArgSet constrSet;
+    for (Int_t i = 0; i < fNConstr; i++)
     {
-        Info("Fit", "Performing binned chi2 fit");
-
-        // create argument set of variables
-        RooArgSet varSet;
-        for (Int_t i = 0; i < fNVar; i++) varSet.add(*fVar[i]);
-
-        // create a binned data set
-        RooDataHist* dataBinned = new RooDataHist(TString::Format("%s_binned", fData->GetName()).Data(),
-                                                  TString::Format("%s (binned)", fData->GetTitle()).Data(),
-                                                  varSet,
-                                                  *fData);
-
-        // configure fit
-        RooLinkedList fitArgs;
-        fitArgs.Add(new RooCmdArg(RooFit::Extended()));
-        fitArgs.Add(new RooCmdArg(RooFit::Save()));
-        fitArgs.Add(new RooCmdArg(RooFit::PrintEvalErrors(1)));
-        fitArgs.Add(new RooCmdArg(CreateMinimizerArg(fMinimizer)));
-        if (FFFooFit::gUseNCPU > 1)
-            fitArgs.Add(new RooCmdArg(RooFit::NumCPU(FFFooFit::gUseNCPU, FFFooFit::gParStrat)));
-
-        // perform binned chi2 fit
-        fResult = fModel->GetPdf()->chi2FitTo(*dataBinned, fitArgs);
-
-        // clean-up
-        fitArgs.Delete();
-        delete dataBinned;
+        Info("Fit", "Using fit constraint %s", fConstr[i]->GetName());
+        constrSet.add(*fConstr[i]->GetPdf());
     }
-    else
-    {
-        Info("Fit", "Performing maximum likelihood fit");
 
-        // look for additional constraints in the model
-        TList* constrList = new TList();
-        fModel->FindAllConstraints(constrList);
-        TIter next(constrList);
-        while (FFRooModel* c = (FFRooModel*)next())
-            AddConstraint(c);
-        delete constrList;
+    // configure fit
+    RooLinkedList fitArgs;
+    fitArgs.Add(new RooCmdArg(RooFit::Extended()));
+    fitArgs.Add(new RooCmdArg(RooFit::Save()));
+    fitArgs.Add(new RooCmdArg(RooFit::PrintEvalErrors(1)));
+    fitArgs.Add(new RooCmdArg(CreateMinimizerArg(fMinimizer)));
+    if (fNConstr)
+        fitArgs.Add(new RooCmdArg(RooFit::ExternalConstraints(constrSet)));
+    if (FFFooFit::gUseNCPU > 1)
+        fitArgs.Add(new RooCmdArg(RooFit::NumCPU(FFFooFit::gUseNCPU, FFFooFit::gParStrat)));
+    if (fData->isWeighted())
+        fitArgs.Add(new RooCmdArg(RooFit::SumW2Error(kTRUE)));
 
-        // create argument set of constraints
-        RooArgSet constrSet;
-        for (Int_t i = 0; i < fNConstr; i++)
-        {
-            Info("Fit", "Using fit constraint %s", fConstr[i]->GetName());
-            constrSet.add(*fConstr[i]->GetPdf());
-        }
+    // perform maximum likelihood fit
+    fResult = fModel->GetPdf()->fitTo(*fData, fitArgs);
 
-        // configure fit
-        RooLinkedList fitArgs;
-        fitArgs.Add(new RooCmdArg(RooFit::Extended()));
-        fitArgs.Add(new RooCmdArg(RooFit::Save()));
-        fitArgs.Add(new RooCmdArg(RooFit::PrintEvalErrors(1)));
-        fitArgs.Add(new RooCmdArg(CreateMinimizerArg(fMinimizer)));
-        if (fNConstr)
-            fitArgs.Add(new RooCmdArg(RooFit::ExternalConstraints(constrSet)));
-        if (FFFooFit::gUseNCPU > 1)
-            fitArgs.Add(new RooCmdArg(RooFit::NumCPU(FFFooFit::gUseNCPU, FFFooFit::gParStrat)));
-        if (fData->isWeighted())
-            fitArgs.Add(new RooCmdArg(RooFit::SumW2Error(kTRUE)));
-
-        // perform maximum likelihood fit
-        fResult = fModel->GetPdf()->fitTo(*fData, fitArgs);
-
-        // clean-up
-        fitArgs.Delete();
-    }
+    // clean-up
+    fitArgs.Delete();
 
     // show fit result
     fResult->Print("v");
