@@ -1,5 +1,5 @@
 /*************************************************************************
- * Author: Dominik Werthmueller, 2015-2016
+ * Author: Dominik Werthmueller, 2015-2018
  *************************************************************************/
 
 //////////////////////////////////////////////////////////////////////////
@@ -14,6 +14,7 @@
 #include "RooArgSet.h"
 #include "RooRealVar.h"
 #include "RooDataSet.h"
+#include "RooDataHist.h"
 #include "RooGlobalFunc.h"
 #include "TTree.h"
 #include "TMath.h"
@@ -25,12 +26,13 @@ ClassImp(FFRooFitTree)
 //______________________________________________________________________________
 FFRooFitTree::FFRooFitTree(TTree* tree, Int_t nVar,
                            const Char_t* name, const Char_t* title,
-                           const Char_t* weightVar)
+                           const Char_t* weightVar, Bool_t binnedFit)
     : FFRooFit(nVar, name, title)
 {
     // Constructor using the tree 'tree' and 'nVar' fit variables.
     // If 'weightVar' is non-zero, create a weighted dataset using this
     // tree variable to read the weights from.
+    // If 'binnedFit' is kTRUE, perform a binned fit of the data set.
 
     // init members
     fTree = tree;
@@ -43,6 +45,7 @@ FFRooFitTree::FFRooFitTree(TTree* tree, Int_t nVar,
     }
     else
         fWeights = 0;
+    fIsBinnedFit = binnedFit;
 }
 
 //______________________________________________________________________________
@@ -154,7 +157,15 @@ Bool_t FFRooFitTree::LoadData()
         Error("LoadData", "Invalid data in data tree!");
         return kFALSE;
     }
-    else
-        return kTRUE;
+
+    // convert to binned data set if requested
+    if (fIsBinnedFit)
+    {
+        RooAbsData* old_data = fData;
+        fData = new RooDataHist(fTree->GetName(), fTree->GetTitle(), varSet, *old_data);
+        delete old_data;
+    }
+
+    return kTRUE;
 }
 

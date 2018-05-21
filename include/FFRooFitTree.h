@@ -1,5 +1,5 @@
 /*************************************************************************
- * Author: Dominik Werthmueller, 2015-2016
+ * Author: Dominik Werthmueller, 2015-2018
  *************************************************************************/
 
 //////////////////////////////////////////////////////////////////////////
@@ -24,15 +24,16 @@ class FFRooFitTree : public FFRooFit
 protected:
     TTree* fTree;                   // input tree (not owned)
     RooRealVar* fWeights;           // weights variable
+    Bool_t fIsBinnedFit;            // binned fit flag
 
     virtual Bool_t LoadData();
 
 public:
     FFRooFitTree() : FFRooFit(),
-                     fTree(0), fWeights(0) { }
+                     fTree(0), fWeights(0), fIsBinnedFit(kFALSE) { }
     FFRooFitTree(TTree* tree, Int_t nVar,
                  const Char_t* name = "FFRooFitTree", const Char_t* title = "a FooFit RooFit",
-                 const Char_t* weightVar = 0);
+                 const Char_t* weightVar = 0, Bool_t binnedFit = kFALSE);
     virtual ~FFRooFitTree();
 
     TTree* GetTree() const { return fTree; }
