@@ -51,9 +51,9 @@ FFRooModel            : base model pdf class
     FFRooModelProd    : product of models
 
 FFRooFit              : base fit class
-  FFRooFitHist        : class for fitting binned data
-  FFRooFitTree        : class for fitting unbinned data
-    FFRooSPlot        : class for sPlot fits of unbinned data
+  FFRooFitHist        : class for fitting histograms
+  FFRooFitTree        : class for fitting trees
+    FFRooSPlot        : class for sPlot fits of trees
 
 FFRooFitter           : base high-level fit class
   FFRooFitterUnbinned : class for high-level fitting of unbinned data
