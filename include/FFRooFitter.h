@@ -48,6 +48,7 @@ public:
     FFRooModel* GetModel() const { return fModel; }
     Int_t GetNSpecies() const { return fNSpec; }
     FFRooFitterSpecies* GetSpecies(Int_t i) const;
+    RooRealVar* GetVariable(Int_t i) const;
 
     void AddSpecies(FFRooFitterSpecies* spec);
     Bool_t AddSpeciesHistPdf(const Char_t* name, const Char_t* title, const Char_t* treeLoc,

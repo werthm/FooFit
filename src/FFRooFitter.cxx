@@ -92,6 +92,20 @@ FFRooFitterSpecies* FFRooFitter::GetSpecies(Int_t i) const
 }
 
 //______________________________________________________________________________
+RooRealVar* FFRooFitter::GetVariable(Int_t i) const
+{
+    // Wrapper for FFRooFit::GetVariable(Int_t i).
+
+    if (fFitter)
+        return fFitter->GetVariable(i);
+    else
+    {
+        Error("SetVariable", "Fitter not created yet!");
+        return 0;
+    }
+}
+
+//______________________________________________________________________________
 Bool_t FFRooFitter::AddSpeciesHistPdf(const Char_t* name, const Char_t* title, const Char_t* treeLoc,
                                       Bool_t addShiftPar, Int_t intOrder)
 {
