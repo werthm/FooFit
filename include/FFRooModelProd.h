@@ -24,7 +24,7 @@ public:
     FFRooModelProd(const Char_t* name, const Char_t* title, Int_t n, FFRooModel** list = 0);
     virtual ~FFRooModelProd() { }
 
-    virtual void BuildModel(RooRealVar** vars);
+    virtual void BuildModel(RooAbsReal** vars);
 
     ClassDef(FFRooModelProd, 0)  // RooFit product of models class
 };

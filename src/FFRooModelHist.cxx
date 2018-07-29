@@ -130,7 +130,7 @@ void FFRooModelHist::DetermineHistoBinning(RooRealVar* var, RooRealVar* par,
 }
 
 //______________________________________________________________________________
-void FFRooModelHist::BuildModel(RooRealVar** vars)
+void FFRooModelHist::BuildModel(RooAbsReal** vars)
 {
     // Build the model using the variables 'vars'.
 
@@ -140,6 +140,26 @@ void FFRooModelHist::BuildModel(RooRealVar** vars)
     RooArgSet varSet;
     for (Int_t i = 0; i < fNDim; i++)
         varSet.add(*vars[i]);
+
+    // check if variables can be down-casted
+    for (Int_t i = 0; i < fNDim; i++)
+    {
+        if (!vars[i]->InheritsFrom("RooRealVar"))
+        {
+            Error("BuildModel", "Variable '%s' is not of type RooRealVar!", vars[i]->GetName());
+            return;
+        }
+    }
+
+    // check if parameters can be down-casted
+    for (Int_t i = 0; i < fNPar; i++)
+    {
+        if (!fPar[i]->InheritsFrom("RooRealVar"))
+        {
+            Error("BuildModel", "Parameter '%s' is not of type RooRealVar!", fPar[i]->GetName());
+            return;
+        }
+    }
 
     // create binned input data
     if (!fHist && fTree)
@@ -151,9 +171,9 @@ void FFRooModelHist::BuildModel(RooRealVar** vars)
             Int_t nbin_0 = 0;
             Double_t min_0 = 0, max_0 = 0;
             if (fNPar)
-                DetermineHistoBinning(vars[0], fPar[0], &nbin_0, &min_0, &max_0);
+                DetermineHistoBinning((RooRealVar*)vars[0], (RooRealVar*)fPar[0], &nbin_0, &min_0, &max_0);
             else
-                DetermineHistoBinning(vars[0], 0, &nbin_0, &min_0, &max_0);
+                DetermineHistoBinning((RooRealVar*)vars[0], 0, &nbin_0, &min_0, &max_0);
 
             // create the histogram
             fHist = new TH1F(TString::Format("hist_%s_%s",
@@ -179,13 +199,13 @@ void FFRooModelHist::BuildModel(RooRealVar** vars)
             Double_t min_1 = 0, max_1 = 0;
             if (fNPar)
             {
-                DetermineHistoBinning(vars[0], fPar[0], &nbin_0, &min_0, &max_0);
-                DetermineHistoBinning(vars[1], fPar[1], &nbin_1, &min_1, &max_1);
+                DetermineHistoBinning((RooRealVar*)vars[0], (RooRealVar*)fPar[0], &nbin_0, &min_0, &max_0);
+                DetermineHistoBinning((RooRealVar*)vars[1], (RooRealVar*)fPar[1], &nbin_1, &min_1, &max_1);
             }
             else
             {
-                DetermineHistoBinning(vars[0], 0, &nbin_0, &min_0, &max_0);
-                DetermineHistoBinning(vars[1], 0, &nbin_1, &min_1, &max_1);
+                DetermineHistoBinning((RooRealVar*)vars[0], 0, &nbin_0, &min_0, &max_0);
+                DetermineHistoBinning((RooRealVar*)vars[1], 0, &nbin_1, &min_1, &max_1);
             }
 
             // create the histogram
@@ -218,15 +238,15 @@ void FFRooModelHist::BuildModel(RooRealVar** vars)
             Double_t min_2 = 0, max_2 = 0;
             if (fNPar)
             {
-                DetermineHistoBinning(vars[0], fPar[0], &nbin_0, &min_0, &max_0);
-                DetermineHistoBinning(vars[1], fPar[1], &nbin_1, &min_1, &max_1);
-                DetermineHistoBinning(vars[2], fPar[2], &nbin_2, &min_2, &max_2);
+                DetermineHistoBinning((RooRealVar*)vars[0], (RooRealVar*)fPar[0], &nbin_0, &min_0, &max_0);
+                DetermineHistoBinning((RooRealVar*)vars[1], (RooRealVar*)fPar[1], &nbin_1, &min_1, &max_1);
+                DetermineHistoBinning((RooRealVar*)vars[2], (RooRealVar*)fPar[2], &nbin_2, &min_2, &max_2);
             }
             else
             {
-                DetermineHistoBinning(vars[0], 0, &nbin_0, &min_0, &max_0);
-                DetermineHistoBinning(vars[1], 0, &nbin_1, &min_1, &max_1);
-                DetermineHistoBinning(vars[2], 0, &nbin_2, &min_2, &max_2);
+                DetermineHistoBinning((RooRealVar*)vars[0], 0, &nbin_0, &min_0, &max_0);
+                DetermineHistoBinning((RooRealVar*)vars[1], 0, &nbin_1, &min_1, &max_1);
+                DetermineHistoBinning((RooRealVar*)vars[2], 0, &nbin_2, &min_2, &max_2);
             }
 
             // create the histogram
@@ -265,18 +285,18 @@ void FFRooModelHist::BuildModel(RooRealVar** vars)
     Double_t vmax[fNDim];
     for (Int_t i = 0; i < fNDim; i++)
     {
-        vbins[i] = vars[i]->getBinning().numBins();
-        vmin[i] = vars[i]->getBinning().lowBound();
-        vmax[i] = vars[i]->getBinning().highBound();
+        vbins[i] = ((RooRealVar*)vars[i])->getBinning().numBins();
+        vmin[i] = ((RooRealVar*)vars[i])->getBinning().lowBound();
+        vmax[i] = ((RooRealVar*)vars[i])->getBinning().highBound();
     }
 
     // extend variables to range of histogram
     TAxis* haxes[3] = { fHist->GetXaxis(), fHist->GetYaxis(), fHist->GetZaxis() };
     for (Int_t i = 0; i < fNDim; i++)
     {
-        vars[i]->setBins(haxes[i]->GetNbins());
-        vars[i]->setMin(haxes[i]->GetXmin());
-        vars[i]->setMax(haxes[i]->GetXmax());
+        ((RooRealVar*)vars[i])->setBins(haxes[i]->GetNbins());
+        ((RooRealVar*)vars[i])->setMin(haxes[i]->GetXmin());
+        ((RooRealVar*)vars[i])->setMax(haxes[i]->GetXmax());
     }
 
     // create RooFit histogram
@@ -288,9 +308,9 @@ void FFRooModelHist::BuildModel(RooRealVar** vars)
     // restore binning of variables
     for (Int_t i = 0; i < fNDim; i++)
     {
-        vars[i]->setBins(vbins[i]);
-        vars[i]->setMin(vmin[i]);
-        vars[i]->setMax(vmax[i]);
+        ((RooRealVar*)vars[i])->setBins(vbins[i]);
+        ((RooRealVar*)vars[i])->setMin(vmin[i]);
+        ((RooRealVar*)vars[i])->setMax(vmax[i]);
     }
 
     // add shift transformation

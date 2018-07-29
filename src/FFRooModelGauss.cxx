@@ -12,7 +12,6 @@
 
 
 #include "RooGaussian.h"
-#include "RooRealVar.h"
 
 #include "FFRooModelGauss.h"
 
@@ -36,7 +35,7 @@ FFRooModelGauss::FFRooModelGauss(const Char_t* name, const Char_t* title)
 }
 
 //______________________________________________________________________________
-void FFRooModelGauss::BuildModel(RooRealVar** vars)
+void FFRooModelGauss::BuildModel(RooAbsReal** vars)
 {
     // Build the model using the variables 'vars'.
 

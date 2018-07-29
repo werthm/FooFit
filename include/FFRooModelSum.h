@@ -24,7 +24,7 @@ public:
     FFRooModelSum(const Char_t* name, const Char_t* title, Int_t n, FFRooModel** list = 0);
     virtual ~FFRooModelSum() { }
 
-    virtual void BuildModel(RooRealVar** vars);
+    virtual void BuildModel(RooAbsReal** vars);
 
     virtual void Print(Option_t* option = "") const;
 

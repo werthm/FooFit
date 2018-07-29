@@ -12,7 +12,6 @@
 
 
 #include "RooPolynomial.h"
-#include "RooRealVar.h"
 
 #include "FFRooModelPol.h"
 
@@ -35,7 +34,7 @@ FFRooModelPol::FFRooModelPol(const Char_t* name, const Char_t* title, Int_t nOrd
 }
 
 //______________________________________________________________________________
-void FFRooModelPol::BuildModel(RooRealVar** vars)
+void FFRooModelPol::BuildModel(RooAbsReal** vars)
 {
     // Build the model using the variables 'vars'.
 

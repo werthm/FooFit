@@ -53,7 +53,7 @@ public:
 
     void SetInterpolationOrder(Int_t order) { fInterpolOrder = order; }
 
-    virtual void BuildModel(RooRealVar** vars);
+    virtual void BuildModel(RooAbsReal** vars);
 
     ClassDef(FFRooModelHist, 0)  // RooFit histogram model class
 };

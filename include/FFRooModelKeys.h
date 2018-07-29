@@ -41,7 +41,7 @@ public:
                    const Char_t* opt = "a", Double_t rho = 1, Int_t nSigma = 3, Bool_t rotate = kTRUE);
     virtual ~FFRooModelKeys();
 
-    virtual void BuildModel(RooRealVar** vars);
+    virtual void BuildModel(RooAbsReal** vars);
 
     ClassDef(FFRooModelKeys, 0)  // RooFit kernel estimation model class
 };

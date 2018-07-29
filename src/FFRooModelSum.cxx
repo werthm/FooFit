@@ -12,7 +12,6 @@
 
 
 #include "RooAddPdf.h"
-#include "RooRealVar.h"
 
 #include "FFRooModelSum.h"
 
@@ -33,7 +32,7 @@ FFRooModelSum::FFRooModelSum(const Char_t* name, const Char_t* title, Int_t n, F
 }
 
 //______________________________________________________________________________
-void FFRooModelSum::BuildModel(RooRealVar** vars)
+void FFRooModelSum::BuildModel(RooAbsReal** vars)
 {
     // Build the model using the variables 'vars'.
 

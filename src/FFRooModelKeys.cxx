@@ -13,7 +13,6 @@
 
 
 #include "TTree.h"
-#include "RooRealVar.h"
 #include "RooDataSet.h"
 #include "RooNDKeysPdf.h"
 
@@ -49,7 +48,7 @@ FFRooModelKeys::~FFRooModelKeys()
 }
 
 //______________________________________________________________________________
-void FFRooModelKeys::BuildModel(RooRealVar** vars)
+void FFRooModelKeys::BuildModel(RooAbsReal** vars)
 {
     // Build the model using the variables 'vars'.
 

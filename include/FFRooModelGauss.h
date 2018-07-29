@@ -24,7 +24,7 @@ public:
     FFRooModelGauss(const Char_t* name, const Char_t* title);
     virtual ~FFRooModelGauss() { }
 
-    virtual void BuildModel(RooRealVar** vars);
+    virtual void BuildModel(RooAbsReal** vars);
 
     ClassDef(FFRooModelGauss, 0)  // 1-dim. Gaussian RooFit model
 };

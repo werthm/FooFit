@@ -12,7 +12,6 @@
 
 
 #include "RooExponential.h"
-#include "RooRealVar.h"
 
 #include "FFRooModelExpo.h"
 
@@ -32,7 +31,7 @@ FFRooModelExpo::FFRooModelExpo(const Char_t* name, const Char_t* title)
 }
 
 //______________________________________________________________________________
-void FFRooModelExpo::BuildModel(RooRealVar** vars)
+void FFRooModelExpo::BuildModel(RooAbsReal** vars)
 {
     // Build the model using the variables 'vars'.
 

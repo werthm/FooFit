@@ -38,7 +38,7 @@ public:
     void SetModelList(FFRooModel** list);
     void SetModel(Int_t i, FFRooModel* model);
 
-    virtual void BuildModel(RooRealVar** vars) = 0;
+    virtual void BuildModel(RooAbsReal** vars) = 0;
 
     ClassDef(FFRooModelComp, 0)  // RooFit composite model class
 };

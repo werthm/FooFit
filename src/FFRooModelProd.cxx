@@ -26,7 +26,7 @@ FFRooModelProd::FFRooModelProd(const Char_t* name, const Char_t* title, Int_t n,
 }
 
 //______________________________________________________________________________
-void FFRooModelProd::BuildModel(RooRealVar** vars)
+void FFRooModelProd::BuildModel(RooAbsReal** vars)
 {
     // Build the model using the variables 'vars'.
 

@@ -29,7 +29,7 @@ FFRooModel::FFRooModel(const Char_t* name, const Char_t* title, Int_t nPar)
     // init members
     fPdf = 0;
     fNPar = nPar;
-    fPar = new RooRealVar*[fNPar];
+    fPar = new RooAbsReal*[fNPar];
     fParIsOwned = new Bool_t[fNPar];
     for (Int_t i = 0; i < fNPar; i++)
     {
@@ -142,7 +142,7 @@ void FFRooModel::AddConstraint(FFRooModel* c)
 }
 
 //______________________________________________________________________________
-RooRealVar* FFRooModel::GetPar(Int_t i) const
+RooAbsReal* FFRooModel::GetPar(Int_t i) const
 {
     // Return the parameter at index 'i'.
 
@@ -172,7 +172,10 @@ Double_t FFRooModel::GetParError(Int_t i) const
     // check parameter index
     if (CheckParBounds(i, "GetParameter()"))
     {
-        return fPar[i] ? fPar[i]->getError() : 0;
+        if (fPar[i] && fPar[i]->InheritsFrom("RooRealVar"))
+            return ((RooRealVar*)fPar[i])->getError();
+        else
+            return 0;
     }
     else return 0;
 }
@@ -217,7 +220,7 @@ const Char_t* FFRooModel::GetParTitle(Int_t i) const
 }
 
 //______________________________________________________________________________
-void FFRooModel::SetParameter(Int_t i, RooRealVar* par)
+void FFRooModel::SetParameter(Int_t i, RooAbsReal* par)
 {
     // Set the parameter at index 'i' to the external (not owned) parameter 'par'.
 
@@ -238,7 +241,8 @@ void FFRooModel::SetParameter(Int_t i, Double_t v)
     // check parameter index
     if (CheckParBounds(i, "SetParameter()"))
     {
-        if (fPar[i]) fPar[i]->setVal(v);
+        if (fPar[i] && fPar[i]->InheritsFrom("RooRealVar"))
+            ((RooRealVar*)fPar[i])->setVal(v);
     }
 }
 
@@ -251,21 +255,23 @@ void FFRooModel::SetParameter(Int_t i, Double_t v, Double_t min, Double_t max)
     // check parameter index
     if (CheckParBounds(i, "SetParameter()"))
     {
-        if (fPar[i])
+        if (fPar[i] && fPar[i]->InheritsFrom("RooRealVar"))
         {
+            RooRealVar* p = (RooRealVar*)fPar[i];
+
             // check if parameter should be fixed
             if (v == min && v == max)
             {
                 Warning("SetParameter", "Setting parameter %s to a constant value of %f",
-                        fPar[i]->GetName(), v);
-                fPar[i]->setVal(v);
-                fPar[i]->setRange(min, max);
-                fPar[i]->setConstant(kTRUE);
+                        p->GetName(), v);
+                p->setVal(v);
+                p->setRange(min, max);
+                p->setConstant(kTRUE);
             }
             else
             {
-                fPar[i]->setVal(v);
-                fPar[i]->setRange(min, max);
+                p->setVal(v);
+                p->setRange(min, max);
             }
         }
     }
@@ -279,20 +285,22 @@ void FFRooModel::SetParLimits(Int_t i, Double_t min, Double_t max)
     // check parameter index
     if (CheckParBounds(i, "SetParLimits()"))
     {
-        if (fPar[i])
+        if (fPar[i] && fPar[i]->InheritsFrom("RooRealVar"))
         {
+            RooRealVar* p = (RooRealVar*)fPar[i];
+
             // check if parameter should be fixed
             if (min == max)
             {
                 Warning("SetParLimits", "Setting parameter %s to a constant value of %f",
-                        fPar[i]->GetName(), min);
-                fPar[i]->setVal(min);
-                fPar[i]->setRange(min, max);
-                fPar[i]->setConstant(kTRUE);
+                        p->GetName(), min);
+                p->setVal(min);
+                p->setRange(min, max);
+                p->setConstant(kTRUE);
             }
             else
             {
-                fPar[i]->setRange(min, max);
+                p->setRange(min, max);
             }
         }
     }
@@ -330,11 +338,12 @@ void FFRooModel::FixParameter(Int_t i, Double_t v)
     // check parameter index
     if (CheckParBounds(i, "FixParameter()"))
     {
-        if (fPar[i])
+        if (fPar[i] && fPar[i]->InheritsFrom("RooRealVar"))
         {
-            fPar[i]->setVal(v);
-            fPar[i]->setRange(v, v);
-            fPar[i]->setConstant(kTRUE);
+            RooRealVar* p = (RooRealVar*)fPar[i];
+            p->setVal(v);
+            p->setRange(v, v);
+            p->setConstant(kTRUE);
         }
     }
 }
@@ -388,6 +397,21 @@ void FFRooModel::FindAllConstraints(TList* list)
 }
 
 //______________________________________________________________________________
+void FFRooModel::BuildModel(RooRealVar** vars, Int_t nVars)
+{
+    // Build the model using the 'nVars' variables 'vars'.
+    // (Wrapper method).
+
+    // convert pointers
+    RooAbsReal* vars_c[nVars];
+    for (Int_t i = 0; i < nVars; i++)
+        vars_c[i] = (RooAbsReal*) vars[i];
+
+    // call main method
+    BuildModel(vars_c);
+}
+
+//______________________________________________________________________________
 void FFRooModel::Print(Option_t* option) const
 {
     // Print out the content of this class.
@@ -420,10 +444,14 @@ void FFRooModel::Print(Option_t* option) const
         {
             printf("%s  Par %2d: %s (%s)\n",
                    option, i, fPar[i]->GetName(), fPar[i]->GetTitle());
-            printf("%s          Value: %14.7e  Error: %14.7e\n",
-                   option, fPar[i]->getVal(), fPar[i]->getError());
-            printf("%s          Min  : %14.7e  Max  : %14.7e\n",
-                   option, fPar[i]->getMin(), fPar[i]->getMax());
+            if (fPar[i]->InheritsFrom("RooRealVar"))
+            {
+                RooRealVar* p = (RooRealVar*)fPar[i];
+                printf("%s          Value: %14.7e  Error: %14.7e\n",
+                       option, p->getVal(), p->getError());
+                printf("%s          Min  : %14.7e  Max  : %14.7e\n",
+                       option, p->getMin(), p->getMax());
+            }
         }
     }
 }

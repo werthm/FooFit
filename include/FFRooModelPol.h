@@ -26,7 +26,7 @@ public:
 
     Int_t GetNOrder() const { return fNPar-1; }
 
-    virtual void BuildModel(RooRealVar** vars);
+    virtual void BuildModel(RooAbsReal** vars);
 
     ClassDef(FFRooModelPol, 0)  // 1-dim. polynomial RooFit model
 };
