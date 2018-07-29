@@ -665,7 +665,7 @@ Bool_t FFRooFit::Fit(const Char_t* opt)
     }
 
     // build the model
-    fModel->BuildModel(fVar);
+    fModel->BuildModel(fVar, fNVar);
 
     // user info
     Info("Fit", "Fitting using %d CPU(s) (Parallelization strategy: %d)",
