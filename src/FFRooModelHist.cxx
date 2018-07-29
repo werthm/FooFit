@@ -85,6 +85,30 @@ FFRooModelHist::FFRooModelHist(const Char_t* name, const Char_t* title, Int_t nD
 }
 
 //______________________________________________________________________________
+FFRooModelHist::FFRooModelHist(const Char_t* name, const Char_t* title, Int_t nDim, TTree* tree,
+                               RooAbsReal** shiftPar, const Char_t* weightVar, Int_t intOrder)
+    : FFRooModel(name, title, nDim)
+{
+    // Constructor.
+
+    Char_t tmp[256];
+
+    // init members
+    fNDim = nDim;
+    fHist = 0;
+    fTree = tree;
+    fWeightVar = "";
+    fInterpolOrder = intOrder;
+    if (weightVar)
+        fWeightVar = weightVar;
+    fDataHist = 0;
+
+    // set shift parameters
+    for (Int_t i = 0; i < fNPar; i++)
+        fPar[i] = shiftPar[i];
+}
+
+//______________________________________________________________________________
 FFRooModelHist::~FFRooModelHist()
 {
     // Destructor.

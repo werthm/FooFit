@@ -46,6 +46,9 @@ public:
     FFRooModelHist(const Char_t* name, const Char_t* title, Int_t Dim, TTree* tree,
                    const Char_t* weightVar = 0, Bool_t addShiftPar = kFALSE,
                    Int_t intOrder = 0);
+    FFRooModelHist(const Char_t* name, const Char_t* title, Int_t Dim, TTree* tree,
+                   RooAbsReal** shiftPar, const Char_t* weightVar = 0,
+                   Int_t intOrder = 0);
     virtual ~FFRooModelHist();
 
     TH1* GetHistogram() const { return fHist; }
