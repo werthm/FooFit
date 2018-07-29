@@ -1,12 +1,15 @@
-# FooFit
+FooFit
+======
 
 Intuitive interface to RooFit.
 
-#### Dependencies
+## Installation
+
+### Dependencies
 * ROOT 5.34 or 6.08.06 (with RooFit and Minuit2 support)
 * CMake 2.8
 
-#### Installation
+### Installation
 ```
 cd /some/directory
 git clone https://github.com/werthm/FooFit.git
@@ -19,7 +22,7 @@ export LD_LIBRARY_PATH="/some/directory/FooFit/build/lib:$LD_LIBRARY_PATH"
 ```
 It is recommended to set the `LD_LIBRARY_PATH` variable in your shell configuration file.
 
-#### Usage
+## Quick start
 ROOT command line interface:
 ```
 root [0] gSystem->Load("libFooFit.so");
@@ -38,7 +41,7 @@ root [0] .include /some/directory/FooFit/build/include
 root [1] .x FooFitMacro.C++
 ```
 
-#### List of classes
+## List of classes
 ```
 FFRooModel            : base model pdf class
   FFRooModelPol       : polynomial function model
