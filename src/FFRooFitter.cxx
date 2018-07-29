@@ -106,6 +106,41 @@ RooRealVar* FFRooFitter::GetVariable(Int_t i) const
 }
 
 //______________________________________________________________________________
+TChain* FFRooFitter::AddSpeciesHistPdfCommon(const Char_t* name, const Char_t* treeLoc,
+                                             TString& outName)
+{
+    // Prepare adding a histogram-based fit species.
+
+    // check if unbinned data is present
+    if (!fTree)
+    {
+        Error("AddSpeciesHistPdfCommon", "Unbinned input data (tree) needed to extract tree name!");
+        return 0;
+    }
+
+    // load tree
+    TChain* chain = new TChain(fTree->GetName());
+    FFFooFit::LoadFilesToChain(treeLoc, chain);
+
+    // check entries
+    if (!chain->GetEntries())
+    {
+        Warning("AddSpeciesHistPdfCommon", "Not adding species %s as no entries were found in tree %s!", name, treeLoc);
+        delete chain;
+        return 0;
+    }
+
+    // loop over fit variables and construct name
+    for (Int_t i = 0; i < fFitter->GetNVariable(); i++)
+    {
+        outName += fFitter->GetVariable(i)->GetName();
+        outName += "_";
+    }
+
+    return chain;
+}
+
+//______________________________________________________________________________
 Bool_t FFRooFitter::AddSpeciesHistPdf(const Char_t* name, const Char_t* title, const Char_t* treeLoc,
                                       Bool_t addShiftPar, Int_t intOrder)
 {
@@ -115,41 +150,47 @@ Bool_t FFRooFitter::AddSpeciesHistPdf(const Char_t* name, const Char_t* title, c
     // The order of the histogram interpolation can be specified via 'intOrder'.
     // Return kTRUE if the species was added, otherwise return kFALSE.
 
-    // check if unbinned data is present
-    if (!fTree)
-    {
-        Error("AddSpeciesHistPdf", "Unbinned input data (tree) needed to extract tree name!");
-        return kFALSE;
-    }
-
-    // models for all fit variables
-    FFRooModel* models[fFitter->GetNVariable()];
-
-    // load tree
-    TChain* chain = new TChain(fTree->GetName());
-    FFFooFit::LoadFilesToChain(treeLoc, chain);
-
-    // check entries
-    if (!chain->GetEntries())
-    {
-        Warning("AddSpeciesHistPdf", "Not adding species %s as no entries were found in tree %s!", name, treeLoc);
-        delete chain;
-        return kFALSE;
-    }
-
-    // loop over fit variables
-    Char_t tmp[256] = "";
-    for (Int_t i = 0; i < fFitter->GetNVariable(); i++)
-    {
-        strcat(tmp, fFitter->GetVariable(i)->GetName());
-        strcat(tmp, "_");
-    }
+    // call common method
+    TString tmp;
+    TChain* chain = AddSpeciesHistPdfCommon(name, treeLoc, tmp);
+    if (!chain) return kFALSE;
 
     // create the model
-    FFRooModel* tot_model = new FFRooModelHist(TString::Format("%s%s", tmp, name).Data(),
+    FFRooModel* tot_model = new FFRooModelHist(TString::Format("%s%s", tmp.Data(), name).Data(),
                                                title, fFitter->GetNVariable(), chain,
                                                fWeightVar == "" ? 0 : fWeightVar.Data(),
                                                addShiftPar, intOrder);
+
+    // create species
+    FFRooFitterSpecies* spec = new FFRooFitterSpecies(name, title, tot_model);
+
+    // add species
+    AddSpecies(spec);
+
+    return kTRUE;
+}
+
+//______________________________________________________________________________
+Bool_t FFRooFitter::AddSpeciesHistPdf(const Char_t* name, const Char_t* title, const Char_t* treeLoc,
+                                      RooAbsReal** shiftPar, Int_t intOrder)
+{
+    // Add the species with name 'name', title 'title' and tree location 'treeLoc'
+    // to the list of species to be fit using a histogram pdf.
+    // Use the parameters 'shiftPar' as shift parameters.
+    // The order of the histogram interpolation can be specified via 'intOrder'.
+    // Return kTRUE if the species was added, otherwise return kFALSE.
+
+    // call common method
+    TString tmp;
+    TChain* chain = AddSpeciesHistPdfCommon(name, treeLoc, tmp);
+    if (!chain) return kFALSE;
+
+    // create the model
+    FFRooModel* tot_model = new FFRooModelHist(TString::Format("%s%s", tmp.Data(), name).Data(),
+                                               title, fFitter->GetNVariable(), chain,
+                                               shiftPar,
+                                               fWeightVar == "" ? 0 : fWeightVar.Data(),
+                                               intOrder);
 
     // create species
     FFRooFitterSpecies* spec = new FFRooFitterSpecies(name, title, tot_model);
@@ -169,9 +210,6 @@ Bool_t FFRooFitter::AddSpeciesHistPdf(const Char_t* name, const Char_t* title, T
     // Add a shift parameter if 'addShiftPar' is kTRUE.
     // The order of the histogram interpolation can be specified via 'intOrder'.
     // Return kTRUE if the species was added, otherwise return kFALSE.
-
-    // models for all fit variables
-    FFRooModel* models[fFitter->GetNVariable()];
 
     // loop over fit variables
     Char_t tmp[256] = "";

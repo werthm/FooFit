@@ -17,7 +17,9 @@
 #include "FFRooFit.h"
 
 class TTree;
+class TChain;
 class TH1;
+class RooAbsReal;
 class FFRooFit;
 class FFRooFitterSpecies;
 
@@ -33,6 +35,8 @@ protected:
     Int_t fNSpec;                   // number of species
     FFRooFitterSpecies** fSpec;     //[fNSpec] array of species
 
+    TChain* AddSpeciesHistPdfCommon(const Char_t* name, const Char_t* treeLoc,
+                                    TString& outName);
     Bool_t BuildModel();
 
 public:
@@ -53,6 +57,8 @@ public:
     void AddSpecies(FFRooFitterSpecies* spec);
     Bool_t AddSpeciesHistPdf(const Char_t* name, const Char_t* title, const Char_t* treeLoc,
                              Bool_t addShiftPar = kFALSE, Int_t intOrder = 0);
+    Bool_t AddSpeciesHistPdf(const Char_t* name, const Char_t* title, const Char_t* treeLoc,
+                             RooAbsReal** shiftPar, Int_t intOrder = 0);
     Bool_t AddSpeciesHistPdf(const Char_t* name, const Char_t* title, TH1* hist,
                              Bool_t addShiftPar = kFALSE, Int_t intOrder = 0);
     Bool_t AddSpeciesKeysPdf(const Char_t* name, const Char_t* title, const Char_t* treeLoc,
