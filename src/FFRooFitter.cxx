@@ -21,6 +21,9 @@
 #include "FFRooModelHist.h"
 #include "FFRooModelSum.h"
 #include "FFRooModelKeys.h"
+#include "FFRooModelGauss.h"
+#include "FFRooModelPol.h"
+#include "FFRooModelExpo.h"
 #include "FFRooFitterSpecies.h"
 #include "FFFooFit.h"
 
@@ -106,6 +109,97 @@ RooRealVar* FFRooFitter::GetVariable(Int_t i) const
 }
 
 //______________________________________________________________________________
+Bool_t FFRooFitter::AddSpeciesGaussPdf(const Char_t* name, const Char_t* title)
+{
+    // Add the species with name 'name' and title 'title' to the list of species
+    // to be fit using a Gaussian pdf.
+    // Return kTRUE if the species was added, otherwise return kFALSE.
+
+    // loop over fit variables
+    TString tmp;
+    for (Int_t i = 0; i < fFitter->GetNVariable(); i++)
+    {
+        tmp += fFitter->GetVariable(i)->GetName();
+        tmp += "_";
+    }
+
+    // create the model
+    FFRooModel* model = new FFRooModelGauss(TString::Format("%s%s", tmp.Data(), name).Data(), title);
+
+    // create species
+    FFRooFitterSpecies* spec = new FFRooFitterSpecies(name, title, model);
+
+    // add species
+    AddSpecies(spec);
+
+    // user info
+    Info("AddSpeciesGaussPdf", "Added species '%s' with Gaussian pdf", title);
+
+    return kTRUE;
+}
+
+//______________________________________________________________________________
+Bool_t FFRooFitter::AddSpeciesPolPdf(const Char_t* name, const Char_t* title, Int_t nOrder)
+{
+    // Add the species with name 'name' and title 'title' to the list of species
+    // to be fit using a polynomial pdf of order 'nOrder'.
+    // Return kTRUE if the species was added, otherwise return kFALSE.
+
+    // loop over fit variables
+    TString tmp;
+    for (Int_t i = 0; i < fFitter->GetNVariable(); i++)
+    {
+        tmp += fFitter->GetVariable(i)->GetName();
+        tmp += "_";
+    }
+
+    // create the model
+    FFRooModel* model = new FFRooModelPol(TString::Format("%s%s", tmp.Data(), name).Data(), title,
+                                          nOrder);
+
+    // create species
+    FFRooFitterSpecies* spec = new FFRooFitterSpecies(name, title, model);
+
+    // add species
+    AddSpecies(spec);
+
+    // user info
+    Info("AddSpeciesPolPdf", "Added species '%s' with polynomial pdf", title);
+
+    return kTRUE;
+}
+
+//______________________________________________________________________________
+Bool_t FFRooFitter::AddSpeciesExpoPdf(const Char_t* name, const Char_t* title)
+{
+    // Add the species with name 'name' and title 'title' to the list of species
+    // to be fit using an exponential pdf.
+    // Return kTRUE if the species was added, otherwise return kFALSE.
+
+    // loop over fit variables
+    TString tmp;
+    for (Int_t i = 0; i < fFitter->GetNVariable(); i++)
+    {
+        tmp += fFitter->GetVariable(i)->GetName();
+        tmp += "_";
+    }
+
+    // create the model
+    FFRooModel* model = new FFRooModelExpo(TString::Format("%s%s", tmp.Data(), name).Data(), title);
+
+    // create species
+    FFRooFitterSpecies* spec = new FFRooFitterSpecies(name, title, model);
+
+    // add species
+    AddSpecies(spec);
+
+    // user info
+    Info("AddSpeciesExpoPdf", "Added species '%s' with exponential pdf", title);
+
+    return kTRUE;
+}
+
+//______________________________________________________________________________
 TChain* FFRooFitter::AddSpeciesHistPdfCommon(const Char_t* name, const Char_t* treeLoc,
                                              TString& outName)
 {
@@ -167,6 +261,9 @@ Bool_t FFRooFitter::AddSpeciesHistPdf(const Char_t* name, const Char_t* title, c
     // add species
     AddSpecies(spec);
 
+    // user info
+    Info("AddSpeciesHistPdf", "Added species '%s' with histogram pdf", title);
+
     return kTRUE;
 }
 
@@ -198,6 +295,9 @@ Bool_t FFRooFitter::AddSpeciesHistPdf(const Char_t* name, const Char_t* title, c
     // add species
     AddSpecies(spec);
 
+    // user info
+    Info("AddSpeciesHistPdf", "Added species '%s' with histogram pdf", title);
+
     return kTRUE;
 }
 
@@ -212,15 +312,15 @@ Bool_t FFRooFitter::AddSpeciesHistPdf(const Char_t* name, const Char_t* title, T
     // Return kTRUE if the species was added, otherwise return kFALSE.
 
     // loop over fit variables
-    Char_t tmp[256] = "";
+    TString tmp;
     for (Int_t i = 0; i < fFitter->GetNVariable(); i++)
     {
-        strcat(tmp, fFitter->GetVariable(i)->GetName());
-        strcat(tmp, "_");
+        tmp += fFitter->GetVariable(i)->GetName();
+        tmp += "_";
     }
 
     // create the model
-    FFRooModel* tot_model = new FFRooModelHist(TString::Format("%s%s", tmp, name).Data(),
+    FFRooModel* tot_model = new FFRooModelHist(TString::Format("%s%s", tmp.Data(), name).Data(),
                                                title, hist, addShiftPar, intOrder);
 
     // create species
@@ -228,6 +328,9 @@ Bool_t FFRooFitter::AddSpeciesHistPdf(const Char_t* name, const Char_t* title, T
 
     // add species
     AddSpecies(spec);
+
+    // user info
+    Info("AddSpeciesHistPdf", "Added species '%s' with histogram pdf", title);
 
     return kTRUE;
 }
@@ -261,15 +364,15 @@ Bool_t FFRooFitter::AddSpeciesKeysPdf(const Char_t* name, const Char_t* title, c
     }
 
     // loop over fit variables
-    Char_t tmp[256] = "";
+    TString tmp;
     for (Int_t i = 0; i < fFitter->GetNVariable(); i++)
     {
-        strcat(tmp, fFitter->GetVariable(i)->GetName());
-        strcat(tmp, "_");
+        tmp += fFitter->GetVariable(i)->GetName();
+        tmp += "_";
     }
 
     // create the model
-    FFRooModel* tot_model = new FFRooModelKeys(TString::Format("%s%s", tmp, name).Data(),
+    FFRooModel* tot_model = new FFRooModelKeys(TString::Format("%s%s", tmp.Data(), name).Data(),
                                                title, fFitter->GetNVariable(), chain,
                                                opt, rho, nSigma, rotate);
 
@@ -278,6 +381,9 @@ Bool_t FFRooFitter::AddSpeciesKeysPdf(const Char_t* name, const Char_t* title, c
 
     // add species
     AddSpecies(spec);
+
+    // user info
+    Info("AddSpeciesKeysPdf", "Added species '%s' with keys pdf", title);
 
     return kTRUE;
 }
