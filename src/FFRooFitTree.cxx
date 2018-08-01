@@ -138,12 +138,14 @@ Bool_t FFRooFitTree::LoadData()
             for (Int_t j = 0; j < fNVar; j++)
             {
                 RooRealVar* var = (RooRealVar*)set->find(fVar[j]->GetName());
-                tmp.Append(TString::Format("%s: %e  ", fVar[j]->GetName(), var->getVal()));
+                if (var)
+                    tmp.Append(TString::Format("%s: %e  ", fVar[j]->GetName(), var->getVal()));
             }
             for (Int_t j = 0; j < fNVarAux; j++)
             {
                 RooRealVar* var = (RooRealVar*)set->find(fVarAux[j]->GetName());
-                tmp.Append(TString::Format("%s: %e  ", fVarAux[j]->GetName(), var->getVal()));
+                if (var)
+                    tmp.Append(TString::Format("%s: %e  ", fVarAux[j]->GetName(), var->getVal()));
             }
 
             Error("LoadData", "NaN at row %d: %s", i, tmp.Data());
