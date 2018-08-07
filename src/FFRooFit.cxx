@@ -55,6 +55,8 @@ FFRooFit::FFRooFit(Int_t nVar, const Char_t* name, const Char_t* title)
     fNChi2PreFit = 0;
     fMinimizer = kMinuit2_Migrad;
     fMinimizerPreFit = kMinuit2_Migrad;
+    fRangeMin = 0;
+    fRangeMax = 0;
 }
 
 //______________________________________________________________________________
@@ -534,6 +536,8 @@ Bool_t FFRooFit::Chi2PreFit()
     fitArgs.Add(new RooCmdArg(CreateMinimizerArg(fMinimizerPreFit)));
     if (FFFooFit::gUseNCPU > 1)
         fitArgs.Add(new RooCmdArg(RooFit::NumCPU(FFFooFit::gUseNCPU, FFFooFit::gParStrat)));
+    if (fRangeMin != 0 || fRangeMax != 0)
+        fitArgs.Add(new RooCmdArg(RooFit::Range(fRangeMin, fRangeMax)));
 
     // perform a number of chi2 fits with random initial parameter values
     Int_t nFailed = 0;
@@ -717,6 +721,8 @@ Bool_t FFRooFit::Fit(const Char_t* opt)
         fitArgs.Add(new RooCmdArg(RooFit::NumCPU(FFFooFit::gUseNCPU, FFFooFit::gParStrat)));
     if (fData->isWeighted())
         fitArgs.Add(new RooCmdArg(RooFit::SumW2Error(kTRUE)));
+    if (fRangeMin != 0 || fRangeMax != 0)
+        fitArgs.Add(new RooCmdArg(RooFit::Range(fRangeMin, fRangeMax)));
 
     // perform maximum likelihood fit
     fResult = fModel->GetPdf()->fitTo(*fData, fitArgs);

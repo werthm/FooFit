@@ -75,6 +75,8 @@ protected:
     Int_t fNChi2PreFit;             // number of chi2 pre-fits
     FFMinimizer_t fMinimizer;       // type of minimizer
     FFMinimizer_t fMinimizerPreFit; // type of minimizer (chi2 pre-fit)
+    Double_t fRangeMin;             // fit range minimum
+    Double_t fRangeMax;             // fit range maximum
 
     Bool_t CheckVarBounds(Int_t var, const Char_t* loc) const;
     Bool_t CheckVariables() const;
@@ -100,7 +102,8 @@ public:
                  fResult(0),
                  fNChi2PreFit(0),
                  fMinimizer(kMinuit2_Migrad),
-                 fMinimizerPreFit(kMinuit2_Migrad) { }
+                 fMinimizerPreFit(kMinuit2_Migrad),
+                 fRangeMin(0), fRangeMax(0) { }
     FFRooFit(Int_t nVar, const Char_t* name = "FFRooFit", const Char_t* title = "a FooFit RooFit");
     virtual ~FFRooFit();
 
@@ -113,6 +116,7 @@ public:
     Int_t GetNChi2PreFit() const { return fNChi2PreFit; }
     FFMinimizer_t GetMinimizer() const { return fMinimizer; }
     FFMinimizer_t GetMinimizerPreFit() const { return fMinimizerPreFit; }
+    void SetFitRange(Double_t min, Double_t max) { fRangeMin = min; fRangeMax = max; }
 
     void SetVariable(Int_t i, const Char_t* name, const Char_t* title,
                      Double_t min, Double_t max, Int_t nbins = 0);
