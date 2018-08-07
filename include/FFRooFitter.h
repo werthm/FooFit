@@ -77,6 +77,7 @@ public:
     void SetNChi2PreFit(Int_t n);
     void SetMinimizer(FFRooFit::FFMinimizer_t min);
     void SetMinimizerPreFit(FFRooFit::FFMinimizer_t min);
+    void SetFitRange(Double_t min, Double_t max);
 
     virtual Bool_t Fit(const Char_t* opt = "");
 

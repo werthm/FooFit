@@ -561,6 +561,17 @@ void FFRooFitter::SetMinimizerPreFit(FFRooFit::FFMinimizer_t min)
 }
 
 //______________________________________________________________________________
+void FFRooFitter::SetFitRange(Double_t min, Double_t max)
+{
+    // Wrapper for FFRooFit::SetFitRange().
+
+    if (fFitter)
+        fFitter->SetFitRange(min, max);
+    else
+        Error("SetFitRange", "Fitter no created yet!");
+}
+
+//______________________________________________________________________________
 TCanvas* FFRooFitter::DrawFit(const Char_t* opt, Int_t var)
 {
     // Wrapper for FFRooFit::DrawFit().
