@@ -7,6 +7,7 @@
 // FFRooModelPol                                                        //
 //                                                                      //
 // 1-dim. polynomial model for RooFit.                                  //
+// Note: Parameters start at order 0.                                   //
 //                                                                      //
 //////////////////////////////////////////////////////////////////////////
 
@@ -23,13 +24,11 @@ FFRooModelPol::FFRooModelPol(const Char_t* name, const Char_t* title, Int_t nOrd
 {
     // Constructor.
 
-    Char_t tmp[256];
-
     // add the coefficient parameters
     for (Int_t i = 0; i < fNPar; i++)
     {
-        sprintf(tmp, "%s_PolCoeff_%d", GetName(), i);
-        AddParameter(i, tmp, tmp);
+        TString tmp = TString::Format("%s_PolCoeff_%d", GetName(), i);
+        AddParameter(i, tmp.Data(), tmp.Data());
     }
 }
 

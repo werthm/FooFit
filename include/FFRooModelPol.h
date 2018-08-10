@@ -7,6 +7,7 @@
 // FFRooModelPol                                                        //
 //                                                                      //
 // 1-dim. polynomial model for RooFit.                                  //
+// Note: Parameters start at order 0.                                   //
 //                                                                      //
 //////////////////////////////////////////////////////////////////////////
 
