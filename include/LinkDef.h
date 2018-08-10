@@ -31,6 +31,7 @@
 #pragma link C++ class FFRooModelGauss+;
 #pragma link C++ class FFRooModelHist+;
 #pragma link C++ class FFRooModelPol+;
+#pragma link C++ class FFRooModelChebychev+;
 #pragma link C++ class FFRooModelKeys+;
 #pragma link C++ class FFRooModelComp+;
 #pragma link C++ class FFRooModelProd+;

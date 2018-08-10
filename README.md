@@ -45,6 +45,7 @@ root [1] .x FooFitMacro.C++
 ```
 FFRooModel            : base model pdf class
   FFRooModelPol       : polynomial function model
+  FFRooModelChebychev : Chebychev polynomial function model
   FFRooModelExpo      : exponential function model
   FFRooModelGauss     : Gaussian function model
   FFRooModelHist      : histogram-based model
