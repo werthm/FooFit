@@ -23,6 +23,7 @@
 #include "FFRooModelKeys.h"
 #include "FFRooModelGauss.h"
 #include "FFRooModelPol.h"
+#include "FFRooModelChebychev.h"
 #include "FFRooModelExpo.h"
 #include "FFRooFitterSpecies.h"
 #include "FFFooFit.h"
@@ -165,6 +166,37 @@ Bool_t FFRooFitter::AddSpeciesPolPdf(const Char_t* name, const Char_t* title, In
 
     // user info
     Info("AddSpeciesPolPdf", "Added species '%s' with polynomial pdf", title);
+
+    return kTRUE;
+}
+
+//______________________________________________________________________________
+Bool_t FFRooFitter::AddSpeciesChebychevPdf(const Char_t* name, const Char_t* title, Int_t nOrder)
+{
+    // Add the species with name 'name' and title 'title' to the list of species
+    // to be fit using a Chebychev polynomial pdf of order 'nOrder'.
+    // Return kTRUE if the species was added, otherwise return kFALSE.
+
+    // loop over fit variables
+    TString tmp;
+    for (Int_t i = 0; i < fFitter->GetNVariable(); i++)
+    {
+        tmp += fFitter->GetVariable(i)->GetName();
+        tmp += "_";
+    }
+
+    // create the model
+    FFRooModel* model = new FFRooModelChebychev(TString::Format("%s%s", tmp.Data(), name).Data(), title,
+                                                nOrder);
+
+    // create species
+    FFRooFitterSpecies* spec = new FFRooFitterSpecies(name, title, model);
+
+    // add species
+    AddSpecies(spec);
+
+    // user info
+    Info("AddSpeciesPolPdf", "Added species '%s' with Chebychev polynomial pdf", title);
 
     return kTRUE;
 }

@@ -57,6 +57,7 @@ public:
     void AddSpecies(FFRooFitterSpecies* spec);
     Bool_t AddSpeciesGaussPdf(const Char_t* name, const Char_t* title);
     Bool_t AddSpeciesPolPdf(const Char_t* name, const Char_t* title, Int_t nOrder);
+    Bool_t AddSpeciesChebychevPdf(const Char_t* name, const Char_t* title, Int_t nOrder);
     Bool_t AddSpeciesExpoPdf(const Char_t* name, const Char_t* title);
     Bool_t AddSpeciesHistPdf(const Char_t* name, const Char_t* title, const Char_t* treeLoc,
                              Bool_t addShiftPar = kFALSE, Int_t intOrder = 0);
