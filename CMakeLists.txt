@@ -44,8 +44,22 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 # create the dictionary
 if (ROOT_VERSION VERSION_GREATER 6)
-    ROOT_GENERATE_DICTIONARY(G__FooFit include/FF*.h LINKDEF LinkDef.h
-                             OPTIONS -rml libFooFit.so -rmf libFooFit.rootmap)
+    # extract pure header file names
+    file(GLOB HDR ${CMAKE_CURRENT_SOURCE_DIR}/include/FF*.h)
+    foreach(head_file ${HDR})
+        get_filename_component(pure_hdr ${head_file} NAME)
+        set(HEADERS ${HEADERS} ${pure_hdr})
+    endforeach()
+
+    add_custom_command(OUTPUT G__FooFit.cxx
+        COMMAND rootcling -f G__FooFit.cxx
+                          -rml libFooFit.so
+                          -rmf libFooFit.rootmap
+                          -s libFooFit.so
+                          -I${CMAKE_CURRENT_SOURCE_DIR}/include
+                          ${HEADERS}
+                          ${CMAKE_CURRENT_SOURCE_DIR}/include/LinkDef.h
+    )
 else()
     ROOT_GENERATE_DICTIONARY(G__FooFit include/FF*.h LINKDEF LinkDef.h)
 endif()
@@ -68,7 +82,7 @@ endif()
 if (ROOT_VERSION VERSION_GREATER 6)
     add_custom_command(TARGET FooFit POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_BINARY_DIR}/libFooFit.rootmap ${PROJECT_BINARY_DIR}/lib
-        COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_BINARY_DIR}/G__FooFit_rdict.pcm ${PROJECT_BINARY_DIR}/lib
+        COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_BINARY_DIR}/libFooFit_rdict.pcm ${PROJECT_BINARY_DIR}/lib
     )
 endif()
 
