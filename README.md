@@ -3,6 +3,11 @@ FooFit
 
 Intuitive interface to RooFit.
 
+## Table of contents
+* [Installation](#installation)
+* [Quick start](#quick-start)
+* [Class hierarchy](#class-hierarchy)
+
 ## Installation
 
 ### Dependencies
@@ -41,7 +46,7 @@ root [0] .include /some/directory/FooFit/build/include
 root [1] .x FooFitMacro.C++
 ```
 
-## List of classes
+## Class hierarchy
 ```
 FFRooModel            : base model pdf class
   FFRooModelPol       : polynomial function model
