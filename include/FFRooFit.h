@@ -24,6 +24,7 @@ class RooPlot;
 class RooFitResult;
 class FFRooModel;
 class TCanvas;
+class TH1;
 class TH2;
 
 class FFRooFit : public TNamed
@@ -135,6 +136,7 @@ public:
     RooPlot* PlotDataAndModel(Int_t var, const Char_t* opt = "");
     TH2* PlotData2D(Int_t var0, Int_t var1);
     TH2* PlotModel2D(Int_t var0, Int_t var1);
+    TH1* CreateDataHistogram(Int_t var);
 
     ClassDef(FFRooFit, 0)  // Abstract RooFit fit class
 };

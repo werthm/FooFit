@@ -917,6 +917,25 @@ TH2* FFRooFit::PlotModel2D(Int_t var0, Int_t var1)
 }
 
 //______________________________________________________________________________
+TH1* FFRooFit::CreateDataHistogram(Int_t var)
+{
+    // Create and return a histogram of the data of variable 'var'.
+
+    // check for data
+    if (fData)
+    {
+        TH1* h = fData->createHistogram(fVar[var]->GetName());
+        h->SetName(TString::Format("hist_%s", fVar[var]->GetName()).Data());
+        return h;
+    }
+    else
+    {
+        Error("CreateDataHistogram", "No data to create histogram!");
+        return 0;
+    }
+}
+
+//______________________________________________________________________________
 TCanvas* FFRooFit::DrawFit(const Char_t* opt, Int_t var)
 {
     // Draw the fit results.
