@@ -436,7 +436,7 @@ void FFRooModel::Print(Option_t* option) const
     }
     printf("%sNumber of variable transf. : %d\n", option, fNVarTrans);
     printf("%sNumber of constraints      : %d\n", option, fNConstr);
-    printf("%sModel PDF                  : 0x%x\n", option, fPdf);
+    printf("%sModel PDF                  : %p\n", option, fPdf);
     if (fNPar)
     {
         printf("%sParameters\n", option);
