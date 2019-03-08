@@ -50,6 +50,7 @@ public:
     virtual ~FFRooFitter();
 
     FFRooModel* GetModel() const { return fModel; }
+
     Int_t GetNSpecies() const { return fNSpec; }
     FFRooFitterSpecies* GetSpecies(Int_t i) const;
     RooRealVar* GetVariable(Int_t i) const;
@@ -87,6 +88,7 @@ public:
     RooPlot* PlotDataAndModel(Int_t var, const Char_t* opt = "");
     TH2* PlotData2D(Int_t var0, Int_t var1);
     TH2* PlotModel2D(Int_t var0, Int_t var1);
+    TH1* CreateDataHistogram(Int_t var);
 
     ClassDef(FFRooFitter, 0)  // Abstract class for species fitting
 };

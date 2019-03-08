@@ -669,6 +669,19 @@ TH2* FFRooFitter::PlotModel2D(Int_t var0, Int_t var1)
 }
 
 //______________________________________________________________________________
+TH1* FFRooFitter::CreateDataHistogram(Int_t var)
+{
+    // Wrapper for FFRooFit::CreateDataHistogram().
+
+    if (fFitter)
+        return fFitter->CreateDataHistogram(var);
+    else
+        Error("CreateDataHistogram", "Fitter not created yet!");
+
+    return 0;
+}
+
+//______________________________________________________________________________
 Bool_t FFRooFitter::BuildModel()
 {
     // Build the total model.
