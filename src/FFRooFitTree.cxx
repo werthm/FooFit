@@ -36,6 +36,7 @@ FFRooFitTree::FFRooFitTree(TTree* tree, Int_t nVar,
 
     // init members
     fTree = tree;
+    fTreeAdd = 0;
     if (weightVar)
     {
         fWeights = new RooRealVar(weightVar, "Event Weights",
@@ -45,6 +46,7 @@ FFRooFitTree::FFRooFitTree(TTree* tree, Int_t nVar,
     }
     else
         fWeights = 0;
+    fWeightsAdd = 0;
     fIsBinnedFit = binnedFit;
 }
 
@@ -53,7 +55,10 @@ FFRooFitTree::~FFRooFitTree()
 {
     // Destructor.
 
-    if (fWeights) delete fWeights;
+    if (fWeights)
+        delete fWeights;
+    if (fWeightsAdd)
+        delete fWeightsAdd;
 }
 
 //______________________________________________________________________________
@@ -88,6 +93,30 @@ Bool_t FFRooFitTree::LoadData()
     {
         fData = new RooDataSet(fTree->GetName(), fTree->GetTitle(), varSet,
                                RooFit::Import(*fTree));
+    }
+
+    // add additional tree
+    if (fTreeAdd)
+    {
+        RooDataSet* addData;
+
+        // check if main data has weights
+        if (fWeights)
+        {
+            addData = new RooDataSet(fTreeAdd->GetName(), fTreeAdd->GetTitle(), varSet,
+                                     RooFit::Import(*fTreeAdd), RooFit::WeightVar(*fWeightsAdd));
+        }
+        else
+        {
+            addData = new RooDataSet(fTreeAdd->GetName(), fTreeAdd->GetTitle(), varSet,
+                                     RooFit::Import(*fTreeAdd));
+        }
+
+        // append data
+        ((RooDataSet*)fData)->append(*addData);
+
+        // delete additional data set
+        delete addData;
     }
 
     // user info
@@ -169,5 +198,20 @@ Bool_t FFRooFitTree::LoadData()
     }
 
     return kTRUE;
+}
+
+//______________________________________________________________________________
+void FFRooFitTree::AddWeightedTree(TTree* tree, const Char_t* weight)
+{
+    // Add the tree 'tree' as additional input data weighted with the weight
+    // variable/branch 'weight'.
+
+    // set tree
+    fTreeAdd = tree;
+
+    // register additional weight variable
+    fWeightsAdd = new RooRealVar(weight, "Event Weights of add. data",
+                                 -RooNumber::infinity(), RooNumber::infinity());
+    AddAuxVariable(fWeightsAdd);
 }
 
