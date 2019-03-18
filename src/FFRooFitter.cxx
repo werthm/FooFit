@@ -27,6 +27,7 @@
 #include "FFRooModelExpo.h"
 #include "FFRooFitterSpecies.h"
 #include "FFFooFit.h"
+#include "FFRooFitTree.h"
 
 ClassImp(FFRooFitter)
 
@@ -38,6 +39,7 @@ FFRooFitter::FFRooFitter(const Char_t* name, const Char_t* title)
 
     // init members
     fTree = 0;
+    fTreeAdd = 0;
     fHist = 0;
     fWeightVar = "";
     fFitter = 0;
@@ -52,6 +54,7 @@ FFRooFitter::~FFRooFitter()
     // Destructor.
 
     if (fTree) delete fTree;
+    if (fTreeAdd) delete fTreeAdd;
     if (fHist) delete fHist;
     if (fFitter) delete fFitter;
     if (fModel) delete fModel;
@@ -61,6 +64,105 @@ FFRooFitter::~FFRooFitter()
             if (fSpec[i]) delete fSpec[i];
         delete [] fSpec;
     }
+}
+
+//______________________________________________________________________________
+void FFRooFitter::AddWeightedTree(const Char_t* treeLoc, Double_t weightScale)
+{
+    // Add the tree located at 'treeLoc' to the current dataset and scale the weights
+    // by 'weightScale'
+
+    // check if unbinned data is present
+    if (!fTree)
+    {
+        Error("AddWeightedTree", "Unbinned input data (tree) needed to extract tree name!");
+        return;
+    }
+
+    // check if weighted data is present
+    if (fWeightVar == "")
+    {
+        Error("AddWeightedTree", "Aborting because main data is unweighted!");
+        return;
+    }
+
+    // add fitter type
+    if (!fFitter->InheritsFrom("FFRooFitTree"))
+    {
+        Error("AddWeightedTree", "Fitter does not support adding of weighted tree!");
+        return;
+    }
+
+    // load tree
+    TChain* chain = new TChain(fTree->GetName());
+    FFFooFit::LoadFilesToChain(treeLoc, chain);
+    fTreeAdd = chain;
+
+    // check type of weight leaf and set up branch address
+    enum { kNone, kFloat, kDouble };
+    Int_t l_type = kNone;
+    Float_t var_f;
+    Double_t var_d;
+    TLeaf* wleaf = fTreeAdd->GetBranch(fWeightVar.Data())->GetLeaf(fWeightVar.Data());
+    TString wtype = wleaf->GetTypeName();
+    if (wtype == "Float_t")
+    {
+        fTreeAdd->SetBranchAddress(fWeightVar.Data(), &var_f);
+        l_type = kFloat;
+    }
+    else if (wtype == "Double_t")
+    {
+        fTreeAdd->SetBranchAddress(fWeightVar.Data(), &var_d);
+        l_type = kDouble;
+    }
+    else
+    {
+        Error("AddWeightedTree", "Leaf type '%s' of weight variable in tree not supported!", wtype.Data());
+        return;
+    }
+
+    // do not read other branches
+    fTreeAdd->SetBranchStatus("*", 0);
+    fTreeAdd->SetBranchStatus(fWeightVar.Data(), 1);
+
+    // create a new tree with a reweight branch
+    TTree* re_tree = new TTree(TString::Format("%s_reweighted", fTreeAdd->GetName()).Data(),
+                               TString::Format("%s (reweighted)", fTreeAdd->GetTitle()).Data());
+    Double_t var_new;
+    re_tree->Branch("reweight", &var_new, "reweight/D");
+
+    // user info
+    Error("AddWeightedTree", "Recalculating weights and creating friend tree");
+
+    // modify the weights in the tree
+    for (Long64_t i = 0; i < fTreeAdd->GetEntries(); i++)
+    {
+        // read entry
+        fTreeAdd->GetEntry(i);
+
+        // read original weight
+        if (l_type == kFloat)
+            var_new = var_f;
+        else if (l_type == kDouble)
+            var_new = var_d;
+
+        // set new weight
+        var_new *= weightScale;
+
+        // fill new tree
+        re_tree->Fill();
+    }
+
+    // reset branch addresses
+    fTreeAdd->ResetBranchAddresses();
+    re_tree->ResetBranchAddresses();
+    fTreeAdd->SetBranchStatus("*", 1);
+
+    // set friend
+    fTreeAdd->AddFriend(re_tree);
+
+    // add the tree
+    ((FFRooFitTree*)fFitter)->AddWeightedTree(fTreeAdd, "reweight");
 }
 
 //______________________________________________________________________________

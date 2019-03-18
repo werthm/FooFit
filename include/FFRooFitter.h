@@ -28,6 +28,7 @@ class FFRooFitter : public TNamed
 
 protected:
     TTree* fTree;                   // unbinned input data
+    TTree* fTreeAdd;                // additional unbinned input data
     TH1* fHist;                     // binned input data
     TString fWeightVar;             // name of event weight variable
     FFRooFit* fFitter;              // RooFit fitter
@@ -41,13 +42,15 @@ protected:
 
 public:
     FFRooFitter(): TNamed(),
-                   fTree(0), fHist(0),
+                   fTree(0), fTreeAdd(0), fHist(0),
                    fWeightVar(""),
                    fFitter(0),
                    fModel(0),
                    fNSpec(0), fSpec(0) { }
     FFRooFitter(const Char_t* name, const Char_t* title);
     virtual ~FFRooFitter();
+
+    void AddWeightedTree(const Char_t* treeLoc, Double_t weightScale);
 
     FFRooModel* GetModel() const { return fModel; }
 
