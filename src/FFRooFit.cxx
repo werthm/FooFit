@@ -624,7 +624,8 @@ Bool_t FFRooFit::Fit(const Char_t* opt)
     // Perform a RooFit-based fit.
     //
     // Options to be set via 'opt':
-    // 'bchi2'     : perform a binned chi2 fit
+    // 'bchi2'      : perform a binned chi2 fit
+    // 'nosumw2err' : set SumW2Error(kFALSE) for weighted fits
     //
     // Return kTRUE on success, otherwise kFALSE.
 
@@ -757,7 +758,12 @@ Bool_t FFRooFit::Fit(const Char_t* opt)
         if (FFFooFit::gUseNCPU > 1)
             fitArgs.Add(new RooCmdArg(RooFit::NumCPU(FFFooFit::gUseNCPU, FFFooFit::gParStrat)));
         if (fData->isWeighted())
-            fitArgs.Add(new RooCmdArg(RooFit::SumW2Error(kTRUE)));
+        {
+            if (FFFooFit::IndexOf(opt, "nosumw2err") != -1)
+                fitArgs.Add(new RooCmdArg(RooFit::SumW2Error(kFALSE)));
+            else
+                fitArgs.Add(new RooCmdArg(RooFit::SumW2Error(kTRUE)));
+        }
         if (fRangeMin != 0 || fRangeMax != 0)
             fitArgs.Add(new RooCmdArg(RooFit::Range(fRangeMin, fRangeMax)));
 
