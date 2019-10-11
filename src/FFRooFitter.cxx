@@ -132,7 +132,7 @@ void FFRooFitter::AddWeightedTree(const Char_t* treeLoc, Double_t weightScale)
     re_tree->Branch("reweight", &var_new, "reweight/D");
 
     // user info
-    Error("AddWeightedTree", "Recalculating weights and creating friend tree");
+    Info("AddWeightedTree", "Recalculating weights and creating friend tree");
 
     // modify the weights in the tree
     for (Long64_t i = 0; i < fTreeAdd->GetEntries(); i++)
