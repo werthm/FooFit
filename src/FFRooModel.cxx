@@ -40,6 +40,9 @@ FFRooModel::FFRooModel(const Char_t* name, const Char_t* title, Int_t nPar)
     fVarTrans = 0;
     fNConstr = 0;
     fConstr = 0;
+    fIsConvol = kFALSE;
+    fPdfIntr = 0;
+    fPdfConv = 0;
 }
 
 //______________________________________________________________________________
@@ -66,6 +69,8 @@ FFRooModel::~FFRooModel()
             if (fConstr[i]) delete fConstr[i];
         delete [] fConstr;
     }
+    if (fPdfIntr) delete fPdfIntr;
+    if (fPdfConv) delete fPdfConv;
 }
 
 //______________________________________________________________________________
@@ -436,6 +441,11 @@ void FFRooModel::Print(Option_t* option) const
     }
     printf("%sNumber of variable transf. : %d\n", option, fNVarTrans);
     printf("%sNumber of constraints      : %d\n", option, fNConstr);
+    printf("%sIs convoluted              : ", option);
+    if (fIsConvol)
+        printf("yes\n");
+    else
+        printf("no\n");
     printf("%sModel PDF                  : %p\n", option, fPdf);
     if (fNPar)
     {

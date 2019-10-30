@@ -32,6 +32,9 @@ protected:
     RooAbsReal** fVarTrans;         //[fNVarTrans] variable transformation array
     Int_t fNConstr;                 // number of constraints
     FFRooModel** fConstr;           //[fNConstr] array of constraints
+    Bool_t fIsConvol;               // flag for convolution with other function
+    RooAbsPdf* fPdfIntr;            //! intrinsic pdf
+    RooAbsPdf* fPdfConv;            //! convolution pdf
 
     Bool_t CheckParBounds(Int_t par, const Char_t* loc) const;
     void AddParameter(Int_t i, const Char_t* name, const Char_t* title);
@@ -43,7 +46,8 @@ public:
                    fPdf(0),
                    fNPar(0), fPar(0), fParIsOwned(0),
                    fNVarTrans(0), fVarTrans(0),
-                   fNConstr(0), fConstr(0) { }
+                   fNConstr(0), fConstr(0),
+                   fIsConvol(kFALSE), fPdfIntr(0), fPdfConv(0) { }
     FFRooModel(const Char_t* name, const Char_t* title, Int_t nPar);
     virtual ~FFRooModel();
 
