@@ -1,5 +1,5 @@
 /*************************************************************************
- * Author: Dominik Werthmueller, 2015-2017
+ * Author: Dominik Werthmueller, 2015-2019
  *************************************************************************/
 
 //////////////////////////////////////////////////////////////////////////
@@ -170,8 +170,10 @@ Bool_t FFFooFit::FileExists(const Char_t* f)
     delete fnt;
 
     // check file
-    if (!gSystem->AccessPathName(fn.Data())) return kTRUE;
-    else return kFALSE;
+    if (!gSystem->AccessPathName(fn.Data()))
+        return kTRUE;
+    else
+        return kFALSE;
 }
 
 //______________________________________________________________________________
@@ -181,8 +183,10 @@ Int_t FFFooFit::IndexOf(const Char_t* s1, const Char_t* s2, UInt_t p)
     // in the string s1 after position p. Returns -1 if s2 was not found.
 
     const Char_t* pos = strstr(s1+p, s2);
-    if (pos) return pos-s1;
-    else return -1;
+    if (pos)
+        return pos-s1;
+    else
+        return -1;
 }
 
 //______________________________________________________________________________

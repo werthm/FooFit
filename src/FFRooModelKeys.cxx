@@ -1,5 +1,5 @@
 /*************************************************************************
- * Author: Dominik Werthmueller, 2015
+ * Author: Dominik Werthmueller, 2015-2019
  *************************************************************************/
 
 //////////////////////////////////////////////////////////////////////////
@@ -43,8 +43,10 @@ FFRooModelKeys::~FFRooModelKeys()
 {
     // Destructor.
 
-    if (fTree) delete fTree;
-    if (fDataSet) delete fDataSet;
+    if (fTree)
+        delete fTree;
+    if (fDataSet)
+        delete fDataSet;
 }
 
 //______________________________________________________________________________
@@ -62,7 +64,8 @@ void FFRooModelKeys::BuildModel(RooAbsReal** vars)
     }
 
     // create RooFit dataset
-    if (fDataSet) delete fDataSet;
+    if (fDataSet)
+        delete fDataSet;
     fDataSet = new RooDataSet(fTree->GetName(), fTree->GetTitle(), varSet, RooFit::Import(*fTree));
 
     // user info
@@ -71,7 +74,8 @@ void FFRooModelKeys::BuildModel(RooAbsReal** vars)
     Info("BuildModel", "Entries in RooFit dataset : %.9e", (Double_t)nEntries);
 
     // create the model pdf
-    if (fPdf) delete fPdf;
+    if (fPdf)
+        delete fPdf;
     fPdf = new RooNDKeysPdf(GetName(), GetTitle(), varList, *fDataSet, fOpt.Data(), fRho, fNSigma, fRotate);
 }
 

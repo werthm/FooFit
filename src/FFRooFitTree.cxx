@@ -1,5 +1,5 @@
 /*************************************************************************
- * Author: Dominik Werthmueller, 2015-2018
+ * Author: Dominik Werthmueller, 2015-2019
  *************************************************************************/
 
 //////////////////////////////////////////////////////////////////////////
@@ -45,7 +45,9 @@ FFRooFitTree::FFRooFitTree(TTree* tree, Int_t nVar,
         Info("FFRooFitTree", "Using variable '%s' as weights", weightVar);
     }
     else
+    {
         fWeights = 0;
+    }
     fWeightsAdd = 0;
     fIsBinnedFit = binnedFit;
 }
@@ -68,7 +70,8 @@ Bool_t FFRooFitTree::LoadData()
     // Return kTRUE on success, otherwise kFALSE.
 
     // check fit variables
-    if (!CheckVariables()) return kFALSE;
+    if (!CheckVariables())
+        return kFALSE;
 
     // check tree
     if (!fTree)
@@ -79,11 +82,14 @@ Bool_t FFRooFitTree::LoadData()
 
     // create argument set of variables and auxiliary variables
     RooArgSet varSet;
-    for (Int_t i = 0; i < fNVar; i++) varSet.add(*fVar[i]);
-    for (Int_t i = 0; i < fNVarAux; i++) varSet.add(*fVarAux[i]);
+    for (Int_t i = 0; i < fNVar; i++)
+        varSet.add(*fVar[i]);
+    for (Int_t i = 0; i < fNVarAux; i++)
+        varSet.add(*fVarAux[i]);
 
     // create RooFit dataset
-    if (fData) delete fData;
+    if (fData)
+        delete fData;
     if (fWeights)
     {
         fData = new RooDataSet(fTree->GetName(), fTree->GetTitle(), varSet,

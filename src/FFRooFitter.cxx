@@ -1,5 +1,5 @@
 /*************************************************************************
- * Author: Dominik Werthmueller, 2017-2018
+ * Author: Dominik Werthmueller, 2017-2019
  *************************************************************************/
 
 //////////////////////////////////////////////////////////////////////////
@@ -53,11 +53,16 @@ FFRooFitter::~FFRooFitter()
 {
     // Destructor.
 
-    if (fTree) delete fTree;
-    if (fTreeAdd) delete fTreeAdd;
-    if (fHist) delete fHist;
-    if (fFitter) delete fFitter;
-    if (fModel) delete fModel;
+    if (fTree)
+        delete fTree;
+    if (fTreeAdd)
+        delete fTreeAdd;
+    if (fHist)
+        delete fHist;
+    if (fFitter)
+        delete fFitter;
+    if (fModel)
+        delete fModel;
     if (fSpec)
     {
         for (Int_t i = 0; i < fNSpec; i++)
@@ -176,14 +181,16 @@ void FFRooFitter::AddSpecies(FFRooFitterSpecies* spec)
 
     // create new list
     fSpec = new FFRooFitterSpecies*[fNSpec+1];
-    for (Int_t i = 0; i < fNSpec; i++) fSpec[i] = old[i];
+    for (Int_t i = 0; i < fNSpec; i++)
+        fSpec[i] = old[i];
 
     // add new element
     fSpec[fNSpec] = spec;
     fNSpec++;
 
     // destroy old list
-    if (old) delete [] old;
+    if (old)
+        delete [] old;
 }
 
 //______________________________________________________________________________
@@ -203,7 +210,9 @@ RooRealVar* FFRooFitter::GetVariable(Int_t i) const
     // Wrapper for FFRooFit::GetVariable(Int_t i).
 
     if (fFitter)
+    {
         return fFitter->GetVariable(i);
+    }
     else
     {
         Error("SetVariable", "Fitter not created yet!");
@@ -381,7 +390,8 @@ Bool_t FFRooFitter::AddSpeciesHistPdf(const Char_t* name, const Char_t* title, c
     // call common method
     TString tmp;
     TChain* chain = AddSpeciesHistPdfCommon(name, treeLoc, tmp);
-    if (!chain) return kFALSE;
+    if (!chain)
+        return kFALSE;
 
     // create the model
     FFRooModel* tot_model = new FFRooModelHist(TString::Format("%s%s", tmp.Data(), name).Data(),
@@ -414,7 +424,8 @@ Bool_t FFRooFitter::AddSpeciesHistPdf(const Char_t* name, const Char_t* title, c
     // call common method
     TString tmp;
     TChain* chain = AddSpeciesHistPdfCommon(name, treeLoc, tmp);
-    if (!chain) return kFALSE;
+    if (!chain)
+        return kFALSE;
 
     // create the model
     FFRooModel* tot_model = new FFRooModelHist(TString::Format("%s%s", tmp.Data(), name).Data(),

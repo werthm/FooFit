@@ -1,5 +1,5 @@
 /*************************************************************************
- * Author: Dominik Werthmueller, 2017
+ * Author: Dominik Werthmueller, 2017-2019
  *************************************************************************/
 
 //////////////////////////////////////////////////////////////////////////
@@ -66,15 +66,18 @@ FFRooFitterSpecies::~FFRooFitterSpecies()
 {
     // Destructor.
 
-    if (fModel) delete fModel;
+    if (fModel)
+        delete fModel;
     if (fModelParName)
     {
         for (Int_t i = 0; i < fNModelPar; i++)
             delete fModelParName[i];
         delete [] fModelParName;
     }
-    if (fModelParValue) delete [] fModelParValue;
-    if (fModelParError) delete [] fModelParError;
+    if (fModelParValue)
+        delete [] fModelParValue;
+    if (fModelParError)
+        delete [] fModelParError;
 }
 
 //______________________________________________________________________________
@@ -103,8 +106,10 @@ void FFRooFitterSpecies::UpdateModelParameters()
                 delete fModelParName[i];
             delete [] fModelParName;
         }
-        if (fModelParValue) delete fModelParValue;
-        if (fModelParError) delete fModelParError;
+        if (fModelParValue)
+            delete fModelParValue;
+        if (fModelParError)
+            delete fModelParError;
 
         // update number of parameters
         fNModelPar = fModel->GetNPar();

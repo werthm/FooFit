@@ -1,5 +1,5 @@
 /*************************************************************************
- * Author: Dominik Werthmueller, 2015
+ * Author: Dominik Werthmueller, 2015-2019
  *************************************************************************/
 
 //////////////////////////////////////////////////////////////////////////
@@ -34,7 +34,8 @@ void FFRooModelExpo::BuildModel(RooAbsReal** vars)
     // Build the model using the variables 'vars'.
 
     // create the model pdf
-    if (fPdf) delete fPdf;
+    if (fPdf)
+        delete fPdf;
     fPdf = new RooExponential(GetName(), GetTitle(), *vars[0], *fPar[0]);
 }
 

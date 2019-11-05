@@ -1,5 +1,5 @@
 /*************************************************************************
- * Author: Dominik Werthmueller, 2015-2017
+ * Author: Dominik Werthmueller, 2015-2019
  *************************************************************************/
 
 //////////////////////////////////////////////////////////////////////////
@@ -50,7 +50,8 @@ FFRooModel::~FFRooModel()
 {
     // Destructor.
 
-    if (fPdf) delete fPdf;
+    if (fPdf)
+        delete fPdf;
     if (fPar)
     {
         for (Int_t i = 0; i < fNPar; i++)
@@ -69,8 +70,10 @@ FFRooModel::~FFRooModel()
             if (fConstr[i]) delete fConstr[i];
         delete [] fConstr;
     }
-    if (fPdfIntr) delete fPdfIntr;
-    if (fPdfConv) delete fPdfConv;
+    if (fPdfIntr)
+        delete fPdfIntr;
+    if (fPdfConv)
+        delete fPdfConv;
 }
 
 //______________________________________________________________________________
@@ -87,7 +90,10 @@ Bool_t FFRooModel::CheckParBounds(Int_t par, const Char_t* loc) const
               loc, par, fNPar);
         return kFALSE;
     }
-    else return kTRUE;
+    else
+    {
+        return kTRUE;
+    }
 }
 
 //______________________________________________________________________________
@@ -116,14 +122,16 @@ void FFRooModel::AddVarTrans(RooAbsReal* varTrans)
 
     // create new list
     fVarTrans = new RooAbsReal*[fNVarTrans+1];
-    for (Int_t i = 0; i < fNVarTrans; i++) fVarTrans[i] = old[i];
+    for (Int_t i = 0; i < fNVarTrans; i++)
+        fVarTrans[i] = old[i];
 
     // add new element
     fVarTrans[fNVarTrans] = varTrans;
     fNVarTrans++;
 
     // destroy old list
-    if (old) delete [] old;
+    if (old)
+        delete [] old;
 }
 
 //______________________________________________________________________________
@@ -143,7 +151,8 @@ void FFRooModel::AddConstraint(FFRooModel* c)
     fNConstr++;
 
     // destroy old list
-    if (old) delete [] old;
+    if (old)
+        delete [] old;
 }
 
 //______________________________________________________________________________
@@ -152,8 +161,10 @@ RooAbsReal* FFRooModel::GetPar(Int_t i) const
     // Return the parameter at index 'i'.
 
     // check parameter index
-    if (CheckParBounds(i, "GetPar()")) return fPar[i];
-    else return 0;
+    if (CheckParBounds(i, "GetPar()"))
+        return fPar[i];
+    else
+        return 0;
 }
 
 //______________________________________________________________________________
@@ -163,10 +174,9 @@ Double_t FFRooModel::GetParameter(Int_t i) const
 
     // check parameter index
     if (CheckParBounds(i, "GetParameter()"))
-    {
         return fPar[i] ? fPar[i]->getVal() : 0;
-    }
-    else return 0;
+    else
+        return 0;
 }
 
 //______________________________________________________________________________
@@ -182,7 +192,10 @@ Double_t FFRooModel::GetParError(Int_t i) const
         else
             return 0;
     }
-    else return 0;
+    else
+    {
+        return 0;
+    }
 }
 
 //______________________________________________________________________________
@@ -192,10 +205,9 @@ Bool_t FFRooModel::IsParConstant(Int_t i) const
 
     // check parameter index
     if (CheckParBounds(i, "IsParConstant()"))
-    {
         return fPar[i] ? fPar[i]->isConstant() : kFALSE;
-    }
-    else return kFALSE;
+    else
+        return kFALSE;
 }
 
 //______________________________________________________________________________
@@ -205,10 +217,9 @@ const Char_t* FFRooModel::GetParName(Int_t i) const
 
     // check parameter index
     if (CheckParBounds(i, "GetParName()"))
-    {
         return fPar[i] ? fPar[i]->GetName() : 0;
-    }
-    else return 0;
+    else
+        return 0;
 }
 
 //______________________________________________________________________________
@@ -218,10 +229,9 @@ const Char_t* FFRooModel::GetParTitle(Int_t i) const
 
     // check parameter index
     if (CheckParBounds(i, "GetParTitle()"))
-    {
         return fPar[i] ? fPar[i]->GetTitle() : 0;
-    }
-    else return 0;
+    else
+        return 0;
 }
 
 //______________________________________________________________________________
@@ -319,7 +329,8 @@ void FFRooModel::SetParName(Int_t i, const Char_t* name)
     // check parameter index
     if (CheckParBounds(i, "SetParName()"))
     {
-        if (fPar[i]) fPar[i]->SetName(name);
+        if (fPar[i])
+            fPar[i]->SetName(name);
     }
 }
 
@@ -331,7 +342,8 @@ void FFRooModel::SetParTitle(Int_t i, const Char_t* title)
     // check parameter index
     if (CheckParBounds(i, "SetParTitle()"))
     {
-        if (fPar[i]) fPar[i]->SetTitle(title);
+        if (fPar[i])
+            fPar[i]->SetTitle(title);
     }
 }
 

@@ -1,5 +1,5 @@
 /*************************************************************************
- * Author: Dominik Werthmueller, 2015-2017
+ * Author: Dominik Werthmueller, 2015-2019
  *************************************************************************/
 
 //////////////////////////////////////////////////////////////////////////
@@ -52,7 +52,8 @@ void FFRooModelProd::BuildModel(RooAbsReal** vars)
     }
 
     // create the model pdf
-    if (fPdf) delete fPdf;
+    if (fPdf)
+        delete fPdf;
     fPdf = new RooProdPdf(GetName(), GetTitle(), modelList);
 }
 

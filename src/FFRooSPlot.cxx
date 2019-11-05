@@ -1,5 +1,5 @@
 /*************************************************************************
- * Author: Dominik Werthmueller, 2015-2016
+ * Author: Dominik Werthmueller, 2015-2019
  *************************************************************************/
 
 //////////////////////////////////////////////////////////////////////////
@@ -63,8 +63,10 @@ FFRooSPlot::~FFRooSPlot()
 {
     // Destructor.
 
-    if (fEventID) delete fEventID;
-    if (fSPlot) delete fSPlot;
+    if (fEventID)
+        delete fEventID;
+    if (fSPlot)
+        delete fSPlot;
 }
 
 //______________________________________________________________________________
@@ -122,8 +124,10 @@ Bool_t FFRooSPlot::CheckEventID()
     fTree->SetBranchStatus("*", 1);
 
     // check errors
-    if (nerror) return kFALSE;
-    else return kTRUE;
+    if (nerror)
+        return kFALSE;
+    else
+        return kTRUE;
 }
 
 //______________________________________________________________________________
@@ -140,7 +144,10 @@ Bool_t FFRooSPlot::CheckSpecBounds(Int_t spec, const Char_t* loc) const
               loc, spec, fNSpec);
         return kFALSE;
     }
-    else return kTRUE;
+    else
+    {
+        return kTRUE;
+    }
 }
 
 //______________________________________________________________________________
@@ -179,7 +186,8 @@ Bool_t FFRooSPlot::Fit(const Char_t* opt)
                 break;
             }
         }
-        if (skip) continue;
+        if (skip)
+            continue;
 
         // check for yield parameter that were not fixed before
         for (Int_t i = 0; i < fNSpec; i++)
@@ -190,7 +198,8 @@ Bool_t FFRooSPlot::Fit(const Char_t* opt)
                 break;
             }
         }
-        if (skip) continue;
+        if (skip)
+            continue;
 
         // fix parameter
         var->setConstant();
@@ -220,7 +229,7 @@ Bool_t FFRooSPlot::Fit(const Char_t* opt)
         {
             Info("Fit", "Species '%s' yield: %e (%s)  %e (SPlot)",
                  fModel->GetParTitle(i), fModel->GetParameter(i), fModel->GetParName(i),
-                fSPlot->GetYieldFromSWeight(fModel->GetParName(i)));
+                 fSPlot->GetYieldFromSWeight(fModel->GetParName(i)));
         }
     }
 
@@ -262,7 +271,10 @@ Double_t FFRooSPlot::GetSpeciesWeight(Int_t event, Int_t i) const
         else
             return 0;
     }
-    else return 0;
+    else
+    {
+        return 0;
+    }
 }
 
 //______________________________________________________________________________

@@ -1,5 +1,5 @@
 /*************************************************************************
- * Author: Dominik Werthmueller, 2015
+ * Author: Dominik Werthmueller, 2015-2019
  *************************************************************************/
 
 //////////////////////////////////////////////////////////////////////////
@@ -39,7 +39,8 @@ Bool_t FFRooFitHist::LoadData()
     // Return kTRUE on success, otherwise kFALSE.
 
     // check fit variables
-    if (!CheckVariables()) return kFALSE;
+    if (!CheckVariables())
+        return kFALSE;
 
     // check histogram
     if (!fHist)
@@ -50,11 +51,14 @@ Bool_t FFRooFitHist::LoadData()
 
     // create argument set of variables and auxiliary variables
     RooArgSet varSet;
-    for (Int_t i = 0; i < fNVar; i++) varSet.add(*fVar[i]);
-    for (Int_t i = 0; i < fNVarAux; i++) varSet.add(*fVarAux[i]);
+    for (Int_t i = 0; i < fNVar; i++)
+        varSet.add(*fVar[i]);
+    for (Int_t i = 0; i < fNVarAux; i++)
+        varSet.add(*fVarAux[i]);
 
     // create RooFit dataset
-    if (fData) delete fData;
+    if (fData)
+        delete fData;
     fData = new RooDataHist(fHist->GetName(), fHist->GetTitle(), varSet, RooFit::Import(*fHist));
 
     return kTRUE;

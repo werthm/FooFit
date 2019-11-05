@@ -1,5 +1,5 @@
 /*************************************************************************
- * Author: Dominik Werthmueller, 2015
+ * Author: Dominik Werthmueller, 2015-2019
  *************************************************************************/
 
 //////////////////////////////////////////////////////////////////////////
@@ -39,10 +39,12 @@ void FFRooModelPol::BuildModel(RooAbsReal** vars)
 
     // prepare list of coefficients
     RooArgList coeffList;
-    for (Int_t i = 0; i < fNPar; i++) coeffList.add(*fPar[i]);
+    for (Int_t i = 0; i < fNPar; i++)
+        coeffList.add(*fPar[i]);
 
     // create the model pdf
-    if (fPdf) delete fPdf;
+    if (fPdf)
+        delete fPdf;
     fPdf = new RooPolynomial(GetName(), GetTitle(), *vars[0], coeffList, 0);
 }
 

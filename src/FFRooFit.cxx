@@ -1,5 +1,5 @@
 /*************************************************************************
- * Author: Dominik Werthmueller, 2015-2018
+ * Author: Dominik Werthmueller, 2015-2019
  *************************************************************************/
 
 //////////////////////////////////////////////////////////////////////////
@@ -42,7 +42,8 @@ FFRooFit::FFRooFit(Int_t nVar, const Char_t* name, const Char_t* title)
     // init members
     fNVar = nVar;
     fVar = new RooRealVar*[fNVar];
-    for (Int_t i = 0; i < fNVar; i++) fVar[i] = 0;
+    for (Int_t i = 0; i < fNVar; i++)
+        fVar[i] = 0;
     fNVarAux = 0;
     fVarAux = 0;
     fNVarCtrl = 0;
@@ -70,16 +71,20 @@ FFRooFit::~FFRooFit()
             if (fVar[i]) delete fVar[i];
         delete [] fVar;
     }
-    if (fVarAux) delete [] fVarAux;
+    if (fVarAux)
+        delete [] fVarAux;
     if (fVarCtrl)
     {
         for (Int_t i = 0; i < fNVarCtrl; i++)
             if (fVarCtrl[i]) delete fVarCtrl[i];
         delete [] fVarCtrl;
     }
-    if (fConstr) delete [] fConstr;
-    if (fData) delete fData;
-    if (fResult) delete fResult;
+    if (fConstr)
+        delete [] fConstr;
+    if (fData)
+        delete fData;
+    if (fResult)
+        delete fResult;
 }
 
 //______________________________________________________________________________
@@ -88,8 +93,10 @@ RooRealVar* FFRooFit::GetVariable(Int_t i) const
     // Return the fit variable with index 'i'.
 
     // check variable index
-    if (CheckVarBounds(i, "GetVariable()")) return fVar[i];
-    else return 0;
+    if (CheckVarBounds(i, "GetVariable()"))
+        return fVar[i];
+    else
+        return 0;
 }
 
 //______________________________________________________________________________
@@ -102,9 +109,11 @@ void FFRooFit::SetVariable(Int_t i, const Char_t* name, const Char_t* title,
     // check variable index
     if (CheckVarBounds(i, "SetVariable()"))
     {
-        if (fVar[i]) delete fVar[i];
+        if (fVar[i])
+            delete fVar[i];
         fVar[i] = new RooRealVar(name, title, min, max);
-        if (nbins) fVar[i]->setBins(nbins);
+        if (nbins)
+            fVar[i]->setBins(nbins);
     }
 }
 
@@ -120,14 +129,16 @@ void FFRooFit::AddAuxVariable(RooRealVar* aux_var)
 
     // create new array
     fVarAux = new RooRealVar*[fNVarAux+1];
-    for (Int_t i = 0; i < fNVarAux; i++) fVarAux[i] = old[i];
+    for (Int_t i = 0; i < fNVarAux; i++)
+        fVarAux[i] = old[i];
 
     // add new element
     fVarAux[fNVarAux] = aux_var;
     fNVarAux++;
 
     // destroy old list
-    if (old) delete [] old;
+    if (old)
+        delete [] old;
 }
 
 //______________________________________________________________________________
@@ -142,7 +153,8 @@ void FFRooFit::AddControlVariable(const Char_t* name, const Char_t* title)
 
     // create new array
     fVarCtrl = new RooRealVar*[fNVarCtrl+1];
-    for (Int_t i = 0; i < fNVarCtrl; i++) fVarCtrl[i] = old[i];
+    for (Int_t i = 0; i < fNVarCtrl; i++)
+        fVarCtrl[i] = old[i];
 
     // add new element
     RooRealVar* v = new RooRealVar(name, title, -RooNumber::infinity(), RooNumber::infinity());
@@ -153,7 +165,8 @@ void FFRooFit::AddControlVariable(const Char_t* name, const Char_t* title)
     AddAuxVariable(v);
 
     // destroy old list
-    if (old) delete [] old;
+    if (old)
+        delete [] old;
 }
 
 //______________________________________________________________________________
@@ -166,14 +179,16 @@ void FFRooFit::AddConstraint(FFRooModel* c)
 
     // create new array
     fConstr = new FFRooModel*[fNConstr+1];
-    for (Int_t i = 0; i < fNConstr; i++) fConstr[i] = old[i];
+    for (Int_t i = 0; i < fNConstr; i++)
+        fConstr[i] = old[i];
 
     // add new element
     fConstr[fNConstr] = c;
     fNConstr++;
 
     // destroy old list
-    if (old) delete [] old;
+    if (old)
+        delete [] old;
 }
 
 //______________________________________________________________________________
@@ -190,7 +205,10 @@ Bool_t FFRooFit::CheckVarBounds(Int_t var, const Char_t* loc) const
               loc, var, fNVar);
         return kFALSE;
     }
-    else return kTRUE;
+    else
+    {
+        return kTRUE;
+    }
 }
 
 //______________________________________________________________________________
@@ -244,7 +262,8 @@ Bool_t FFRooFit::CheckFitResult(RooFitResult* res, FFMinimizer_t minimizer,
     //     convergence.)
     if (!fData->isWeighted() && res->covQual() != 3)
     {
-        if (verbose) Error("CheckFitResult", "Poor quality of covariance matrix (%d) - the fit probably failed!", res->covQual());
+        if (verbose)
+            Error("CheckFitResult", "Poor quality of covariance matrix (%d) - the fit probably failed!", res->covQual());
         return kFALSE;
     }
 
@@ -269,20 +288,26 @@ Bool_t FFRooFit::ContainsVariable(RooAbsPdf* pdf, Int_t var, Bool_t excl) const
             // check variable
             if (pdf->getVariables()->find(fVar[i]->GetName()))
             {
-                if (i == var) corr = kTRUE;
-                else other = kTRUE;
+                if (i == var)
+                    corr = kTRUE;
+                else
+                    other = kTRUE;
             }
         }
 
         // check result
-        if (corr && !other) return kTRUE;
-        else return kFALSE;
+        if (corr && !other)
+            return kTRUE;
+        else
+            return kFALSE;
     }
     else
     {
         // check only the corresponding variable
-        if (pdf->getVariables()->find(fVar[var]->GetName())) return kTRUE;
-        else return kFALSE;
+        if (pdf->getVariables()->find(fVar[var]->GetName()))
+            return kTRUE;
+        else
+            return kFALSE;
     }
 }
 
@@ -441,7 +466,8 @@ Bool_t FFRooFit::PrepareFit()
         for (Int_t i = 0; i < fNVarCtrl; i++)
             maxLen = TMath::Max(maxLen, (Int_t)strlen(fVarCtrl[i]->GetTitle()));
 
-        if (fNVar == 1) printf("\n");
+        if (fNVar == 1)
+            printf("\n");
         printf("  Fit-Control variable correlations\n");
         printf("\n");
 
@@ -630,7 +656,8 @@ Bool_t FFRooFit::Fit(const Char_t* opt)
     // Return kTRUE on success, otherwise kFALSE.
 
     // check fit variables
-    if (!CheckVariables()) return kFALSE;
+    if (!CheckVariables())
+        return kFALSE;
 
     // try to load the data
     if (!LoadData())
@@ -702,7 +729,8 @@ Bool_t FFRooFit::Fit(const Char_t* opt)
 
         // create argument set of variables
         RooArgSet varSet;
-        for (Int_t i = 0; i < fNVar; i++) varSet.add(*fVar[i]);
+        for (Int_t i = 0; i < fNVar; i++)
+            varSet.add(*fVar[i]);
 
         // create a binned data set
         RooDataHist* dataBinned = new RooDataHist(TString::Format("%s_binned", fData->GetName()).Data(),
@@ -803,7 +831,8 @@ RooPlot* FFRooFit::PlotDataAndModel(Int_t var, const Char_t* opt)
     // NOTE: the returned RooPlot has to be destroyed by the caller.
 
     // check variable index
-    if (!CheckVarBounds(var, "PlotDataAndModel()")) return 0;
+    if (!CheckVarBounds(var, "PlotDataAndModel()"))
+        return 0;
 
     // check for data
     if (!fData)
@@ -910,8 +939,10 @@ TH2* FFRooFit::PlotData2D(Int_t var0, Int_t var1)
     // NOTE: the returned histogram has to be destroyed by the caller.
 
     // check variable indices
-    if (!CheckVarBounds(var0, "PlotData2D()")) return 0;
-    if (!CheckVarBounds(var1, "PlotData2D()")) return 0;
+    if (!CheckVarBounds(var0, "PlotData2D()"))
+        return 0;
+    if (!CheckVarBounds(var1, "PlotData2D()"))
+        return 0;
 
     // check for data
     if (!fData)
@@ -941,8 +972,10 @@ TH2* FFRooFit::PlotModel2D(Int_t var0, Int_t var1)
     // NOTE: the returned histogram has to be destroyed by the caller.
 
     // check variable indices
-    if (!CheckVarBounds(var0, "PlotModel2D()")) return 0;
-    if (!CheckVarBounds(var1, "PlotModel2D()")) return 0;
+    if (!CheckVarBounds(var0, "PlotModel2D()"))
+        return 0;
+    if (!CheckVarBounds(var1, "PlotModel2D()"))
+        return 0;
 
     // check for model
     if (!fModel || !fModel->GetPdf())
@@ -1009,7 +1042,8 @@ TCanvas* FFRooFit::DrawFit(const Char_t* opt, Int_t var)
 
         // plot data and model projection
         RooPlot* p = PlotDataAndModel(v, opt);
-        if (p) p->Draw();
+        if (p)
+            p->Draw();
 
         return canvas;
     }
@@ -1022,15 +1056,18 @@ TCanvas* FFRooFit::DrawFit(const Char_t* opt, Int_t var)
                                       TString::Format("Result of %s", GetTitle()).Data(),
                                       900, 800);
 
-        if (fNVar == 2) canvas->Divide(2, 3);
-        else if (fNVar == 3) canvas->Divide(3, 4);
+        if (fNVar == 2)
+            canvas->Divide(2, 3);
+        else if (fNVar == 3)
+            canvas->Divide(3, 4);
 
         // plot data and model projections
         for (Int_t i = 0; i < fNVar; i++)
         {
             RooPlot* p = PlotDataAndModel(i, opt);
             canvas->cd(nPad++);
-            if (p) p->Draw();
+            if (p)
+                p->Draw();
         }
 
         //
@@ -1041,8 +1078,10 @@ TCanvas* FFRooFit::DrawFit(const Char_t* opt, Int_t var)
         Int_t var0[3] = { 0, 0, 1 };
         Int_t var1[3] = { 1, 2, 2 };
         Int_t n = 0;
-        if (fNVar == 2) n = 1;
-        else if (fNVar == 3) n = 3;
+        if (fNVar == 2)
+            n = 1;
+        else if (fNVar == 3)
+            n = 3;
 
         // loop over combinations of variables
         for (Int_t i = 0; i < n; i++)

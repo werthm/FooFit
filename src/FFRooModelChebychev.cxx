@@ -1,5 +1,5 @@
 /*************************************************************************
- * Author: Dominik Werthmueller, 2018
+ * Author: Dominik Werthmueller, 2018-2019
  *************************************************************************/
 
 //////////////////////////////////////////////////////////////////////////
@@ -42,7 +42,8 @@ void FFRooModelChebychev::BuildModel(RooAbsReal** vars)
     for (Int_t i = 0; i < fNPar; i++) coeffList.add(*fPar[i]);
 
     // create the model pdf
-    if (fPdf) delete fPdf;
+    if (fPdf)
+        delete fPdf;
     fPdf = new RooChebychev(GetName(), GetTitle(), *vars[0], coeffList);
 }
 
