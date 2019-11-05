@@ -1,7 +1,7 @@
 FooFit
 ======
 
-Intuitive interface to RooFit.
+Intuitive interface to RooFit
 
 ## Table of contents
 * [Release notes](#release-notes)
