@@ -802,8 +802,6 @@ RooPlot* FFRooFit::PlotDataAndModel(Int_t var, const Char_t* opt)
     //
     // NOTE: the returned RooPlot has to be destroyed by the caller.
 
-    Char_t tmp[256];
-
     // check variable index
     if (!CheckVarBounds(var, "PlotDataAndModel()")) return 0;
 
@@ -822,8 +820,7 @@ RooPlot* FFRooFit::PlotDataAndModel(Int_t var, const Char_t* opt)
     RooPlot* frame = fVar[var]->frame();
 
     // name plot
-    sprintf(tmp, "%s_Variable_%s", GetName(), fVar[var]->GetName());
-    frame->SetName(tmp);
+    frame->SetName(TString::Format("%s_Variable_%s", GetName(), fVar[var]->GetName()).Data());
 
     // plot data
     fData->plotOn(frame, RooFit::DataError(RooAbsData::SumW2));
@@ -832,9 +829,8 @@ RooPlot* FFRooFit::PlotDataAndModel(Int_t var, const Char_t* opt)
     if (fModel && fModel->GetPdf())
     {
         // frame title
-        sprintf(tmp, "Variable '%s' of data '%s' fitted with model '%s'",
-                fVar[var]->GetTitle(), fData->GetName(), fModel->GetTitle());
-        frame->SetTitle(tmp);
+        frame->SetTitle(TString::Format("Variable '%s' of data '%s' fitted with model '%s'",
+                                        fVar[var]->GetTitle(), fData->GetName(), fModel->GetTitle()).Data());
 
         // create legend
         TLegend* leg;
@@ -876,10 +872,10 @@ RooPlot* FFRooFit::PlotDataAndModel(Int_t var, const Char_t* opt)
                 continue;
 
             // plot component
-            sprintf(tmp, "plot_model_%d", n);
-            fModel->GetPdf()->plotOn(frame, RooFit::Name(tmp), RooFit::Components(*comp),
+            TString tmp = TString::Format("plot_model_%d", n);
+            fModel->GetPdf()->plotOn(frame, RooFit::Name(tmp.Data()), RooFit::Components(*comp),
                                      RooFit::LineStyle(fgLStyle[n / 8]), RooFit::LineColor(fgColors[n % 8]));
-            leg->AddEntry(frame->findObject(tmp), comp->GetTitle(), "l");
+            leg->AddEntry(frame->findObject(tmp.Data()), comp->GetTitle(), "l");
 
             // increment counter
             n++;
@@ -899,8 +895,8 @@ RooPlot* FFRooFit::PlotDataAndModel(Int_t var, const Char_t* opt)
         Warning("PlotDataAndModel", "No fitted model found - plotting data only");
 
         // frame title
-        sprintf(tmp, "Variable '%s' of data '%s'", fVar[var]->GetTitle(), fData->GetTitle());
-        frame->SetTitle(tmp);
+        frame->SetTitle(TString::Format("Variable '%s' of data '%s'",
+                                        fVar[var]->GetTitle(), fData->GetTitle()).Data());
     }
 
     return frame;
@@ -912,8 +908,6 @@ TH2* FFRooFit::PlotData2D(Int_t var0, Int_t var1)
     // Return a 2-dim. histogram containing the data of the variable 'var1'
     // plotted vs. the variable 'var0'.
     // NOTE: the returned histogram has to be destroyed by the caller.
-
-    Char_t tmp[256];
 
     // check variable indices
     if (!CheckVarBounds(var0, "PlotData2D()")) return 0;
@@ -931,11 +925,10 @@ TH2* FFRooFit::PlotData2D(Int_t var0, Int_t var1)
     }
 
     // create histogram
-    sprintf(tmp, "%s_vs_%s_data", fVar[var1]->GetName(), fVar[var0]->GetName());
-    TH2* h = (TH2*) fData->createHistogram(tmp, *fVar[var0], RooFit::Binning(fVar[var0]->getBinning()),
+    TH2* h = (TH2*) fData->createHistogram(TString::Format("%s_vs_%s_data", fVar[var1]->GetName(), fVar[var0]->GetName()).Data(),
+                                           *fVar[var0], RooFit::Binning(fVar[var0]->getBinning()),
                                            RooFit::YVar(*fVar[var1], RooFit::Binning(fVar[var1]->getBinning())));
-    sprintf(tmp, "%s vs. %s (Data)", fVar[var1]->GetTitle(), fVar[var0]->GetTitle());
-    h->SetTitle(tmp);
+    h->SetTitle(TString::Format("%s vs. %s (Data)", fVar[var1]->GetTitle(), fVar[var0]->GetTitle()).Data());
 
     return h;
 }
@@ -946,8 +939,6 @@ TH2* FFRooFit::PlotModel2D(Int_t var0, Int_t var1)
     // Return a 2-dim. histogram containing the model of the variable 'var1'
     // plotted vs. the variable 'var0'.
     // NOTE: the returned histogram has to be destroyed by the caller.
-
-    Char_t tmp[256];
 
     // check variable indices
     if (!CheckVarBounds(var0, "PlotModel2D()")) return 0;
@@ -961,11 +952,10 @@ TH2* FFRooFit::PlotModel2D(Int_t var0, Int_t var1)
     }
 
     // create histogram
-    sprintf(tmp, "%s_vs_%s_model", fVar[var1]->GetName(), fVar[var0]->GetName());
-    TH2* h = (TH2*) fModel->GetPdf()->createHistogram(tmp, *fVar[var0], RooFit::Binning(fVar[var0]->getBinning()),
+    TH2* h = (TH2*) fModel->GetPdf()->createHistogram(TString::Format("%s_vs_%s_model", fVar[var1]->GetName(), fVar[var0]->GetName()).Data(),
+                                                      *fVar[var0], RooFit::Binning(fVar[var0]->getBinning()),
                                                       RooFit::YVar(*fVar[var1], RooFit::Binning(fVar[var1]->getBinning())));
-    sprintf(tmp, "%s vs. %s (Model)", fVar[var1]->GetTitle(), fVar[var0]->GetTitle());
-    h->SetTitle(tmp);
+    h->SetTitle(TString::Format("%s vs. %s (Model)", fVar[var1]->GetTitle(), fVar[var0]->GetTitle()).Data());
 
     return h;
 }
@@ -995,8 +985,6 @@ TCanvas* FFRooFit::DrawFit(const Char_t* opt, Int_t var)
     // Draw the fit results.
     // If 'var' is different to -1, plot only the variable with this index.
     // NOTE: the returned TCanvas has to be destroyed by the caller.
-
-    Char_t tmp[256];
 
     // 1-dimensional fit
     if (fNVar == 1 || var != -1)
@@ -1072,11 +1060,11 @@ TCanvas* FFRooFit::DrawFit(const Char_t* opt, Int_t var)
                 h01_m->GetZaxis()->SetRangeUser(0, 1.05*h01_d->GetMaximum());
 
                 // residue
-                sprintf(tmp, "%s_vs_%s_residue", fVar[var1[i]]->GetName(), fVar[var0[i]]->GetName());
-                TH2* h01_r = (TH2*) h01_d->Clone(tmp);
+                TH2* h01_r = (TH2*) h01_d->Clone(TString::Format("%s_vs_%s_residue",
+                                                                 fVar[var1[i]]->GetName(), fVar[var0[i]]->GetName()).Data());
                 h01_r->Add(h01_m, -1.);
-                sprintf(tmp, "%s vs. %s (Residue)", fVar[var1[i]]->GetTitle(), fVar[var0[i]]->GetTitle());
-                h01_r->SetTitle(tmp);
+                h01_r->SetTitle(TString::Format("%s vs. %s (Residue)",
+                                                fVar[var1[i]]->GetTitle(), fVar[var0[i]]->GetTitle()).Data());
 
                 // draw
                 canvas->cd(nPad++);

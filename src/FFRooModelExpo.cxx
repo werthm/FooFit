@@ -23,11 +23,9 @@ FFRooModelExpo::FFRooModelExpo(const Char_t* name, const Char_t* title)
 {
     // Constructor.
 
-    Char_t tmp[256];
-
     // add the slope parameter
-    sprintf(tmp, "%s_Slope", GetName());
-    AddParameter(0, tmp, tmp);
+    TString tmp = TString::Format("%s_Slope", GetName());
+    AddParameter(0, tmp.Data(), tmp.Data());
 }
 
 //______________________________________________________________________________

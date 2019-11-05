@@ -23,15 +23,13 @@ FFRooModelGauss::FFRooModelGauss(const Char_t* name, const Char_t* title)
 {
     // Constructor.
 
-    Char_t tmp[256];
-
     // add the mean parameter
-    sprintf(tmp, "%s_Mean", GetName());
-    AddParameter(0, tmp, tmp);
+    TString tmp = TString::Format("%s_Mean", GetName());
+    AddParameter(0, tmp.Data(), tmp.Data());
 
     // add the sigma parameter
-    sprintf(tmp, "%s_Sigma", GetName());
-    AddParameter(1, tmp, tmp);
+    tmp = TString::Format("%s_Sigma", GetName());
+    AddParameter(1, tmp.Data(), tmp.Data());
 }
 
 //______________________________________________________________________________

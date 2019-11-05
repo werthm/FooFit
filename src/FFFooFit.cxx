@@ -74,8 +74,6 @@ Bool_t FFFooFit::LoadFilesToChain(const Char_t* loc, TChain* chain,
     // If 'wildCard' is non-zero, look for files in 'loc' using this file wild card.
     // Return kTRUE if the loading was successful without any error, otherwise kFALSE.
 
-    Char_t tmp[256];
-
     // read location
     TString loc_ex = ExpandPath(loc);
 
@@ -138,17 +136,17 @@ Bool_t FFFooFit::LoadFilesToChain(const Char_t* loc, TChain* chain,
         if (str.EndsWith(".root"))
         {
             // full path
-            sprintf(tmp, "%s/%s", loc_ex.Data(), f->GetName());
+            TString tmp = TString::Format("%s/%s", loc_ex.Data(), f->GetName());
 
             // check wild card
             if (wildCard && !str.Contains(wildCard))
                 continue;
 
             // user information
-            Info("FFFooFit::LoadFilesToChain", "[%d] Adding '%s' to chain", n+1, tmp);
+            Info("FFFooFit::LoadFilesToChain", "[%d] Adding '%s' to chain", n+1, tmp.Data());
 
             // add file to chains
-            chain->Add(tmp);
+            chain->Add(tmp.Data());
 
             // count file
             n++;
@@ -166,15 +164,13 @@ Bool_t FFFooFit::FileExists(const Char_t* f)
 {
     // Return kTRUE if the file 'f' exists, otherwise return kFALSE.
 
-    Char_t fn[256];
-
     // expand filename
     Char_t* fnt = gSystem->ExpandPathName(f);
-    strcpy(fn, fnt);
+    TString fn = fnt;
     delete fnt;
 
     // check file
-    if (!gSystem->AccessPathName(fn)) return kTRUE;
+    if (!gSystem->AccessPathName(fn.Data())) return kTRUE;
     else return kFALSE;
 }
 
