@@ -64,11 +64,11 @@ public:
     Bool_t AddSpeciesChebychevPdf(const Char_t* name, const Char_t* title, Int_t nOrder);
     Bool_t AddSpeciesExpoPdf(const Char_t* name, const Char_t* title);
     Bool_t AddSpeciesHistPdf(const Char_t* name, const Char_t* title, const Char_t* treeLoc,
-                             Bool_t addShiftPar = kFALSE, Int_t intOrder = 0);
+                             Bool_t gaussConvol = kFALSE, Int_t intOrder = 0);
     Bool_t AddSpeciesHistPdf(const Char_t* name, const Char_t* title, const Char_t* treeLoc,
-                             RooAbsReal** shiftPar, Int_t intOrder = 0);
+                             RooAbsReal** convolPar, Int_t intOrder = 0);
     Bool_t AddSpeciesHistPdf(const Char_t* name, const Char_t* title, TH1* hist,
-                             Bool_t addShiftPar = kFALSE, Int_t intOrder = 0);
+                             Bool_t gaussConvol = kFALSE, Int_t intOrder = 0);
     Bool_t AddSpeciesKeysPdf(const Char_t* name, const Char_t* title, const Char_t* treeLoc,
                              const Char_t* opt = "a", Double_t rho = 1, Int_t nSigma = 3, Bool_t rotate = kTRUE);
 

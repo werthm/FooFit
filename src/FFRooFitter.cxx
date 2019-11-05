@@ -370,11 +370,11 @@ TChain* FFRooFitter::AddSpeciesHistPdfCommon(const Char_t* name, const Char_t* t
 
 //______________________________________________________________________________
 Bool_t FFRooFitter::AddSpeciesHistPdf(const Char_t* name, const Char_t* title, const Char_t* treeLoc,
-                                      Bool_t addShiftPar, Int_t intOrder)
+                                      Bool_t gaussConvol, Int_t intOrder)
 {
     // Add the species with name 'name', title 'title' and tree location 'treeLoc'
     // to the list of species to be fit using a histogram pdf.
-    // Add a shift parameter if 'addShiftPar' is kTRUE.
+    // If 'gaussConvol' is kTRUE, the pdf will be convoluted with a Gaussian.
     // The order of the histogram interpolation can be specified via 'intOrder'.
     // Return kTRUE if the species was added, otherwise return kFALSE.
 
@@ -387,7 +387,7 @@ Bool_t FFRooFitter::AddSpeciesHistPdf(const Char_t* name, const Char_t* title, c
     FFRooModel* tot_model = new FFRooModelHist(TString::Format("%s%s", tmp.Data(), name).Data(),
                                                title, fFitter->GetNVariable(), chain,
                                                fWeightVar == "" ? 0 : fWeightVar.Data(),
-                                               addShiftPar, intOrder);
+                                               gaussConvol, intOrder);
 
     // create species
     FFRooFitterSpecies* spec = new FFRooFitterSpecies(name, title, tot_model);
@@ -403,11 +403,11 @@ Bool_t FFRooFitter::AddSpeciesHistPdf(const Char_t* name, const Char_t* title, c
 
 //______________________________________________________________________________
 Bool_t FFRooFitter::AddSpeciesHistPdf(const Char_t* name, const Char_t* title, const Char_t* treeLoc,
-                                      RooAbsReal** shiftPar, Int_t intOrder)
+                                      RooAbsReal** convolPar, Int_t intOrder)
 {
     // Add the species with name 'name', title 'title' and tree location 'treeLoc'
     // to the list of species to be fit using a histogram pdf.
-    // Use the parameters 'shiftPar' as shift parameters.
+    // Use the parameters 'convolPar' as Gaussian convolution parameters.
     // The order of the histogram interpolation can be specified via 'intOrder'.
     // Return kTRUE if the species was added, otherwise return kFALSE.
 
@@ -419,7 +419,7 @@ Bool_t FFRooFitter::AddSpeciesHistPdf(const Char_t* name, const Char_t* title, c
     // create the model
     FFRooModel* tot_model = new FFRooModelHist(TString::Format("%s%s", tmp.Data(), name).Data(),
                                                title, fFitter->GetNVariable(), chain,
-                                               shiftPar,
+                                               convolPar,
                                                fWeightVar == "" ? 0 : fWeightVar.Data(),
                                                intOrder);
 
@@ -437,11 +437,11 @@ Bool_t FFRooFitter::AddSpeciesHistPdf(const Char_t* name, const Char_t* title, c
 
 //______________________________________________________________________________
 Bool_t FFRooFitter::AddSpeciesHistPdf(const Char_t* name, const Char_t* title, TH1* hist,
-                                      Bool_t addShiftPar, Int_t intOrder)
+                                      Bool_t gaussConvol, Int_t intOrder)
 {
     // Add the species with name 'name', title 'title' and histogram 'hist'
     // to the list of species to be fit using a histogram pdf.
-    // Add a shift parameter if 'addShiftPar' is kTRUE.
+    // If 'gaussConvol' is kTRUE, the pdf will be convoluted with a Gaussian.
     // The order of the histogram interpolation can be specified via 'intOrder'.
     // Return kTRUE if the species was added, otherwise return kFALSE.
 
@@ -455,7 +455,7 @@ Bool_t FFRooFitter::AddSpeciesHistPdf(const Char_t* name, const Char_t* title, T
 
     // create the model
     FFRooModel* tot_model = new FFRooModelHist(TString::Format("%s%s", tmp.Data(), name).Data(),
-                                               title, hist, addShiftPar, intOrder);
+                                               title, hist, gaussConvol, intOrder);
 
     // create species
     FFRooFitterSpecies* spec = new FFRooFitterSpecies(name, title, tot_model);
