@@ -17,6 +17,8 @@
 #include "RooRealVar.h"
 #include "RooDataHist.h"
 #include "RooHistPdf.h"
+#include "RooGaussModel.h"
+#include "RooFFTConvPdf.h"
 
 #include "FFRooModelHist.h"
 
@@ -24,12 +26,10 @@ ClassImp(FFRooModelHist)
 
 //______________________________________________________________________________
 FFRooModelHist::FFRooModelHist(const Char_t* name, const Char_t* title, TH1* hist,
-                               Bool_t addShiftPar, Int_t intOrder)
-    : FFRooModel(name, title, addShiftPar ? hist->GetDimension() : 0)
+                               Bool_t gaussConvol, Int_t intOrder)
+    : FFRooModel(name, title, gaussConvol ? hist->GetDimension() * 2 : 0)
 {
     // Constructor.
-
-    Char_t tmp[256];
 
     // init members
     fNDim = hist->GetDimension();
@@ -38,28 +38,17 @@ FFRooModelHist::FFRooModelHist(const Char_t* name, const Char_t* title, TH1* his
     fWeightVar = "";
     fInterpolOrder = intOrder;
     fDataHist = 0;
-
-    // add shift parameters
-    if (addShiftPar)
-    {
-        // loop over dimensions
-        for (Int_t i = 0; i < fNDim; i++)
-        {
-            // add shift parameter
-            sprintf(tmp, "%s_Shift", GetName());
-            AddParameter(i, tmp, tmp);
-        }
-    }
+    fIsConvol = gaussConvol;
+    if (fIsConvol)
+        AddGaussConvolPars();
 }
 
 //______________________________________________________________________________
 FFRooModelHist::FFRooModelHist(const Char_t* name, const Char_t* title, Int_t nDim, TTree* tree,
-                               const Char_t* weightVar, Bool_t addShiftPar, Int_t intOrder)
-    : FFRooModel(name, title, addShiftPar ? nDim : 0)
+                               const Char_t* weightVar, Bool_t gaussConvol, Int_t intOrder)
+    : FFRooModel(name, title, gaussConvol ? nDim * 2 : 0)
 {
     // Constructor.
-
-    Char_t tmp[256];
 
     // init members
     fNDim = nDim;
@@ -70,28 +59,17 @@ FFRooModelHist::FFRooModelHist(const Char_t* name, const Char_t* title, Int_t nD
     if (weightVar)
         fWeightVar = weightVar;
     fDataHist = 0;
-
-    // add shift parameters
-    if (addShiftPar)
-    {
-        // loop over dimensions
-        for (Int_t i = 0; i < fNDim; i++)
-        {
-            // add shift parameter
-            sprintf(tmp, "%s_Shift", GetName());
-            AddParameter(i, tmp, tmp);
-        }
-    }
+    fIsConvol = gaussConvol;
+    if (fIsConvol)
+        AddGaussConvolPars();
 }
 
 //______________________________________________________________________________
 FFRooModelHist::FFRooModelHist(const Char_t* name, const Char_t* title, Int_t nDim, TTree* tree,
-                               RooAbsReal** shiftPar, const Char_t* weightVar, Int_t intOrder)
-    : FFRooModel(name, title, nDim)
+                               RooAbsReal** convolPar, const Char_t* weightVar, Int_t intOrder)
+    : FFRooModel(name, title, nDim * 2)
 {
     // Constructor.
-
-    Char_t tmp[256];
 
     // init members
     fNDim = nDim;
@@ -102,10 +80,11 @@ FFRooModelHist::FFRooModelHist(const Char_t* name, const Char_t* title, Int_t nD
     if (weightVar)
         fWeightVar = weightVar;
     fDataHist = 0;
+    fIsConvol = kTRUE;
 
-    // set shift parameters
+    // set Gaussian convolution parameters
     for (Int_t i = 0; i < fNPar; i++)
-        fPar[i] = shiftPar[i];
+        fPar[i] = convolPar[i];
 }
 
 //______________________________________________________________________________
@@ -113,9 +92,12 @@ FFRooModelHist::~FFRooModelHist()
 {
     // Destructor.
 
-    if (fHist) delete fHist;
-    if (fTree) delete fTree;
-    if (fDataHist) delete fDataHist;
+    if (fHist)
+        delete fHist;
+    if (fTree)
+        delete fTree;
+    if (fDataHist)
+        delete fDataHist;
 }
 
 //______________________________________________________________________________
@@ -131,18 +113,20 @@ void FFRooModelHist::DetermineHistoBinning(RooRealVar* var, RooRealVar* par,
     RooAbsBinning& binning = var->getBinning();
     Double_t binw = binning.averageBinWidth();
 
-    // different binning if shift parameter is present
-    if (par)
+    // different binning if convolution is used
+    if (fIsConvol)
     {
-        // extend range due to shift parameter
+        // extend range due to bias parameter
         Double_t lmin = TMath::Min(binning.lowBound() - par->getMin(), binning.lowBound() - par->getMax());
         Double_t lmax = TMath::Max(binning.highBound() - par->getMin(), binning.highBound() - par->getMax());
         *min = binning.lowBound() - binw;
         *max = binning.highBound() + binw;
 
         // extend range to original binning
-        while (*min > lmin) *min -= binw;
-        while (*max < lmax) *max += binw;
+        while (*min > lmin)
+            *min -= binw;
+        while (*max < lmax)
+            *max += binw;
         *nBin = (*max - *min) / binw;
     }
     else
@@ -154,11 +138,26 @@ void FFRooModelHist::DetermineHistoBinning(RooRealVar* var, RooRealVar* par,
 }
 
 //______________________________________________________________________________
+void FFRooModelHist::AddGaussConvolPars()
+{
+    // Init the parameters for the Gaussian convolution.
+
+    // loop over dimensions
+    for (Int_t i = 0; i < fNDim; i++)
+    {
+        // add convolution parameters
+        TString tmp;
+        tmp = TString::Format("%s_%d_Conv_GMean", GetName(), i);
+        AddParameter(2*i, tmp.Data(), tmp.Data());
+        tmp = TString::Format("%s_%d_Conv_GSigma", GetName(), i);
+        AddParameter(2*i+1, tmp.Data(), tmp.Data());
+    }
+}
+
+//______________________________________________________________________________
 void FFRooModelHist::BuildModel(RooAbsReal** vars)
 {
     // Build the model using the variables 'vars'.
-
-    Char_t tmp[256];
 
     // prepare variable set
     RooArgSet varSet;
@@ -194,7 +193,7 @@ void FFRooModelHist::BuildModel(RooAbsReal** vars)
             // calculate the binning
             Int_t nbin_0 = 0;
             Double_t min_0 = 0, max_0 = 0;
-            if (fNPar)
+            if (fIsConvol)
                 DetermineHistoBinning((RooRealVar*)vars[0], (RooRealVar*)fPar[0], &nbin_0, &min_0, &max_0);
             else
                 DetermineHistoBinning((RooRealVar*)vars[0], 0, &nbin_0, &min_0, &max_0);
@@ -221,10 +220,10 @@ void FFRooModelHist::BuildModel(RooAbsReal** vars)
             Int_t nbin_1 = 0;
             Double_t min_0 = 0, max_0 = 0;
             Double_t min_1 = 0, max_1 = 0;
-            if (fNPar)
+            if (fIsConvol)
             {
                 DetermineHistoBinning((RooRealVar*)vars[0], (RooRealVar*)fPar[0], &nbin_0, &min_0, &max_0);
-                DetermineHistoBinning((RooRealVar*)vars[1], (RooRealVar*)fPar[1], &nbin_1, &min_1, &max_1);
+                DetermineHistoBinning((RooRealVar*)vars[1], (RooRealVar*)fPar[2], &nbin_1, &min_1, &max_1);
             }
             else
             {
@@ -260,11 +259,11 @@ void FFRooModelHist::BuildModel(RooAbsReal** vars)
             Double_t min_0 = 0, max_0 = 0;
             Double_t min_1 = 0, max_1 = 0;
             Double_t min_2 = 0, max_2 = 0;
-            if (fNPar)
+            if (fIsConvol)
             {
                 DetermineHistoBinning((RooRealVar*)vars[0], (RooRealVar*)fPar[0], &nbin_0, &min_0, &max_0);
-                DetermineHistoBinning((RooRealVar*)vars[1], (RooRealVar*)fPar[1], &nbin_1, &min_1, &max_1);
-                DetermineHistoBinning((RooRealVar*)vars[2], (RooRealVar*)fPar[2], &nbin_2, &min_2, &max_2);
+                DetermineHistoBinning((RooRealVar*)vars[1], (RooRealVar*)fPar[2], &nbin_1, &min_1, &max_1);
+                DetermineHistoBinning((RooRealVar*)vars[2], (RooRealVar*)fPar[4], &nbin_2, &min_2, &max_2);
             }
             else
             {
@@ -337,27 +336,30 @@ void FFRooModelHist::BuildModel(RooAbsReal** vars)
         ((RooRealVar*)vars[i])->setMax(vmax[i]);
     }
 
-    // add shift transformation
-    RooArgSet varSetTrans;
-    if (fNPar)
-    {
-        // loop over dimensions
-        for (Int_t i = 0; i < fNDim; i++)
-        {
-            // add shift transformation
-            sprintf(tmp, "%s - %s", vars[i]->GetName(), GetPar(i)->GetName());
-            RooFormulaVar* trans = new RooFormulaVar(TString::Format("Trans_Shift_%s_Var_%s", GetName(), vars[i]->GetName()).Data(),
-                                                     tmp, RooArgSet(*vars[i], *GetPar(i)));
-            AddVarTrans(trans);
-            varSetTrans.add(*trans);
-        }
-    }
-
     // create the model pdf
-    if (fPdf) delete fPdf;
-    if (fNPar)
-        fPdf = new RooHistPdf(GetName(), GetTitle(), varSetTrans, varSet, *fDataHist, fInterpolOrder);
+    if (fPdf)
+        delete fPdf;
+    if (fIsConvol)
+    {
+        // delete old pdfs
+        if (fPdfIntr)
+            delete fPdfIntr;
+        if (fPdfConv)
+            delete fPdfConv;
+
+        // create pdfs
+        TString tmp;
+        tmp = TString::Format("%s_Conv_Intr", GetName());
+        fPdfIntr = new RooHistPdf(tmp.Data(), tmp.Data(), varSet, *fDataHist, fInterpolOrder);
+        tmp = TString::Format("%s_Conv_Gauss", GetName());
+        fPdfConv = new RooGaussModel(tmp.Data(), tmp.Data(), *((RooRealVar*)vars[0]), *fPar[0], *fPar[1]);
+        ((RooRealVar*)vars[0])->setBins(10000, "cache");
+        fPdf = new RooFFTConvPdf(GetName(), GetTitle(), *((RooRealVar*)vars[0]), *fPdfIntr, *fPdfConv);
+    }
     else
+    {
+        // create pdfs
         fPdf = new RooHistPdf(GetName(), GetTitle(), varSet, *fDataHist, fInterpolOrder);
+    }
 }
 

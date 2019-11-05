@@ -33,6 +33,7 @@ protected:
 
     void DetermineHistoBinning(RooRealVar* var, RooRealVar* par,
                                Int_t* nBin, Double_t* min, Double_t* max);
+    void AddGaussConvolPars();
 
 public:
     FFRooModelHist() : FFRooModel(),
@@ -42,12 +43,12 @@ public:
                        fInterpolOrder(0),
                        fDataHist(0) { }
     FFRooModelHist(const Char_t* name, const Char_t* title, TH1* hist,
-                   Bool_t addShiftPar = kFALSE, Int_t intOrder = 0);
+                   Bool_t gaussConvol = kFALSE, Int_t intOrder = 0);
     FFRooModelHist(const Char_t* name, const Char_t* title, Int_t Dim, TTree* tree,
-                   const Char_t* weightVar = 0, Bool_t addShiftPar = kFALSE,
+                   const Char_t* weightVar = 0, Bool_t gaussConvol = kFALSE,
                    Int_t intOrder = 0);
     FFRooModelHist(const Char_t* name, const Char_t* title, Int_t Dim, TTree* tree,
-                   RooAbsReal** shiftPar, const Char_t* weightVar = 0,
+                   RooAbsReal** convolPar, const Char_t* weightVar = 0,
                    Int_t intOrder = 0);
     virtual ~FFRooModelHist();
 
