@@ -674,6 +674,7 @@ Bool_t FFRooFit::Fit(const Char_t* opt)
     }
 
     // build the model
+    Info("Fit", "Building the model pdf");
     fModel->BuildModel(fVar, fNVar);
 
     // user info
@@ -855,15 +856,24 @@ RooPlot* FFRooFit::PlotDataAndModel(Int_t var, const Char_t* opt)
         while (RooAbsPdf* comp = (RooAbsPdf*)iter->Next())
         {
             // do not plot total pdf again
-            if (comp == fModel->GetPdf()) continue;
+            if (comp == fModel->GetPdf())
+                continue;
 
             // check if pdf has to contain the variable exclusively - if yes, skip component
             Bool_t drawVarExcl = kTRUE;
-            if (comp->InheritsFrom("RooHistPdf") || comp->InheritsFrom("RooNDKeysPdf")) drawVarExcl = kFALSE;
-            if (!ContainsVariable(comp, var, drawVarExcl)) continue;
+            if (comp->InheritsFrom("RooHistPdf") || comp->InheritsFrom("RooNDKeysPdf"))
+                drawVarExcl = kFALSE;
+            if (!ContainsVariable(comp, var, drawVarExcl))
+                continue;
 
             // do not draw variable transformations
-            if (comp->InheritsFrom("RooFormulaVar")) continue;
+            if (comp->InheritsFrom("RooFormulaVar"))
+                continue;
+
+            // do not draw convolution components
+            TString compName(comp->GetName());
+            if (compName.EndsWith("_Conv_Intr") || compName.EndsWith("_Conv_Gauss"))
+                continue;
 
             // plot component
             sprintf(tmp, "plot_model_%d", n);
