@@ -34,8 +34,6 @@ FFRooSPlot::FFRooSPlot(TTree* tree, Int_t nVar, Int_t nSpec,
     // If 'weightVar' is non-zero, create a weighted dataset using this
     // tree variable to read the weights from.
 
-    Char_t tmp[256];
-
     // init members
     fNSpec = nSpec;
     fEventID = new RooRealVar(evIDVar, "Event ID", 0, 9.99999999999999e14);

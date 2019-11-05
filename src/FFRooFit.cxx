@@ -516,8 +516,8 @@ Bool_t FFRooFit::Chi2PreFit()
 
     // variables for best fit
     const Int_t nPar = params->getSize();
-    Double_t bestChi2;
-    Int_t bestFit;
+    Double_t bestChi2 = 1e99;
+    Int_t bestFit = 0;
     Double_t bestPar[nPar];
     Double_t bestParErr[nPar];
 
