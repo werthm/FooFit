@@ -3,14 +3,12 @@ project(FooFit)
 
 # more warnings
 add_definitions(-D_FORTIFY_SOURCE=2)
+add_definitions(-Wall)
 
 # set default build type
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release")
 endif()
-
-# define variables
-set(DOCS OFF CACHE BOOL "create FooFit HTML documentation")
 
 # Mac OS X special settings
 if(APPLE)
@@ -18,22 +16,9 @@ if(APPLE)
     set(CMAKE_SHARED_LIBRARY_SUFFIX ".so")
 endif(APPLE)
 
-# load ROOT CMake modules
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
+# find ROOT
 list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS})
-
-# adjust some paths
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
-
-# locate the ROOT package and defines a number of variables (e.g. ROOT_INCLUDE_DIRS)
-find_package(ROOT REQUIRED MODULE COMPONENTS MathCore RIO Hist Tree Net RooFit RooFitCore RooStats)
-
-# check for RooFit support
-if(NOT ROOT_roofit_FOUND)
-    message(FATAL_ERROR "No RooFit support in ROOT installation!")
-endif()
-
-# define useful ROOT functions and macros (e.g. ROOT_GENERATE_DICTIONARY)
+find_package(ROOT REQUIRED COMPONENTS MathCore RIO Hist Tree RooFit RooFitCore RooStats)
 include(${ROOT_USE_FILE})
 
 # source file globbing
@@ -43,53 +28,30 @@ file(GLOB SRCS src/FF*.cxx)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 # create the dictionary
-if (ROOT_VERSION VERSION_GREATER 6)
-    # extract pure header file names
-    file(GLOB HDR ${CMAKE_CURRENT_SOURCE_DIR}/include/FF*.h)
-    foreach(head_file ${HDR})
-        get_filename_component(pure_hdr ${head_file} NAME)
-        set(HEADERS ${HEADERS} ${pure_hdr})
-    endforeach()
+file(GLOB HDR ${CMAKE_CURRENT_SOURCE_DIR}/include/FF*.h)
+foreach(head_file ${HDR})
+    # extract pure header file name
+    get_filename_component(pure_hdr ${head_file} NAME)
+    set(HEADERS ${HEADERS} ${pure_hdr})
+endforeach()
 
-    add_custom_command(OUTPUT G__FooFit.cxx
-        COMMAND rootcling -f G__FooFit.cxx
-                          -rml libFooFit.so
-                          -rmf libFooFit.rootmap
-                          -s libFooFit.so
-                          -I${CMAKE_CURRENT_SOURCE_DIR}/include
-                          ${HEADERS}
-                          ${CMAKE_CURRENT_SOURCE_DIR}/include/LinkDef.h
-    )
-else()
-    ROOT_GENERATE_DICTIONARY(G__FooFit include/FF*.h LINKDEF LinkDef.h)
-endif()
+add_custom_command(OUTPUT G__FooFit.cxx
+    COMMAND rootcling -f G__FooFit.cxx
+                      -rml libFooFit.so
+                      -rmf libFooFit.rootmap
+                      -s libFooFit.so
+                      -I${CMAKE_CURRENT_SOURCE_DIR}/include
+                      ${HEADERS}
+                      ${CMAKE_CURRENT_SOURCE_DIR}/include/LinkDef.h
+)
 
 # create the shared library
 add_library(FooFit SHARED ${SRCS} G__FooFit.cxx)
 target_link_libraries(FooFit ${ROOT_LIBRARIES})
 
-# generate rootmap
-if (ROOT_VERSION VERSION_LESS 6)
-    add_custom_command(TARGET FooFit POST_BUILD
-        COMMAND rlibmap -o ${PROJECT_BINARY_DIR}/lib/libFooFit.rootmap
-                        -l ${PROJECT_BINARY_DIR}/lib/libFooFit.so
-                        -d ${ROOT_LIBRARIES}
-                        -c ${CMAKE_SOURCE_DIR}/include/LinkDef.h
-    )
-endif()
-
-# copy rootmaps and pcm files
-if (ROOT_VERSION VERSION_GREATER 6)
-    add_custom_command(TARGET FooFit POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_BINARY_DIR}/libFooFit.rootmap ${PROJECT_BINARY_DIR}/lib
-        COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_BINARY_DIR}/libFooFit_rdict.pcm ${PROJECT_BINARY_DIR}/lib
-    )
-endif()
-
-# generate HTML documentation
-if (DOCS)
-    add_custom_command(TARGET FooFit POST_BUILD
-        COMMAND root -b ${CMAKE_SOURCE_DIR}/src/htmldoc.C'(\"${CMAKE_SOURCE_DIR}\") '
-    )
-endif()
+# installation
+install(TARGETS FooFit LIBRARY DESTINATION ${PROJECT_BINARY_DIR}/lib)
+install(FILES ${PROJECT_BINARY_DIR}/libFooFit.rootmap DESTINATION ${PROJECT_BINARY_DIR}/lib)
+install(FILES ${PROJECT_BINARY_DIR}/libFooFit_rdict.pcm DESTINATION ${PROJECT_BINARY_DIR}/lib)
+install(FILES ${HDR} DESTINATION ${PROJECT_BINARY_DIR}/include)
 
