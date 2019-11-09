@@ -61,28 +61,29 @@ root [1] .x FooFitMacro.C++
 
 ## Class hierarchy
 ```
-FFRooModel            : base model pdf class
-  FFRooModelPol       : polynomial function model
-  FFRooModelChebychev : Chebychev polynomial function model
-  FFRooModelExpo      : exponential function model
-  FFRooModelGauss     : Gaussian function model
-  FFRooModelHist      : histogram-based model
-  FFRooModelKeys      : model using kernel estimation
-  FFRooModelComp      : base class for composite models
-    FFRooModelSum     : sum of models
-    FFRooModelProd    : product of models
+FFRooModel             : base model pdf class
+  FFRooModelPol        : polynomial function model
+  FFRooModelChebychev  : Chebychev polynomial function model
+  FFRooModelExpo       : exponential function model
+  FFRooModelGauss      : Gaussian function model
+  FFRooModelGaussBifur : bifurcated Gaussian function model
+  FFRooModelHist       : histogram-based model
+  FFRooModelKeys       : model using kernel estimation
+  FFRooModelComp       : base class for composite models
+    FFRooModelSum      : sum of models
+    FFRooModelProd     : product of models
 
-FFRooFit              : base fit class
-  FFRooFitHist        : class for fitting histograms
-  FFRooFitTree        : class for fitting trees
-    FFRooSPlot        : class for sPlot fits of trees
+FFRooFit               : base fit class
+  FFRooFitHist         : class for fitting histograms
+  FFRooFitTree         : class for fitting trees
+    FFRooSPlot         : class for sPlot fits of trees
 
-FFRooFitter           : base high-level fit class
-  FFRooFitterUnbinned : class for high-level fitting of unbinned data
-    FFRooFitterSPlot  : class for high-level sPlot fits of unbinned data
-  FFRooFitterBinned   : class for high-level fitting of binned data
-FFRooFitterSpecies    : class representing a fit species
+FFRooFitter            : base high-level fit class
+  FFRooFitterUnbinned  : class for high-level fitting of unbinned data
+    FFRooFitterSPlot   : class for high-level sPlot fits of unbinned data
+  FFRooFitterBinned    : class for high-level fitting of binned data
+FFRooFitterSpecies     : class representing a fit species
 
-FFFooFit              : namespace for utility methods
+FFFooFit               : namespace for utility methods
 ```
 
