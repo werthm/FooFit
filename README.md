@@ -67,6 +67,7 @@ FFRooModel             : base model pdf class
   FFRooModelExpo       : exponential function model
   FFRooModelGauss      : Gaussian function model
   FFRooModelGaussBifur : bifurcated Gaussian function model
+  FFRooModelLandau     : Landau function model
   FFRooModelHist       : histogram-based model
   FFRooModelKeys       : model using kernel estimation
   FFRooModelComp       : base class for composite models
