@@ -358,7 +358,7 @@ void FFRooModelHist::BuildModel(RooAbsReal** vars)
     }
     else
     {
-        // create pdfs
+        // create pdf
         fPdf = new RooHistPdf(GetName(), GetTitle(), varSet, *fDataHist, fInterpolOrder);
     }
 }
