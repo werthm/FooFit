@@ -36,8 +36,10 @@ protected:
     Int_t fNSpec;                   // number of species
     FFRooFitterSpecies** fSpec;     //[fNSpec] array of species
 
-    TChain* AddSpeciesHistPdfCommon(const Char_t* name, const Char_t* treeLoc,
-                                    TString& outName);
+    TString BuildModelName(const Char_t* name);
+    TChain* LoadChainSpecies(const Char_t* name, const Char_t* treeLoc);
+    Bool_t AddSpeciesModel(const Char_t* name, const Char_t* title,
+                           const Char_t* type, FFRooModel* model);
     Bool_t BuildModel();
 
 public:
@@ -60,6 +62,9 @@ public:
 
     void AddSpecies(FFRooFitterSpecies* spec);
     Bool_t AddSpeciesGaussPdf(const Char_t* name, const Char_t* title);
+    Bool_t AddSpeciesGaussBifurPdf(const Char_t* name, const Char_t* title);
+    Bool_t AddSpeciesLandauPdf(const Char_t* name, const Char_t* title,
+                               Bool_t gaussConvol = kFALSE);
     Bool_t AddSpeciesPolPdf(const Char_t* name, const Char_t* title, Int_t nOrder);
     Bool_t AddSpeciesChebychevPdf(const Char_t* name, const Char_t* title, Int_t nOrder);
     Bool_t AddSpeciesExpoPdf(const Char_t* name, const Char_t* title);

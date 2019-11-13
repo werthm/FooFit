@@ -22,6 +22,8 @@
 #include "FFRooModelSum.h"
 #include "FFRooModelKeys.h"
 #include "FFRooModelGauss.h"
+#include "FFRooModelGaussBifur.h"
+#include "FFRooModelLandau.h"
 #include "FFRooModelPol.h"
 #include "FFRooModelChebychev.h"
 #include "FFRooModelExpo.h"
@@ -221,13 +223,11 @@ RooRealVar* FFRooFitter::GetVariable(Int_t i) const
 }
 
 //______________________________________________________________________________
-Bool_t FFRooFitter::AddSpeciesGaussPdf(const Char_t* name, const Char_t* title)
+TString FFRooFitter::BuildModelName(const Char_t* name)
 {
-    // Add the species with name 'name' and title 'title' to the list of species
-    // to be fit using a Gaussian pdf.
-    // Return kTRUE if the species was added, otherwise return kFALSE.
+    // Build the model name using the variables as prefix.
 
-    // loop over fit variables
+    // name the model
     TString tmp;
     for (Int_t i = 0; i < fFitter->GetNVariable(); i++)
     {
@@ -235,123 +235,18 @@ Bool_t FFRooFitter::AddSpeciesGaussPdf(const Char_t* name, const Char_t* title)
         tmp += "_";
     }
 
-    // create the model
-    FFRooModel* model = new FFRooModelGauss(TString::Format("%s%s", tmp.Data(), name).Data(), title);
-
-    // create species
-    FFRooFitterSpecies* spec = new FFRooFitterSpecies(name, title, model);
-
-    // add species
-    AddSpecies(spec);
-
-    // user info
-    Info("AddSpeciesGaussPdf", "Added species '%s' with Gaussian pdf", title);
-
-    return kTRUE;
+    return TString::Format("%s%s", tmp.Data(), name);
 }
 
 //______________________________________________________________________________
-Bool_t FFRooFitter::AddSpeciesPolPdf(const Char_t* name, const Char_t* title, Int_t nOrder)
+TChain* FFRooFitter::LoadChainSpecies(const Char_t* name, const Char_t* treeLoc)
 {
-    // Add the species with name 'name' and title 'title' to the list of species
-    // to be fit using a polynomial pdf of order 'nOrder'.
-    // Return kTRUE if the species was added, otherwise return kFALSE.
-
-    // loop over fit variables
-    TString tmp;
-    for (Int_t i = 0; i < fFitter->GetNVariable(); i++)
-    {
-        tmp += fFitter->GetVariable(i)->GetName();
-        tmp += "_";
-    }
-
-    // create the model
-    FFRooModel* model = new FFRooModelPol(TString::Format("%s%s", tmp.Data(), name).Data(), title,
-                                          nOrder);
-
-    // create species
-    FFRooFitterSpecies* spec = new FFRooFitterSpecies(name, title, model);
-
-    // add species
-    AddSpecies(spec);
-
-    // user info
-    Info("AddSpeciesPolPdf", "Added species '%s' with polynomial pdf", title);
-
-    return kTRUE;
-}
-
-//______________________________________________________________________________
-Bool_t FFRooFitter::AddSpeciesChebychevPdf(const Char_t* name, const Char_t* title, Int_t nOrder)
-{
-    // Add the species with name 'name' and title 'title' to the list of species
-    // to be fit using a Chebychev polynomial pdf of order 'nOrder'.
-    // Return kTRUE if the species was added, otherwise return kFALSE.
-
-    // loop over fit variables
-    TString tmp;
-    for (Int_t i = 0; i < fFitter->GetNVariable(); i++)
-    {
-        tmp += fFitter->GetVariable(i)->GetName();
-        tmp += "_";
-    }
-
-    // create the model
-    FFRooModel* model = new FFRooModelChebychev(TString::Format("%s%s", tmp.Data(), name).Data(), title,
-                                                nOrder);
-
-    // create species
-    FFRooFitterSpecies* spec = new FFRooFitterSpecies(name, title, model);
-
-    // add species
-    AddSpecies(spec);
-
-    // user info
-    Info("AddSpeciesPolPdf", "Added species '%s' with Chebychev polynomial pdf", title);
-
-    return kTRUE;
-}
-
-//______________________________________________________________________________
-Bool_t FFRooFitter::AddSpeciesExpoPdf(const Char_t* name, const Char_t* title)
-{
-    // Add the species with name 'name' and title 'title' to the list of species
-    // to be fit using an exponential pdf.
-    // Return kTRUE if the species was added, otherwise return kFALSE.
-
-    // loop over fit variables
-    TString tmp;
-    for (Int_t i = 0; i < fFitter->GetNVariable(); i++)
-    {
-        tmp += fFitter->GetVariable(i)->GetName();
-        tmp += "_";
-    }
-
-    // create the model
-    FFRooModel* model = new FFRooModelExpo(TString::Format("%s%s", tmp.Data(), name).Data(), title);
-
-    // create species
-    FFRooFitterSpecies* spec = new FFRooFitterSpecies(name, title, model);
-
-    // add species
-    AddSpecies(spec);
-
-    // user info
-    Info("AddSpeciesExpoPdf", "Added species '%s' with exponential pdf", title);
-
-    return kTRUE;
-}
-
-//______________________________________________________________________________
-TChain* FFRooFitter::AddSpeciesHistPdfCommon(const Char_t* name, const Char_t* treeLoc,
-                                             TString& outName)
-{
-    // Prepare adding a histogram-based fit species.
+    // Load a TChain to model the species 'name' using the file location 'treeLoc'.
 
     // check if unbinned data is present
     if (!fTree)
     {
-        Error("AddSpeciesHistPdfCommon", "Unbinned input data (tree) needed to extract tree name!");
+        Error("LoadChainSpecies", "Unbinned input data (tree) needed to extract tree name!");
         return 0;
     }
 
@@ -362,19 +257,115 @@ TChain* FFRooFitter::AddSpeciesHistPdfCommon(const Char_t* name, const Char_t* t
     // check entries
     if (!chain->GetEntries())
     {
-        Warning("AddSpeciesHistPdfCommon", "Not adding species %s as no entries were found in tree %s!", name, treeLoc);
+        Warning("LoadChainSpecies", "Not adding species %s as no entries were found in tree %s!", name, treeLoc);
         delete chain;
         return 0;
     }
 
-    // loop over fit variables and construct name
-    for (Int_t i = 0; i < fFitter->GetNVariable(); i++)
-    {
-        outName += fFitter->GetVariable(i)->GetName();
-        outName += "_";
-    }
-
     return chain;
+}
+
+//______________________________________________________________________________
+Bool_t FFRooFitter::AddSpeciesModel(const Char_t* name, const Char_t* title,
+                                    const Char_t* type, FFRooModel* model)
+{
+    // Add the species with name 'name', title 'title', and type 'type' to the
+    // list of species to be fit using the model 'model'.
+    // Return kTRUE if the species was added, otherwise return kFALSE.
+
+    // create species
+    FFRooFitterSpecies* spec = new FFRooFitterSpecies(name, title, model);
+
+    // add species
+    AddSpecies(spec);
+
+    // user info
+    Info("AddSpeciesModel", "Added species '%s' with %s pdf", title, type);
+
+    return kTRUE;
+}
+
+//______________________________________________________________________________
+Bool_t FFRooFitter::AddSpeciesGaussPdf(const Char_t* name, const Char_t* title)
+{
+    // Add the species with name 'name' and title 'title' to the list of species
+    // to be fit using a Gaussian pdf.
+    // Return kTRUE if the species was added, otherwise return kFALSE.
+
+    // create the model
+    FFRooModel* model = new FFRooModelGauss(BuildModelName(name).Data(), title);
+
+    // add species
+    return AddSpeciesModel(name, title, "Gaussian", model);
+}
+
+//______________________________________________________________________________
+Bool_t FFRooFitter::AddSpeciesGaussBifurPdf(const Char_t* name, const Char_t* title)
+{
+    // Add the species with name 'name' and title 'title' to the list of species
+    // to be fit using a bifurcated Gaussian pdf.
+    // Return kTRUE if the species was added, otherwise return kFALSE.
+
+    // create the model
+    FFRooModel* model = new FFRooModelGaussBifur(BuildModelName(name).Data(), title);
+
+    // add species
+    return AddSpeciesModel(name, title, "bifurcated Gaussian", model);
+}
+
+//______________________________________________________________________________
+Bool_t FFRooFitter::AddSpeciesLandauPdf(const Char_t* name, const Char_t* title,
+                                        Bool_t gaussConvol)
+{
+    // Add the species with name 'name' and title 'title' to the list of species
+    // to be fit using a Landau pdf.
+    // If 'gaussConvol' is kTRUE, the pdf will be convoluted with a Gaussian.
+    // Return kTRUE if the species was added, otherwise return kFALSE.
+
+    // create the model
+    FFRooModel* model = new FFRooModelLandau(BuildModelName(name).Data(), title, gaussConvol);
+
+    // add species
+    return AddSpeciesModel(name, title, "Landau", model);
+}
+
+//______________________________________________________________________________
+Bool_t FFRooFitter::AddSpeciesPolPdf(const Char_t* name, const Char_t* title, Int_t nOrder)
+{
+    // Add the species with name 'name' and title 'title' to the list of species
+    // to be fit using a polynomial pdf of order 'nOrder'.
+    // Return kTRUE if the species was added, otherwise return kFALSE.
+
+    // create the model
+    FFRooModel* model = new FFRooModelPol(BuildModelName(name).Data(), title, nOrder);
+
+    return AddSpeciesModel(name, title, "polynomial", model);
+}
+
+//______________________________________________________________________________
+Bool_t FFRooFitter::AddSpeciesChebychevPdf(const Char_t* name, const Char_t* title, Int_t nOrder)
+{
+    // Add the species with name 'name' and title 'title' to the list of species
+    // to be fit using a Chebychev polynomial pdf of order 'nOrder'.
+    // Return kTRUE if the species was added, otherwise return kFALSE.
+
+    // create the model
+    FFRooModel* model = new FFRooModelChebychev(BuildModelName(name).Data(), title, nOrder);
+
+    return AddSpeciesModel(name, title, "Chebychev polynomial", model);
+}
+
+//______________________________________________________________________________
+Bool_t FFRooFitter::AddSpeciesExpoPdf(const Char_t* name, const Char_t* title)
+{
+    // Add the species with name 'name' and title 'title' to the list of species
+    // to be fit using an exponential pdf.
+    // Return kTRUE if the species was added, otherwise return kFALSE.
+
+    // create the model
+    FFRooModel* model = new FFRooModelExpo(BuildModelName(name).Data(), title);
+
+    return AddSpeciesModel(name, title, "exponential", model);
 }
 
 //______________________________________________________________________________
@@ -387,28 +378,18 @@ Bool_t FFRooFitter::AddSpeciesHistPdf(const Char_t* name, const Char_t* title, c
     // The order of the histogram interpolation can be specified via 'intOrder'.
     // Return kTRUE if the species was added, otherwise return kFALSE.
 
-    // call common method
-    TString tmp;
-    TChain* chain = AddSpeciesHistPdfCommon(name, treeLoc, tmp);
+    // load chain
+    TChain* chain = LoadChainSpecies(name, treeLoc);
     if (!chain)
         return kFALSE;
 
     // create the model
-    FFRooModel* tot_model = new FFRooModelHist(TString::Format("%s%s", tmp.Data(), name).Data(),
-                                               title, fFitter->GetNVariable(), chain,
-                                               fWeightVar == "" ? 0 : fWeightVar.Data(),
-                                               gaussConvol, intOrder);
+    FFRooModel* model = new FFRooModelHist(BuildModelName(name).Data(),
+                                           title, fFitter->GetNVariable(), chain,
+                                           fWeightVar == "" ? 0 : fWeightVar.Data(),
+                                           gaussConvol, intOrder);
 
-    // create species
-    FFRooFitterSpecies* spec = new FFRooFitterSpecies(name, title, tot_model);
-
-    // add species
-    AddSpecies(spec);
-
-    // user info
-    Info("AddSpeciesHistPdf", "Added species '%s' with histogram pdf", title);
-
-    return kTRUE;
+    return AddSpeciesModel(name, title, "histogram", model);
 }
 
 //______________________________________________________________________________
@@ -421,29 +402,19 @@ Bool_t FFRooFitter::AddSpeciesHistPdf(const Char_t* name, const Char_t* title, c
     // The order of the histogram interpolation can be specified via 'intOrder'.
     // Return kTRUE if the species was added, otherwise return kFALSE.
 
-    // call common method
-    TString tmp;
-    TChain* chain = AddSpeciesHistPdfCommon(name, treeLoc, tmp);
+    // load chain
+    TChain* chain = LoadChainSpecies(name, treeLoc);
     if (!chain)
         return kFALSE;
 
     // create the model
-    FFRooModel* tot_model = new FFRooModelHist(TString::Format("%s%s", tmp.Data(), name).Data(),
-                                               title, fFitter->GetNVariable(), chain,
-                                               convolPar,
-                                               fWeightVar == "" ? 0 : fWeightVar.Data(),
-                                               intOrder);
+    FFRooModel* model = new FFRooModelHist(BuildModelName(name).Data(),
+                                           title, fFitter->GetNVariable(), chain,
+                                           convolPar,
+                                           fWeightVar == "" ? 0 : fWeightVar.Data(),
+                                           intOrder);
 
-    // create species
-    FFRooFitterSpecies* spec = new FFRooFitterSpecies(name, title, tot_model);
-
-    // add species
-    AddSpecies(spec);
-
-    // user info
-    Info("AddSpeciesHistPdf", "Added species '%s' with histogram pdf", title);
-
-    return kTRUE;
+    return AddSpeciesModel(name, title, "histogram", model);
 }
 
 //______________________________________________________________________________
@@ -456,28 +427,11 @@ Bool_t FFRooFitter::AddSpeciesHistPdf(const Char_t* name, const Char_t* title, T
     // The order of the histogram interpolation can be specified via 'intOrder'.
     // Return kTRUE if the species was added, otherwise return kFALSE.
 
-    // loop over fit variables
-    TString tmp;
-    for (Int_t i = 0; i < fFitter->GetNVariable(); i++)
-    {
-        tmp += fFitter->GetVariable(i)->GetName();
-        tmp += "_";
-    }
-
     // create the model
-    FFRooModel* tot_model = new FFRooModelHist(TString::Format("%s%s", tmp.Data(), name).Data(),
-                                               title, hist, gaussConvol, intOrder);
+    FFRooModel* model = new FFRooModelHist(BuildModelName(name).Data(), title,
+                                           hist, gaussConvol, intOrder);
 
-    // create species
-    FFRooFitterSpecies* spec = new FFRooFitterSpecies(name, title, tot_model);
-
-    // add species
-    AddSpecies(spec);
-
-    // user info
-    Info("AddSpeciesHistPdf", "Added species '%s' with histogram pdf", title);
-
-    return kTRUE;
+    return AddSpeciesModel(name, title, "histogram", model);
 }
 
 //______________________________________________________________________________
@@ -489,48 +443,17 @@ Bool_t FFRooFitter::AddSpeciesKeysPdf(const Char_t* name, const Char_t* title, c
     // See RooNDKeysPdf for meaning of parameters 'opt', 'rho', 'nSigma' and 'rotate'.
     // Return kTRUE if the species was added, otherwise return kFALSE.
 
-    // check if unbinned data is present
-    if (!fTree)
-    {
-        Error("AddSpeciesKeysPdf", "Unbinned input data (tree) needed to extract tree name!");
+    // load chain
+    TChain* chain = LoadChainSpecies(name, treeLoc);
+    if (!chain)
         return kFALSE;
-    }
-
-    // load tree
-    TChain* chain = new TChain(fTree->GetName());
-    FFFooFit::LoadFilesToChain(treeLoc, chain);
-
-    // check entries
-    if (!chain->GetEntries())
-    {
-        Warning("AddSpeciesKeysPdf", "Not adding species %s as no entries were found in tree %s!", name, treeLoc);
-        delete chain;
-        return kFALSE;
-    }
-
-    // loop over fit variables
-    TString tmp;
-    for (Int_t i = 0; i < fFitter->GetNVariable(); i++)
-    {
-        tmp += fFitter->GetVariable(i)->GetName();
-        tmp += "_";
-    }
 
     // create the model
-    FFRooModel* tot_model = new FFRooModelKeys(TString::Format("%s%s", tmp.Data(), name).Data(),
-                                               title, fFitter->GetNVariable(), chain,
-                                               opt, rho, nSigma, rotate);
+    FFRooModel* model = new FFRooModelKeys(BuildModelName(name).Data(),
+                                           title, fFitter->GetNVariable(), chain,
+                                           opt, rho, nSigma, rotate);
 
-    // create species
-    FFRooFitterSpecies* spec = new FFRooFitterSpecies(name, title, tot_model);
-
-    // add species
-    AddSpecies(spec);
-
-    // user info
-    Info("AddSpeciesKeysPdf", "Added species '%s' with keys pdf", title);
-
-    return kTRUE;
+    return AddSpeciesModel(name, title, "keys", model);
 }
 
 //______________________________________________________________________________
