@@ -293,7 +293,7 @@ TTree* FFRooSPlot::GetSpeciesWeightsTree(const Char_t* name,
     Int_t nEvents = GetNEvents();
 
     // check species
-    Int_t specIdx[nSpec];
+    Int_t specIdx[fNSpec];
     if (!nSpec && !spec)
     {
         for (Int_t i = 0; i < fNSpec; i++)
