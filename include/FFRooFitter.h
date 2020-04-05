@@ -14,6 +14,10 @@
 #ifndef FOOFIT_FFRooFitter
 #define FOOFIT_FFRooFitter
 
+#include <vector>
+
+#include "RooKeysPdf.h"
+
 #include "FFRooFit.h"
 
 class TTree;
@@ -28,7 +32,7 @@ class FFRooFitter : public TNamed
 
 protected:
     TTree* fTree;                   // unbinned input data
-    TTree* fTreeAdd;                // additional unbinned input data
+    std::vector<TTree*> fTreeAdd;   // additional unbinned input data
     TH1* fHist;                     // binned input data
     TString fWeightVar;             // name of event weight variable
     FFRooFit* fFitter;              // RooFit fitter
@@ -44,7 +48,7 @@ protected:
 
 public:
     FFRooFitter(): TNamed(),
-                   fTree(0), fTreeAdd(0), fHist(0),
+                   fTree(0), fHist(0),
                    fWeightVar(""),
                    fFitter(0),
                    fModel(0),

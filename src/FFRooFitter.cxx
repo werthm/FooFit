@@ -41,7 +41,6 @@ FFRooFitter::FFRooFitter(const Char_t* name, const Char_t* title)
 
     // init members
     fTree = 0;
-    fTreeAdd = 0;
     fHist = 0;
     fWeightVar = "";
     fFitter = 0;
@@ -57,8 +56,8 @@ FFRooFitter::~FFRooFitter()
 
     if (fTree)
         delete fTree;
-    if (fTreeAdd)
-        delete fTreeAdd;
+    for (TTree* t : fTreeAdd)
+        delete t;
     if (fHist)
         delete fHist;
     if (fFitter)
@@ -103,23 +102,22 @@ void FFRooFitter::AddWeightedTree(const Char_t* treeLoc, Double_t weightScale)
     // load tree
     TChain* chain = new TChain(fTree->GetName());
     FFFooFit::LoadFilesToChain(treeLoc, chain);
-    fTreeAdd = chain;
 
     // check type of weight leaf and set up branch address
     enum { kNone, kFloat, kDouble };
     Int_t l_type = kNone;
     Float_t var_f;
     Double_t var_d;
-    TLeaf* wleaf = fTreeAdd->GetBranch(fWeightVar.Data())->GetLeaf(fWeightVar.Data());
+    TLeaf* wleaf = chain->GetBranch(fWeightVar.Data())->GetLeaf(fWeightVar.Data());
     TString wtype = wleaf->GetTypeName();
     if (wtype == "Float_t")
     {
-        fTreeAdd->SetBranchAddress(fWeightVar.Data(), &var_f);
+        chain->SetBranchAddress(fWeightVar.Data(), &var_f);
         l_type = kFloat;
     }
     else if (wtype == "Double_t")
     {
-        fTreeAdd->SetBranchAddress(fWeightVar.Data(), &var_d);
+        chain->SetBranchAddress(fWeightVar.Data(), &var_d);
         l_type = kDouble;
     }
     else
@@ -129,23 +127,24 @@ void FFRooFitter::AddWeightedTree(const Char_t* treeLoc, Double_t weightScale)
     }
 
     // do not read other branches
-    fTreeAdd->SetBranchStatus("*", 0);
-    fTreeAdd->SetBranchStatus(fWeightVar.Data(), 1);
+    chain->SetBranchStatus("*", 0);
+    chain->SetBranchStatus(fWeightVar.Data(), 1);
 
-    // create a new tree with a reweight branch
-    TTree* re_tree = new TTree(TString::Format("%s_reweighted", fTreeAdd->GetName()).Data(),
-                               TString::Format("%s (reweighted)", fTreeAdd->GetTitle()).Data());
+    // create a new tree with a unique reweight branch
+    TTree* re_tree = new TTree(TString::Format("%s_reweighted_%lu", chain->GetName(), fTreeAdd.size()).Data(),
+                               TString::Format("%s (reweighted)", chain->GetTitle()).Data());
     Double_t var_new;
-    re_tree->Branch("reweight", &var_new, "reweight/D");
+    TString brname = TString::Format("reweight_%lu", fTreeAdd.size());
+    re_tree->Branch(brname.Data(), &var_new, Form("%s/D", brname.Data()));
 
     // user info
     Info("AddWeightedTree", "Recalculating weights and creating friend tree");
 
     // modify the weights in the tree
-    for (Long64_t i = 0; i < fTreeAdd->GetEntries(); i++)
+    for (Long64_t i = 0; i < chain->GetEntries(); i++)
     {
         // read entry
-        fTreeAdd->GetEntry(i);
+        chain->GetEntry(i);
 
         // read original weight
         if (l_type == kFloat)
@@ -161,15 +160,18 @@ void FFRooFitter::AddWeightedTree(const Char_t* treeLoc, Double_t weightScale)
     }
 
     // reset branch addresses
-    fTreeAdd->ResetBranchAddresses();
+    chain->ResetBranchAddresses();
     re_tree->ResetBranchAddresses();
-    fTreeAdd->SetBranchStatus("*", 1);
+    chain->SetBranchStatus("*", 1);
 
     // set friend
-    fTreeAdd->AddFriend(re_tree);
+    chain->AddFriend(re_tree);
+
+    // register tree
+    fTreeAdd.push_back(chain);
 
     // add the tree
-    ((FFRooFitTree*)fFitter)->AddWeightedTree(fTreeAdd, "reweight");
+    ((FFRooFitTree*)fFitter)->AddWeightedTree(chain, brname.Data());
 }
 
 //______________________________________________________________________________
