@@ -80,6 +80,8 @@ public:
                              Bool_t gaussConvol = kFALSE, Int_t intOrder = 0);
     Bool_t AddSpeciesKeysPdf(const Char_t* name, const Char_t* title, const Char_t* treeLoc,
                              const Char_t* opt = "a", Double_t rho = 1, Int_t nSigma = 3, Bool_t rotate = kTRUE);
+    Bool_t AddSpeciesKeysPdf(const Char_t* name, const Char_t* title, const Char_t* treeLoc,
+                             Bool_t addShiftPar = kFALSE, RooKeysPdf::Mirror mirror = RooKeysPdf::NoMirror, Double_t rho = 1);
 
     void SetVariable(Int_t i, const Char_t* name, const Char_t* title,
                      Double_t min, Double_t max, Int_t nbins);

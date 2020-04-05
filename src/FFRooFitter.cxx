@@ -459,6 +459,29 @@ Bool_t FFRooFitter::AddSpeciesKeysPdf(const Char_t* name, const Char_t* title, c
 }
 
 //______________________________________________________________________________
+Bool_t FFRooFitter::AddSpeciesKeysPdf(const Char_t* name, const Char_t* title, const Char_t* treeLoc,
+                                      Bool_t addShiftPar, RooKeysPdf::Mirror mirror, Double_t rho)
+{
+    // Add the species with name 'name', title 'title' and tree location 'treeLoc'
+    // to the list of species to be fit using a 1-dim. kernel estimation pdf.
+    // If 'addShiftPar' is kTRUE, a shift parameter for the fit variable is added.
+    // See RooKeysPdf for meaning of parameters 'mirror' and 'rho'.
+    // Return kTRUE if the species was added, otherwise return kFALSE.
+
+    // load chain
+    TChain* chain = LoadChainSpecies(name, treeLoc);
+    if (!chain)
+        return kFALSE;
+
+    // create the model
+    FFRooModel* model = new FFRooModelKeys(BuildModelName(name).Data(),
+                                           title, chain, addShiftPar,
+                                           mirror, rho);
+
+    return AddSpeciesModel(name, title, "keys", model);
+}
+
+//______________________________________________________________________________
 void FFRooFitter::SetVariable(Int_t i, const Char_t* name, const Char_t* title,
                               Double_t min, Double_t max, Int_t nbins)
 {
