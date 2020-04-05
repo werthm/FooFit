@@ -117,8 +117,8 @@ void FFRooModelHist::DetermineHistoBinning(RooRealVar* var, RooRealVar* par,
     if (fIsConvol)
     {
         // extend range due to bias parameter
-        Double_t lmin = TMath::Min(binning.lowBound() - par->getMin(), binning.lowBound() - par->getMax());
-        Double_t lmax = TMath::Max(binning.highBound() - par->getMin(), binning.highBound() - par->getMax());
+        Double_t lmin = TMath::Min(binning.lowBound(), TMath::Min(binning.lowBound() - par->getMin(), binning.lowBound() - par->getMax()));
+        Double_t lmax = TMath::Max(binning.highBound(), TMath::Max(binning.highBound() - par->getMin(), binning.highBound() - par->getMax()));
         *min = binning.lowBound() - binw;
         *max = binning.highBound() + binw;
 
