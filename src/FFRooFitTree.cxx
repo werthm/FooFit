@@ -12,11 +12,9 @@
 
 
 #include "RooArgSet.h"
-#include "RooRealVar.h"
 #include "RooDataSet.h"
 #include "RooDataHist.h"
 #include "RooGlobalFunc.h"
-#include "TTree.h"
 #include "TMath.h"
 
 #include "FFRooFitTree.h"
@@ -36,7 +34,6 @@ FFRooFitTree::FFRooFitTree(TTree* tree, Int_t nVar,
 
     // init members
     fTree = tree;
-    fTreeAdd = 0;
     if (weightVar)
     {
         fWeights = new RooRealVar(weightVar, "Event Weights",
@@ -48,7 +45,6 @@ FFRooFitTree::FFRooFitTree(TTree* tree, Int_t nVar,
     {
         fWeights = 0;
     }
-    fWeightsAdd = 0;
     fIsBinnedFit = binnedFit;
 }
 
@@ -59,8 +55,8 @@ FFRooFitTree::~FFRooFitTree()
 
     if (fWeights)
         delete fWeights;
-    if (fWeightsAdd)
-        delete fWeightsAdd;
+    for (AddTree* at : fTreeAdd)
+        delete at;
 }
 
 //______________________________________________________________________________
@@ -101,21 +97,25 @@ Bool_t FFRooFitTree::LoadData()
                                RooFit::Import(*fTree));
     }
 
-    // add additional tree
-    if (fTreeAdd)
+    // add additional trees
+    for (const AddTree* at : fTreeAdd)
     {
         RooDataSet* addData;
+
+        // extend set of variables
+        RooArgSet varSetAdd = varSet;
+        varSetAdd.add(*at->fWeights);
 
         // check if main data has weights
         if (fWeights)
         {
-            addData = new RooDataSet(fTreeAdd->GetName(), fTreeAdd->GetTitle(), varSet,
-                                     RooFit::Import(*fTreeAdd), RooFit::WeightVar(*fWeightsAdd));
+            addData = new RooDataSet(at->fTree->GetName(), at->fTree->GetTitle(), varSetAdd,
+                                     RooFit::Import(*at->fTree), RooFit::WeightVar(*at->fWeights));
         }
         else
         {
-            addData = new RooDataSet(fTreeAdd->GetName(), fTreeAdd->GetTitle(), varSet,
-                                     RooFit::Import(*fTreeAdd));
+            addData = new RooDataSet(at->fTree->GetName(), at->fTree->GetTitle(), varSetAdd,
+                                     RooFit::Import(*at->fTree));
         }
 
         // append data
@@ -212,12 +212,11 @@ void FFRooFitTree::AddWeightedTree(TTree* tree, const Char_t* weight)
     // Add the tree 'tree' as additional input data weighted with the weight
     // variable/branch 'weight'.
 
-    // set tree
-    fTreeAdd = tree;
+    // register additional tree
+    AddTree* at = new AddTree(tree, weight);
+    fTreeAdd.push_back(at);
 
     // register additional weight variable
-    fWeightsAdd = new RooRealVar(weight, "Event Weights of add. data",
-                                 -RooNumber::infinity(), RooNumber::infinity());
-    AddAuxVariable(fWeightsAdd);
+    //AddAuxVariable(at->fWeights);
 }
 
